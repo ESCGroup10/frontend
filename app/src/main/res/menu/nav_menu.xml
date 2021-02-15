@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item
+        android:icon="@drawable/ic_home"
+        android:id="@+id/action_LatestReport"
+        android:title="Latest Report" />
+    <item
+        android:icon="@drawable/ic_report"
+        android:id="@+id/action_MyReport"
+        android:title="My Reports" />
+    <item
+        android:icon="@drawable/ic_statistics"
+        android:id="@+id/action_Statistics"
+        android:title="View Statistics" />
+
+</menu>
