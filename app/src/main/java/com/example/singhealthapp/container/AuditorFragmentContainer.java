@@ -7,7 +7,7 @@ import com.example.singhealthapp.R;
 import com.example.singhealthapp.auditor.AddTenantFragment;
 import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
-import com.example.singhealthapp.auditor.TenantsListFragment;
+import com.example.singhealthapp.auditor.SearchTenantFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +38,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsListFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
         }
     }
 
@@ -60,7 +60,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Tenants:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsListFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
                 break;
 
             case R.id.nav_Reports:

@@ -11,13 +11,13 @@ import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.R;
 
-public class TenantsListFragment extends Fragment {
+public class SearchTenantFragment extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getActivity().setTitle("Tenants");
+        getActivity().setTitle("Search Tenant");
         return inflater.inflate(R.layout.fragment_tenants, container, false);
 
     }
