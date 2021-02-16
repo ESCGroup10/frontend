@@ -3,11 +3,11 @@ package com.example.singhealthapp.container;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.example.singhealthapp.tenant.LatestReportFragment;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.auditor.AddTenantFragment;
 import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
-import com.example.singhealthapp.auditor.TenantsFragment;
+import com.example.singhealthapp.auditor.TenantsListFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +38,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsListFragment()).commit();
         }
     }
 
@@ -60,11 +60,15 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Tenants:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsListFragment()).commit();
                 break;
 
             case R.id.nav_Reports:
                 getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsFragment()).commit();
+                break;
+
+            case R.id.nav_Add_Tenant:
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment()).commit();
                 break;
         }
 
