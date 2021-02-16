@@ -1,4 +1,4 @@
-package com.example.singhealthapp;
+package com.example.singhealthapp.container;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -10,16 +10,20 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.example.singhealthapp.tenant.LatestReportFragment;
+import com.example.singhealthapp.tenant.MyReportsFragment;
+import com.example.singhealthapp.R;
+import com.example.singhealthapp.StatisticsFragment;
 import com.google.android.material.navigation.NavigationView;
 
-public class FragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class TenantFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_tenant_fragmentcontainer);
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -33,7 +37,7 @@ public class FragmentContainer extends AppCompatActivity implements NavigationVi
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LatestReportActivity()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LatestReportFragment()).commit();
         }
     }
 
@@ -50,16 +54,16 @@ public class FragmentContainer extends AppCompatActivity implements NavigationVi
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_MyReport:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReports()).commit();
+            case R.id.nav_MyReport:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment()).commit();
                 break;
 
-            case R.id.action_Statistics:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new StatisticsActivity()).commit();
+            case R.id.nav_Tenant_Statistics:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new StatisticsFragment()).commit();
                 break;
 
-            case R.id.action_LatestReport:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LatestReportActivity()).commit();
+            case R.id.nav_LatestReport:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LatestReportFragment()).commit();
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);

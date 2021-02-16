@@ -4,15 +4,15 @@
     tools:showIn="navigation_view">
     <item
         android:icon="@drawable/ic_home"
-        android:id="@+id/action_LatestReport"
+        android:id="@+id/nav_LatestReport"
         android:title="Latest Report" />
     <item
         android:icon="@drawable/ic_report"
-        android:id="@+id/action_MyReport"
+        android:id="@+id/nav_MyReport"
         android:title="My Reports" />
     <item
         android:icon="@drawable/ic_statistics"
-        android:id="@+id/action_Statistics"
+        android:id="@+id/nav_Tenant_Statistics"
         android:title="View Statistics" />
 
 </menu>

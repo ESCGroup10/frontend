@@ -54,5 +54,22 @@
         android:text="Login"
         android:textSize="18sp" />
 
+    <Button
+        android:id="@+id/tenantButton"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="#a4bf"
+        android:text="Tenant"
+        android:textSize="18sp" />
+    <Button
+        android:id="@+id/auditorButton"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="#a4bf"
+        android:text="Auditor"
+        android:textSize="18sp" />
+
 
 </LinearLayout>

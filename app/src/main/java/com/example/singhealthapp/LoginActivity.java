@@ -4,22 +4,30 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
+
+import com.example.singhealthapp.container.AuditorFragmentContainer;
+import com.example.singhealthapp.container.TenantFragmentContainer;
 
 public class LoginActivity extends AppCompatActivity {
 
-    Button login;
+    Button auditor;
+    Button tenant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        login = findViewById(R.id.loginButton);
+        auditor = findViewById(R.id.auditorButton);
+        tenant = findViewById(R.id.tenantButton);
 
-        login.setOnClickListener(v -> {
-            Intent intent = new Intent(this, FragmentContainer.class);
+        auditor.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AuditorFragmentContainer.class);
+            startActivity(intent);
+        });
+        tenant.setOnClickListener(v -> {
+            Intent intent = new Intent(this, TenantFragmentContainer.class);
             startActivity(intent);
         });
     }

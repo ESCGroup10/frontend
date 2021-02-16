@@ -1,8 +1,7 @@
-package com.example.singhealthapp;
+package com.example.singhealthapp.tenant;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
@@ -10,12 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class LatestReportActivity extends Fragment {
+import com.example.singhealthapp.R;
+
+public class MyReportsFragment extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getActivity().setTitle("Latest Report");
-        return inflater.inflate(R.layout.activity_latest_report, container, false);
+        getActivity().setTitle("My Reports");
+        return inflater.inflate(R.layout.fragment_my_reports, container, false);
     }
 }
