@@ -1,11 +1,6 @@
 package com.example.singhealthapp;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +8,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Text;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -65,6 +60,11 @@ public class TestFragment extends Fragment {
             // if query succeeds, show the query on the app by updating the TextView
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+
+                if (!response.isSuccessful()) {
+                    Toast.makeText(getContext(), String.valueOf(response.code()), Toast.LENGTH_LONG).show();
+                    return ;
+                }
 
                 List<User> webUserList = response.body(); // get the response body from the webserver
                 String localUser = new String(); // create a String to hold the query (to display on app)
