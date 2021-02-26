@@ -13,14 +13,4 @@ public interface DatabaseApiCaller {
     @GET("/api/users/?format=json")
     Call<List<User>> getUsers();
 
-    @FormUrlEncoded
-    @POST("/api/users/?format=json")
-    Call<User> postUser(
-            @Field("password") String password,
-            @Field("name") String name,
-            @Field("company") String company,
-            @Field("location") String location,
-            @Field("institution") String institution,
-            @Field("type") String type
-    );
 }
