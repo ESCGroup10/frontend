@@ -41,7 +41,6 @@ public class TestFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-
         queryTextView = getView().findViewById(R.id.query_textview);
         testButton = getView().findViewById(R.id.test_button);
 
@@ -62,24 +61,28 @@ public class TestFragment extends Fragment {
 
         // make a call to get a response of a List of User
         call.enqueue(new Callback<List<User>>() {
+
+            // if query succeeds, show the query on the app by updating the TextView
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
 
-                List<User> webUserList = response.body();
-                String localUser = new String();
+                List<User> webUserList = response.body(); // get the response body from the webserver
+                String localUser = new String(); // create a String to hold the query (to display on app)
 
+                // append all the info to the String (to display later on)
                 for (User webUser : webUserList) {
                     localUser += " [id: " + webUser.getId() + " name: " + webUser.getName() + " email: " + webUser.getEmail() + " company: " + webUser.getCompany() + " institution: " + webUser.getInstitution() + " type: " + webUser.getType() + "]";
                 }
 
-                System.out.println(localUser);
-                queryTextView.setText(localUser);
+                queryTextView.setText(localUser); // update the TextView with the query
             }
 
+            // if query fails, display the reason for failure using Toast
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
+
                 queryTextView.setText("Query Failed!");
-                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_LONG).show(); // show the error message with Toast
             }
         });
     }
