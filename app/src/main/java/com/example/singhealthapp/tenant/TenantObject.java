@@ -26,7 +26,7 @@ public class TenantObject extends User {
     }
 
     public TenantObject(String name, int id, String email, String password, String company, String location, String institution, String type) {
-        super(name, id, email, password);
+        super (id, name, company, email, location, institution, type);
         this.company = company;
         this.location = location;
         this.institution = institution;
