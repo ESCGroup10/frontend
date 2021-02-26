@@ -26,6 +26,10 @@
             android:icon="@drawable/ic_add"
             android:id="@+id/nav_Add_Tenant"
             android:title="Add Tenant"/>
+        <item
+            android:icon="@drawable/ic_report"
+            android:id="@+id/nav_Test"
+            android:title="Test Example"/>
     </menu>
 </item>
 </menu>

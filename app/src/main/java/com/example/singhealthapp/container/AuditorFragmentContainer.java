@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.TestFragment;
 import com.example.singhealthapp.auditor.AddTenantFragment;
 import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
@@ -69,6 +70,10 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
             case R.id.nav_Add_Tenant:
                 getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment()).commit();
+                break;
+
+            case R.id.nav_Test:
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TestFragment()).commit();
                 break;
         }
 

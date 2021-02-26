@@ -10,6 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.example.singhealthapp.TestFragment;
 import com.example.singhealthapp.tenant.LatestReportFragment;
 import com.example.singhealthapp.tenant.MyReportsFragment;
 import com.example.singhealthapp.R;
@@ -64,6 +65,10 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
 
             case R.id.nav_LatestReport:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LatestReportFragment()).commit();
+                break;
+
+            case R.id.nav_Test:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new TestFragment()).commit();
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
