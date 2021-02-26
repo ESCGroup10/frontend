@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
         auditor = findViewById(R.id.auditorButton);
         tenant = findViewById(R.id.tenantButton);
-        textViewUsername = (EditText) findViewById(R.id.login_username);
+        textViewUsername = (EditText) findViewById(R.id.login_email);
         textViewPassword = (EditText) findViewById(R.id.login_password);
         login_button = (Button) findViewById(R.id.loginButton);
 
@@ -63,7 +63,8 @@ public class LoginActivity extends AppCompatActivity {
         getUserCall = djangoApi.getUser();
 
         String base = username + ":"+ password;
-        String authHeader = "Salt "+ Base64.encodeToString(base.getBytes(), Base64.NO_WRAP);
+        // use combined username and password to form an encoded token
+        String authHeader = "auth "+ Base64.encodeToString(base.getBytes(), Base64.NO_WRAP);
         Call<LoginInfo> authenticate = djangoApi.authenticate(authHeader);
 
         auditor.setOnClickListener(v -> {

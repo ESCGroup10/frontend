@@ -15,7 +15,7 @@ public interface DjangoApi {
     @GET("users/")
     Call<List<User>> getUser();
 
-    @GET("authentication/")
+    @GET("auth/")
     Call<LoginInfo> authenticate(@Header("Authorization") String authHeader);
 
 

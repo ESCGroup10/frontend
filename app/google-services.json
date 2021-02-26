@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "768399307333",
+    "project_id": "singhealth-e9be4",
+    "storage_bucket": "singhealth-e9be4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768399307333:android:ce0342a1a6c8c05601e92c",
+        "android_client_info": {
+          "package_name": "com.example.singhealthapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "768399307333-dpa29hkf8k1okk0k1f7lo7fmltifkoa8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.singhealthapp",
+            "certificate_hash": "94fa34733378ce690ea157a346849db5d7fa7b35"
+          }
+        },
+        {
+          "client_id": "768399307333-28tvsd34h3mg6h4qinburkh7154prt3t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApbU6LfXBChj1YhApYa_PFeWwWHjMO2yM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "768399307333-28tvsd34h3mg6h4qinburkh7154prt3t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
