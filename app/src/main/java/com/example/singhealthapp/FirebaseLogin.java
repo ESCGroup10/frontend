@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.singhealthapp.DatabaseApi.DjangoApi;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.ObjectsFromDatabase.User;
 import com.example.singhealthapp.container.AuditorFragmentContainer;
@@ -44,6 +43,9 @@ public class FirebaseLogin extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener mAuthListener;
 
+    Button auditor;
+    Button tenant;
+
     Call<List<User>> getAllUsersCall;
 
     @Override
@@ -55,6 +57,18 @@ public class FirebaseLogin extends AppCompatActivity {
         textViewPassword = (EditText) findViewById(R.id.login_password);
         login_button = (Button) findViewById(R.id.loginButton);
 
+        auditor = findViewById(R.id.auditorButton);
+        tenant = findViewById(R.id.tenantButton);
+
+        auditor.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AuditorFragmentContainer.class);
+            startActivity(intent);
+        });
+        tenant.setOnClickListener(v -> {
+            Intent intent = new Intent(this, TenantFragmentContainer.class);
+            startActivity(intent);
+        });
+
         mAuth = FirebaseAuth.getInstance();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -63,34 +77,24 @@ public class FirebaseLogin extends AppCompatActivity {
                 .build();
 
         // retrofit to create the class from the interface
-        DjangoApi djangoApi = retrofit.create(DjangoApi.class);
+        DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
 
-        getAllUsersCall = djangoApi.getUser();
+        getAllUsersCall = apiCaller.getUser();
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                login_button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.d(TAG, "onClick: login button clicked!");
-                        email = textViewEmail.getText().toString();
-                        password = textViewPassword.getText().toString();
-                        startLogIn();
-                        if (firebaseAuth.getCurrentUser() != null) { //if logged in, go to home page
-                            Log.d(TAG, "onClick: user is authenticated!");
-                            Toast.makeText(FirebaseLogin.this, "Email and pw correct, attempting to log in", Toast.LENGTH_LONG).show();
-                            // check if auditor or tenant and go to corresponding page
-                            checkUserTypeAndEnter(getAllUsersCall);
-                        } else {
-                            Log.d(TAG, "onClick: user was not authenticated!");
-                        }
-                    }
-                });
-
+        mAuthListener = firebaseAuth -> login_button.setOnClickListener(v -> {
+            Log.d(TAG, "onClick: login button clicked!");
+            email = textViewEmail.getText().toString();
+            password = textViewPassword.getText().toString();
+            startLogIn();
+            if (firebaseAuth.getCurrentUser() != null) { //if logged in, go to home page
+                Log.d(TAG, "onClick: user is authenticated!");
+                Toast.makeText(FirebaseLogin.this, "Email and pw correct, attempting to log in", Toast.LENGTH_LONG).show();
+                // check if auditor or tenant and go to corresponding page
+                checkUserTypeAndEnter(getAllUsersCall);
+            } else {
+                Log.d(TAG, "onClick: user was not authenticated!");
             }
-        };
+        });
 
 
     }

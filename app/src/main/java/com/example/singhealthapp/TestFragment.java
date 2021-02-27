@@ -93,7 +93,7 @@ public class TestFragment extends Fragment {
         // create an api caller to the webserver
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-        Call<User> call = apiCaller.postNewUser("James", "J. Bakery", "james@t.com", "Blk 4 Lvl 1", "SGH", "F&B");
+        Call<User> call = apiCaller.postNewUser("Alice", "Alice Bakery", "alice@t.com", "Blk 4 Lvl 1", "SGH", "F&B");
 
         // make a call to post a new User to the database
         call.enqueue(new Callback<User>() {
@@ -101,15 +101,13 @@ public class TestFragment extends Fragment {
             // on success, the TextView shows success message
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-
-                postTextView.setText("Post Success! Check the website! \n" + "Response Code: " + response.code() + " Response Body: " + response.body().getEmail());
+                postTextView.setText("Post Success! Click on 'Get All Users' button to see changes! \n" + "Response Code: " + response.code());
             }
 
             // on failure, the TextView shows a failure message
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 postTextView.setText("Failure! Error: "+ t);
-                System.out.println("Failure! Error: "+ t);
             }
         });
     }
