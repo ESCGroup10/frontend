@@ -44,12 +44,7 @@ public class TestFragment extends Fragment {
         queryTextView = getView().findViewById(R.id.query_textview);
         testButton = getView().findViewById(R.id.test_button);
 
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                queryUsers();
-            }
-        });
+        testButton.setOnClickListener(v -> queryUsers());
     }
 
     public void queryUsers() {
