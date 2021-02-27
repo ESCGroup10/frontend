@@ -123,7 +123,7 @@ public class AddTenantFragment extends Fragment {
     }
 
     protected void queryAddTenant(User user) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://jsonplaceholder.typicode.com/")
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
