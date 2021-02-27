@@ -4,8 +4,8 @@ public class User {
     private String name, email, company, location, institution, type;
     private int id;
 
-    public User(int id, String name, String company, String email, String location, String institution, String type) {
-        this.id = id;
+    public User(String name, String company, String email, String location, String institution, String type) {
+        //this.id = id;
         this.name = name;
         this.company = company;
         this.email = email;

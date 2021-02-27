@@ -31,6 +31,9 @@ public class TestFragment extends Fragment {
     TextView queryTextView;
     Button testButton;
 
+    TextView postTextView;
+    Button postButton;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,7 +47,11 @@ public class TestFragment extends Fragment {
         queryTextView = getView().findViewById(R.id.query_textview);
         testButton = getView().findViewById(R.id.test_button);
 
+        postTextView = getView().findViewById(R.id.post_textview);
+        postButton = getView().findViewById(R.id.post_button);
+
         testButton.setOnClickListener(v -> queryUsers());
+        postButton.setOnClickListener(v -> addNewUser());
     }
 
     public void queryUsers() {
@@ -78,6 +85,31 @@ public class TestFragment extends Fragment {
 
                 queryTextView.setText("Query Failed!");
                 Toast.makeText(getActivity(), "" + t, Toast.LENGTH_LONG).show(); // show the error message with Toast
+            }
+        });
+    }
+
+    public void addNewUser() {
+        // create an api caller to the webserver
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
+        DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
+        Call<User> call = apiCaller.postNewUser("James", "J. Bakery", "james@t.com", "Blk 4 Lvl 1", "SGH", "F&B");
+
+        // make a call to post a new User to the database
+        call.enqueue(new Callback<User>() {
+
+            // on success, the TextView shows success message
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+
+                postTextView.setText("Post Success! Check the website! \n" + "Response Code: " + response.code() + " Response Body: " + response.body().getEmail());
+            }
+
+            // on failure, the TextView shows a failure message
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                postTextView.setText("Failure! Error: "+ t);
+                System.out.println("Failure! Error: "+ t);
             }
         });
     }
