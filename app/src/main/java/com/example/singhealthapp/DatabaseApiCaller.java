@@ -39,7 +39,7 @@ public interface DatabaseApiCaller {
 
     // get the details of a single user
     @GET("users/")
-    Call<List<com.example.singhealthapp.ObjectsFromDatabase.User>> getUser();
+    Call<List<com.example.singhealthapp.User>> getUser();
 
     // get authentication of a single user
     @GET("auth/")

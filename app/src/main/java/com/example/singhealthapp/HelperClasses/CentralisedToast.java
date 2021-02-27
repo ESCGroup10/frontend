@@ -13,5 +13,4 @@ public class CentralisedToast {
         if( toastView != null) toastView.setGravity(Gravity.CENTER);
         toast.show();
     }
-
 }

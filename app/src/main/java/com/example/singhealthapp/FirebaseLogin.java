@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
-import com.example.singhealthapp.ObjectsFromDatabase.User;
 import com.example.singhealthapp.container.AuditorFragmentContainer;
 import com.example.singhealthapp.container.TenantFragmentContainer;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -100,9 +98,9 @@ public class FirebaseLogin extends AppCompatActivity {
     }
 
     private void checkUserTypeAndEnter(Call call) {
-        call.clone().enqueue(new Callback<List<com.example.singhealthapp.ObjectsFromDatabase.User>>() {
+        call.clone().enqueue(new Callback<List<com.example.singhealthapp.User>>() {
             @Override
-            public void onResponse(Call<List<com.example.singhealthapp.ObjectsFromDatabase.User>> call, Response<List<com.example.singhealthapp.ObjectsFromDatabase.User>> response) {
+            public void onResponse(Call<List<com.example.singhealthapp.User>> call, Response<List<com.example.singhealthapp.User>> response) {
                 if (!response.isSuccessful()) {
                     // TODO 1.5: throw a certain type of response if authentication failed so we can handle it here
                     Log.d(TAG, "Login Ver1 onFailure: "+response.code());
@@ -110,7 +108,7 @@ public class FirebaseLogin extends AppCompatActivity {
                     return;
                 }
                 Log.d(TAG, "successful response code:"+response.code());
-                List<com.example.singhealthapp.ObjectsFromDatabase.User> user_list = response.body();
+                List<com.example.singhealthapp.User> user_list = response.body();
                 // TODO 2: if they match, go to the corresponding fragment
                 Intent intent;
                 int user_index = -1;

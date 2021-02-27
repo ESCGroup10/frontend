@@ -21,7 +21,6 @@ public class User {
         return email;
     }
 
-
     public String getCompany() {
         return company;
     }
