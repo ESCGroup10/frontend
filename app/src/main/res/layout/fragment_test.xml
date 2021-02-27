@@ -22,4 +22,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <TextView
+        android:id="@+id/post_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Example Post"/>
+
+    <Button
+        android:layout_margin="20dp"
+        android:id="@+id/post_button"
+        android:text="Add New User"
+        android:background="#a4bf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>
