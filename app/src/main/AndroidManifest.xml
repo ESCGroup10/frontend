@@ -13,7 +13,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".container.AuditorFragmentContainer"/>
         <activity android:name=".container.TenantFragmentContainer"/>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".FirebaseLogin">
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
