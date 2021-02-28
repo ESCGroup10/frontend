@@ -24,20 +24,3 @@ public class User {
     public String getCompany() {
         return company;
     }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public String getInstitution() {
-        return institution;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public int getId() {
-        return id;
-    }
-}
