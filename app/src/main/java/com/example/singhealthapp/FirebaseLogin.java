@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
-import com.example.singhealthapp.User;
 import com.example.singhealthapp.container.AuditorFragmentContainer;
 import com.example.singhealthapp.container.TenantFragmentContainer;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -59,7 +58,7 @@ public class FirebaseLogin extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://esc10-303807.et.r.appspot.com/api/")
+                .baseUrl("http://esc10-303807.et.r.appspot.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -67,7 +66,7 @@ public class FirebaseLogin extends AppCompatActivity {
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
 
         // makes use of User class to get information from api
-        getAllUsersCall = apiCaller.getUser();
+        getAllUsersCall = apiCaller.getUsers();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -92,28 +91,23 @@ public class FirebaseLogin extends AppCompatActivity {
                 startLogIn();
             }
         });
-
-
-
-
     }
 
-    /*
-    Validates email with database and retrieves user type (auditor or tenant)
-
-    * 1. Retrieves all User information from api
-    * 2. Checks for matching email to validate
-    * 3. Decides if user is an auditor or tenant
-    * 4. Creates intent to corresponding fragment
-    * */
-
-
     private void checkUserTypeAndEnter(Call call) {
+        /*
+            Validates email with database and retrieves user type (auditor or tenant)
+
+            * 1. Retrieves all User information from api
+            * 2. Checks for matching email to validate
+            * 3. Decides if user is an auditor or tenant
+            * 4. Creates intent to corresponding fragment
+        * */
+
         // Retrieves all User information from api on worker process
-        call.clone().enqueue(new Callback<List<com.example.singhealthapp.ObjectsFromDatabase.User>>() {
+        call.clone().enqueue(new Callback<List<com.example.singhealthapp.User>>() {
             @Override
-            public void onResponse(Call<List<com.example.singhealthapp.ObjectsFromDatabase.User>> call,
-                                   Response<List<com.example.singhealthapp.ObjectsFromDatabase.User>> response) {
+            public void onResponse(Call<List<com.example.singhealthapp.User>> call,
+                                   Response<List<com.example.singhealthapp.User>> response) {
                 if (!response.isSuccessful()) {
                     Log.d(TAG, "error getting info from database: "+response.code());
                     CentralisedToast.makeText(FirebaseLogin.this,
@@ -174,6 +168,10 @@ public class FirebaseLogin extends AppCompatActivity {
     }
 
     private void startLogIn() {
+        /*
+            Attempts to authenticate user using Firebase auth data
+        */
+
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
             CentralisedToast.makeText(this,
                     "Email or password is empty", Toast.LENGTH_SHORT);
@@ -194,6 +192,6 @@ public class FirebaseLogin extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
+        mAuth.addAuthStateListener(mAuthListener); // to detect if the user has been authenticated by firebase
     }
 }
