@@ -7,6 +7,9 @@ import android.widget.Toast;
 
 public class CentralisedToast {
 
+    public static final int LENGTH_SHORT = 0;
+    public static final int LENGTH_LONG = 1;
+
     public static void makeText(Context context, String text, int duration) {
         Toast toast = Toast.makeText(context, text, duration);
         TextView toastView = (TextView) toast.getView().findViewById(android.R.id.message);

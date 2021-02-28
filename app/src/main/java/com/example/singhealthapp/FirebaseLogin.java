@@ -2,8 +2,6 @@ package com.example.singhealthapp;
 
 
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,12 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.container.AuditorFragmentContainer;
@@ -82,6 +78,7 @@ public class FirebaseLogin extends AppCompatActivity {
                 if (firebaseAuth.getCurrentUser() != null) { //if logged in, confirm user in database
                     Log.d(TAG, "onClick: user is authenticated!");
                     // check if auditor or tenant and go to corresponding page
+                    Log.d(TAG, "current user at auth state changed: "+mAuth.getCurrentUser());
                     checkUserTypeAndEnter(getAllUsersCall);
                 } else {
                     Log.d(TAG, "onClick: user was not authenticated!");
@@ -95,7 +92,10 @@ public class FirebaseLogin extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(TAG, "onClick: login button clicked!");
                 email = textViewEmail.getText().toString();
+                Log.d(TAG, "email: "+email);
                 password = textViewPassword.getText().toString();
+                Log.d(TAG, "pw: "+password);
+                Log.d(TAG, "current user before login: "+mAuth.getCurrentUser());
                 startLogIn();
             }
         });
@@ -128,7 +128,7 @@ public class FirebaseLogin extends AppCompatActivity {
                 if (!response.isSuccessful()) {
                     Log.d(TAG, "error getting info from database: "+response.code());
                     CentralisedToast.makeText(FirebaseLogin.this,
-                            "Database response:\nError "+response.code(), Toast.LENGTH_SHORT);
+                            "Database response:\nError "+response.code(), CentralisedToast.LENGTH_SHORT);
                     return;
                 }
                 Log.d(TAG, "got into database response code:"+response.code());
@@ -139,16 +139,16 @@ public class FirebaseLogin extends AppCompatActivity {
                 boolean found = false; // one email match was found
                 for (int i=0; i<user_list.size(); i++) { // iterate through all the registered emails on the database to match with the user's email
                     User user = user_list.get(i);
-                    Log.d(TAG, "checking if "+user.getEmail()+" == "+email);
-                    if (user.getEmail().equals(email) && !found) {
+                    Log.d(TAG, "checking if "+user.getEmail()+" == "+mAuth.getCurrentUser().getEmail());
+                    if (user.getEmail().equals(mAuth.getCurrentUser().getEmail()) && !found) {
                         Log.d(TAG, "found an email match!");
                         user_index = i;
                         found = true;
-                    } else if (user.getEmail().equals(email) && found) { // if more than one email matches, deny login
+                    } else if (user.getEmail().equals(mAuth.getCurrentUser().getEmail()) && found) { // if more than one email matches, deny login
                         Log.e(TAG, "found more than one email match!");
                         CentralisedToast.makeText(FirebaseLogin.this,
                                 "Email conflict\nPlease wait for developers to solve this problem",
-                                Toast.LENGTH_LONG);
+                                CentralisedToast.LENGTH_LONG);
                         return;
                     }
                 }
@@ -168,7 +168,7 @@ public class FirebaseLogin extends AppCompatActivity {
                 } else {
                     Log.d(TAG, "User type: "+user.getType()+" does not fit either auditor nor tenant, denying login...");
                     CentralisedToast.makeText(FirebaseLogin.this,
-                            "account type invalid, please contact developer.", Toast.LENGTH_LONG);
+                            "account type invalid, please contact developer.", CentralisedToast.LENGTH_LONG);
                     return;
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // so that user does not have to keep logging in
@@ -178,7 +178,7 @@ public class FirebaseLogin extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
                 CentralisedToast.makeText(FirebaseLogin.this,
-                        "Error retrieving from database, please try again.", Toast.LENGTH_SHORT);
+                        "Error retrieving from database, please try again.", CentralisedToast.LENGTH_SHORT);
                 Log.d(TAG, "onDatabaseCallFailure: "+t.toString());
             }
         });
@@ -191,7 +191,7 @@ public class FirebaseLogin extends AppCompatActivity {
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
             CentralisedToast.makeText(this,
-                    "Email or password is empty", Toast.LENGTH_SHORT);
+                    "Email or password is empty", CentralisedToast.LENGTH_SHORT);
         } else {
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -199,7 +199,9 @@ public class FirebaseLogin extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (!task.isSuccessful()) {
                         CentralisedToast.makeText(FirebaseLogin.this,
-                                "Email or Password is wrong. Please try again.", Toast.LENGTH_SHORT);
+                                "Email or Password is wrong. Please try again.", CentralisedToast.LENGTH_SHORT);
+                    } else {
+                        Log.d(TAG, "signInWithEmailAndPassword success");
                     }
                 }
             });
