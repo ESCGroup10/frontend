@@ -1,5 +1,9 @@
 package com.example.singhealthapp;
 
+
+
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -7,11 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.container.AuditorFragmentContainer;
@@ -38,6 +44,7 @@ public class FirebaseLogin extends AppCompatActivity {
     EditText textViewPassword;
     String password;
     Button login_button;
+    TextView textViewResetPassword;
 
     // firebase auth objects
     FirebaseAuth mAuth;
@@ -54,6 +61,7 @@ public class FirebaseLogin extends AppCompatActivity {
         textViewEmail = (EditText) findViewById(R.id.login_email);
         textViewPassword = (EditText) findViewById(R.id.login_password);
         login_button = (Button) findViewById(R.id.loginButton);
+        textViewResetPassword = (TextView) findViewById(R.id.reset_password_textView);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -71,7 +79,7 @@ public class FirebaseLogin extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() != null) { //if logged in, go to home page
+                if (firebaseAuth.getCurrentUser() != null) { //if logged in, confirm user in database
                     Log.d(TAG, "onClick: user is authenticated!");
                     // check if auditor or tenant and go to corresponding page
                     checkUserTypeAndEnter(getAllUsersCall);
@@ -89,6 +97,15 @@ public class FirebaseLogin extends AppCompatActivity {
                 email = textViewEmail.getText().toString();
                 password = textViewPassword.getText().toString();
                 startLogIn();
+            }
+        });
+
+        textViewResetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent;
+                intent = new Intent(FirebaseLogin.this, ResetPasswordActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -188,6 +205,7 @@ public class FirebaseLogin extends AppCompatActivity {
             });
         }
     }
+
 
     @Override
     protected void onStart() {

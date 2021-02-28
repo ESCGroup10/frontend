@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
         android:paddingBottom="12dp"
-        android:text="Singhealth App"
+        android:text="@string/singhealth_app"
         android:textSize="28sp"
         />
 
@@ -71,6 +71,18 @@
         android:background="#a4bf"
         android:text="Auditor"
         android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="@string/reset_password"
+        android:textSize="15dp"
+        android:textColor="@color/fui_linkColor"
+        android:gravity="center"
+        android:id="@+id/reset_password_textView">
+
+    </TextView>
+
 
 
 </LinearLayout>
