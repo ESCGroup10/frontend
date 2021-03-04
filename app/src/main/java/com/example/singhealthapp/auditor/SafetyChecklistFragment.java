@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,9 @@ public class SafetyChecklistFragment extends Fragment {
     private ArrayList<Checklist_item> checklist_items_array_part1;
     private ArrayList<Checklist_item> checklist_items_array_part2;
     private SafetyChecklistAdapter safetyChecklistAdapter;
+
+    Button start_audit_button;
+
 
     @Nullable
     @Override

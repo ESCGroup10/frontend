@@ -15,7 +15,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Safe Management Measures for Front-of-house"/>
+            android:text="Safe Management Measures for Front-of-house"
+            android:textSize="20dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginHorizontal="5dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/safety_checklist_recyclerview_part1"
@@ -25,7 +29,12 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Staff Hygiene &amp; Safe Management Measures"/>
+            android:text="Staff Hygiene &amp; Safe Management Measures"
+            android:textSize="20dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="5dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/safety_checklist_recyclerview_part2"
@@ -34,8 +43,9 @@
 
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:hint="Overall Comments"/>
+            android:layout_height="wrap_content"
+            android:hint="Overall Comments"
+            android:layout_marginVertical="10dp"/>
 
         <Button
             android:layout_width="wrap_content"

@@ -6,8 +6,7 @@
     android:orientation="horizontal"
     android:layout_margin="5dp"
     app:cardCornerRadius="10dp"
-    app:cardElevation="5dp"
-    android:background="@color/cardview_dark_background">
+    app:cardElevation="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,12 +17,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:text="Default text to be replaced" />
+            android:text="Default text to be replaced"
+            android:textSize="18dp"
+            android:textColor="@color/black"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginTop="10dp"/>
 
         <LinearLayout
             android:id="@+id/checkbox_level"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_below="@+id/textview_question"
             android:layout_marginTop="10dp"
             android:paddingRight="10dp"
@@ -36,32 +39,65 @@
                 android:layout_weight="2"
                 android:background="@color/black" />
 
-            <TextView
-                android:id="@+id/textview_true"
+            <Button
+                android:id="@+id/button_true"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="6dp"
                 android:layout_weight="33"
-                android:background="@color/cardview_light_background"
-                android:text="True" />
+                android:text="True"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="13sp"
+                app:icon="@drawable/ic_baseline_check_24"
+                android:layout_marginStart="6dp"
+                android:backgroundTint="@color/blue"
+                app:iconTint="@color/black"/>
 
-            <TextView
-                android:id="@+id/textview_false"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/checkbox_true"
-                android:layout_weight="33"
-                android:background="@color/cardview_light_background"
-                android:text="False" />
+<!--            <Button-->
+<!--                android:id="@+id/containedButton"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="33"-->
+<!--                android:text="True"-->
+<!--                android:textSize="10sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:gravity="center"-->
+<!--                android:backgroundTint="@color/blue"/>-->
+<!--                style="@style/Widget.MaterialComponents.Button.TextButton"-->
 
-            <TextView
-                android:id="@+id/textview_na"
+            <Button
+                android:id="@+id/button_false"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/checkbox_false"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="6dp"
                 android:layout_weight="33"
-                android:background="@color/cardview_light_background"
-                android:text="NA" />
+                android:text="False"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="13sp"
+                app:icon="@drawable/ic_baseline_check_24"
+                android:layout_marginStart="6dp"
+                android:backgroundTint="@color/blue"
+                app:iconTint="@color/black"/>
+
+            <Button
+                android:id="@+id/button_na"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="6dp"
+                android:layout_weight="33"
+                android:text="NA"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="13sp"
+                app:icon="@drawable/ic_baseline_check_24"
+                android:layout_marginStart="6dp"
+                android:backgroundTint="@color/blue"
+                app:iconTint="@color/black"/>
 
 
         </LinearLayout>
@@ -72,7 +108,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/checkbox_level"
             android:layout_margin="10dp"
-            android:hint="Remarks" />
+            android:hint="Remarks"
+            android:textSize="18dp"/>
 
 
     </RelativeLayout>

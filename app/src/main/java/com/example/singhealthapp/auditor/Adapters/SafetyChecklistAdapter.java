@@ -62,9 +62,9 @@ public class SafetyChecklistAdapter extends RecyclerView.Adapter<SafetyChecklist
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewQuestion = itemView.findViewById(R.id.textview_question);
-            textViewTrue = itemView.findViewById(R.id.textview_true);
-            textViewFalse = itemView.findViewById(R.id.textview_false);
-            textViewNA = itemView.findViewById(R.id.textview_na);
+            textViewTrue = itemView.findViewById(R.id.button_true);
+            textViewFalse = itemView.findViewById(R.id.button_false);
+            textViewNA = itemView.findViewById(R.id.button_na);
             editTextRemarks = itemView.findViewById(R.id.remarks);
             colourStatusIndicator = itemView.findViewById(R.id.color_status_indicator);
 
@@ -73,16 +73,10 @@ public class SafetyChecklistAdapter extends RecyclerView.Adapter<SafetyChecklist
                 @Override
                 public void onClick(View v) {
                     if (colourStatusIndicator.getBackground().equals(green)) { // view has been clicked before
-                        itemView.setBackgroundColor(grey);
                         colourStatusIndicator.setBackgroundColor(black);
-                        textViewTrue.setBackgroundColor(white);
                     } else { // view has not been clicked before
-                        itemView.setBackgroundColor(white);
                         colourStatusIndicator.setBackgroundColor(green);
-                        textViewTrue.setBackgroundColor(green);
                     }
-                    textViewFalse.setBackgroundColor(white);
-                    textViewNA.setBackgroundColor(white);
                 }
             });
 
@@ -91,16 +85,10 @@ public class SafetyChecklistAdapter extends RecyclerView.Adapter<SafetyChecklist
                 @Override
                 public void onClick(View v) {
                     if (colourStatusIndicator.getBackground().equals(red)) { // view has been clicked before
-                        itemView.setBackgroundColor(grey);
                         colourStatusIndicator.setBackgroundColor(black);
-                        textViewFalse.setBackgroundColor(white);
                     } else { // view has not been clicked before
-                        itemView.setBackgroundColor(white);
                         colourStatusIndicator.setBackgroundColor(red);
-                        textViewFalse.setBackgroundColor(red);
                     }
-                    textViewTrue.setBackgroundColor(white);
-                    textViewNA.setBackgroundColor(white);
                 }
             });
 
@@ -109,16 +97,10 @@ public class SafetyChecklistAdapter extends RecyclerView.Adapter<SafetyChecklist
                 @Override
                 public void onClick(View v) {
                     if (colourStatusIndicator.getBackground().equals(grey)) { // view has been clicked before
-                        itemView.setBackgroundColor(grey);
                         colourStatusIndicator.setBackgroundColor(black);
-                        textViewNA.setBackgroundColor(white);
                     } else { // view has not been clicked before
-                        itemView.setBackgroundColor(white);
                         colourStatusIndicator.setBackgroundColor(grey);
-                        textViewNA.setBackgroundColor(grey);
                     }
-                    textViewTrue.setBackgroundColor(white);
-                    textViewFalse.setBackgroundColor(white);
                 }
             });
         }
