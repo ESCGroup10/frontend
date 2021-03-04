@@ -171,7 +171,7 @@ public class FirebaseLogin extends AppCompatActivity {
                             "account type invalid, please contact developer.", CentralisedToast.LENGTH_LONG);
                     return;
                 }
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // so that user does not have to keep logging in
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
 
