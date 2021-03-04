@@ -55,16 +55,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
-//            auditor_drawer.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-//        super.onBackPressed();
-//    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
