@@ -1,30 +1,28 @@
 package com.example.singhealthapp.auditor;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.Models.Checklist_item;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.StatisticsFragment;
 import com.example.singhealthapp.auditor.Adapters.SafetyChecklistAdapter;
 
 import java.util.ArrayList;
 
-public class SafetyChecklistFragment extends Fragment {
+public class AuditChecklistFragment extends Fragment {
+    private static final String TAG = "AuditChecklistFragment";
 
     RecyclerView safetyChecklistRecyclerViewPart1;
     RecyclerView safetyChecklistRecyclerViewPart2;
@@ -35,12 +33,32 @@ public class SafetyChecklistFragment extends Fragment {
 
     Button start_audit_button;
 
+    private static final String TENANT_TYPE_KEY = "TENANT TYPE KEY";
+
+    private String tenant_type = null;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getActivity().setTitle("COVID safe measures checklist");
-        View view = inflater.inflate(R.layout.fragment_safety_checklist, container, false);
+        getActivity().setTitle("Audit checklist");
+
+        // Gets result either "fb" or "nfb" which denotes the tenant type from previous fragment
+        getParentFragmentManager().setFragmentResultListener(TENANT_TYPE_KEY, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                tenant_type = result.getString(TENANT_TYPE_KEY);
+                if (tenant_type == "fb") {
+                    View view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+                } else if (tenant_type== "nfb") {
+                    View view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
+                } else {
+                    CentralisedToast.makeText(getContext(), "Error verifying tenant type", CentralisedToast.LENGTH_LONG);
+                    Log.d(TAG, "onFragmentResult: Error verifying tenant type");
+                }
+            }
+        });
 
         checklist_items_array_part1 = new ArrayList<>();
         checklist_items_array_part2 = new ArrayList<>();
@@ -95,5 +113,4 @@ public class SafetyChecklistFragment extends Fragment {
         list.add(new Checklist_item(statement, ""));
         safetyChecklistAdapter.notifyDataSetChanged();
     }
-
 }

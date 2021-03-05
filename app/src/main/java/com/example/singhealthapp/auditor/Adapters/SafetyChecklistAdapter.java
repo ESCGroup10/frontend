@@ -19,11 +19,10 @@ import android.content.Context;
 
 public class SafetyChecklistAdapter extends RecyclerView.Adapter<SafetyChecklistAdapter.ViewHolder> {
 
-    private int green = Color.parseColor("#FF00FF00");
-    private int red = Color.parseColor("#FFFF0000");
-    private int grey = Color.parseColor("#FF808080");
-    private int black = Color.parseColor("#FF000000");
-    private int white = Color.parseColor("#FFFFFFFF");
+    private final int green = Color.parseColor("#FF00FF00");
+    private final int red = Color.parseColor("#FFFF0000");
+    private final int grey = Color.parseColor("#FF808080");
+    private final int black = Color.parseColor("#FF000000");
 
     private ArrayList<Checklist_item> checklist_items_array = new ArrayList<>();
     //private Context context = new Context();
