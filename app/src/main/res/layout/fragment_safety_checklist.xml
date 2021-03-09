@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Safe Management Measures for Front-of-house"
-            android:textSize="20dp"
+            android:textSize="30sp"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_marginHorizontal="5dp"/>
@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Staff Hygiene &amp; Safe Management Measures"
-            android:textSize="20dp"
+            android:textSize="30sp"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_marginTop="20dp"

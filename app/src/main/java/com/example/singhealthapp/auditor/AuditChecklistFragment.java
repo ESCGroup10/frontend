@@ -10,33 +10,25 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.Models.Checklist_item;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.auditor.Adapters.SafetyChecklistAdapter;
+import com.example.singhealthapp.auditor.Adapters.ChecklistAdapter;
 
 import java.util.ArrayList;
 
 public class AuditChecklistFragment extends Fragment {
     private static final String TAG = "AuditChecklistFragment";
 
-    RecyclerView safetyChecklistRecyclerViewPart1;
-    RecyclerView safetyChecklistRecyclerViewPart2;
+    private ChecklistAdapter checklistAdapter;
 
-    private ArrayList<Checklist_item> checklist_items_array_part1;
-    private ArrayList<Checklist_item> checklist_items_array_part2;
-    private SafetyChecklistAdapter safetyChecklistAdapter;
+    Button submit_audit_button;
 
-    Button start_audit_button;
-
-    private static final String TENANT_TYPE_KEY = "TENANT TYPE KEY";
-
-    private String tenant_type = null;
-
+    private static final String TENANT_TYPE_KEY = "tenant_type_key";
+    private String[] headers;
 
     @Nullable
     @Override
@@ -45,38 +37,35 @@ public class AuditChecklistFragment extends Fragment {
         getActivity().setTitle("Audit checklist");
 
         // Gets result either "fb" or "nfb" which denotes the tenant type from previous fragment
-        getParentFragmentManager().setFragmentResultListener(TENANT_TYPE_KEY, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                tenant_type = result.getString(TENANT_TYPE_KEY);
-                if (tenant_type == "fb") {
-                    View view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
-                } else if (tenant_type== "nfb") {
-                    View view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
-                } else {
-                    CentralisedToast.makeText(getContext(), "Error verifying tenant type", CentralisedToast.LENGTH_LONG);
-                    Log.d(TAG, "onFragmentResult: Error verifying tenant type");
-                }
-            }
-        });
+        Bundle bundle = getArguments();
+        String tenant_type = bundle.getString(TENANT_TYPE_KEY);
+        View view;
+        if (tenant_type.toLowerCase().equals("fb")) {
+            Log.d(TAG, "onCreateView: setting up for fb");
+            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+            headers = new String[]{"fb_food_hygiene.txt", "fb_healthier_choice.txt", "fb_professionalism_and_staff_hygiene.txt", "fb_workplace_safety_and_health.txt", "fb_housekeeping_and_general_cleanliness.txt"};
+        } else if (tenant_type.toLowerCase().equals("nfb")) {
+            Log.d(TAG, "onCreateView: setting up for nfb");
+            view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
+            headers = new String[]{"nfb_professionalism_and_staff_hygiene.txt", "nfb_workplace_safety_and_health.txt", "nfb_housekeeping_and_general_cleanliness.txt"};
+        } else {
+            CentralisedToast.makeText(getContext(), "Error verifying tenant type, defaulting to Food and Beverage type", CentralisedToast.LENGTH_LONG);
+            Log.d(TAG, "onCreateView: invalid tenant type: "+tenant_type);
+            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+        }
 
-        checklist_items_array_part1 = new ArrayList<>();
-        checklist_items_array_part2 = new ArrayList<>();
+        submit_audit_button = view.findViewById(R.id.submit_audit_button);
 
-        initSafetyChecklistPart1();
-        initSafetyChecklistPart2();
+        // initialize and fill all recyclerViews using text files in assets directory
+        for (String pathName : headers) {
+            Log.d(TAG, "onCreateView: init checklist section for: "+pathName);
+            initChecklistSection(view, pathName);
+        }
 
-        safetyChecklistRecyclerViewPart1 = view.findViewById(R.id.safety_checklist_recyclerview_part1);
-        safetyChecklistRecyclerViewPart2 = view.findViewById(R.id.safety_checklist_recyclerview_part2);
-        start_audit_button = view.findViewById(R.id.start_audit_button);
-
-        init_recyclerView(safetyChecklistRecyclerViewPart1, checklist_items_array_part1);
-        init_recyclerView(safetyChecklistRecyclerViewPart2, checklist_items_array_part2);
-
-        start_audit_button.setOnClickListener(new View.OnClickListener() {
+        submit_audit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AuditChecklistFragment()).commit();
+                AuditChecklistFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AuditChecklistFragment()).commit();
             }
         });
 
@@ -86,31 +75,94 @@ public class AuditChecklistFragment extends Fragment {
     private void init_recyclerView(RecyclerView recyclerView, ArrayList<Checklist_item> list) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        safetyChecklistAdapter = new SafetyChecklistAdapter(list);
-        recyclerView.setAdapter(safetyChecklistAdapter);
+        checklistAdapter = new ChecklistAdapter(list);
+        recyclerView.setAdapter(checklistAdapter);
     }
 
-    private void initSafetyChecklistPart1() {
-        checklist_items_array_part1.add(new Checklist_item("SafeEntry has been implemented for dine-in customers.", ""));
-        checklist_items_array_part1.add(new Checklist_item("Temperature screening is conducted for customers of outlets that are located outside of institution’s temperature screening zone.", ""));
-        checklist_items_array_part1.add(new Checklist_item("Table and seating arrangement adheres to the one-metre spacing between tables or groups. Where tables/seats are fixed, tables/seats should be marked out, ensuring at least one-metre spacing.", ""));
-        checklist_items_array_part1.add(new Checklist_item("Queue is demarcated to ensure at least one-metre spacing between customers such as entrances and cashier counters (e.g. through floor markers).", ""));
-        checklist_items_array_part1.add(new Checklist_item("Staff to ensure customers maintain safe distance of one-metre when queuing and seated.", ""));
-        checklist_items_array_part1.add(new Checklist_item("Staff to ensure customers wear a mask at all times, unless eating or drinking.", ""));
-        checklist_items_array_part1.add(new Checklist_item("Hand sanitizers are placed at high touch areas (i.e. tray return, collection point, outlet entrance/exit).", ""));
-        checklist_items_array_part1.add(new Checklist_item("Outlet promotes use of cashless payment modes.", ""));
-    }
-
-    private void initSafetyChecklistPart2() {
-        checklist_items_array_part2.add(new Checklist_item("All staff to wear a mask at all times, unless eating or drinking.", ""));
-        checklist_items_array_part2.add(new Checklist_item("Mask worn by staff is in the correct manner (i.e. cover nose and mouth, no hanging of mask under the chin/neck).", ""));
-        checklist_items_array_part2.add(new Checklist_item("All staff to record their temperature daily.", ""));
-        checklist_items_array_part2.add(new Checklist_item("Staff to maintain safe distance of one-metre (where possible) and not congregate, including at common areas, and during break/meal times.", ""));
-        checklist_items_array_part2.add(new Checklist_item("Check with supervisor that all staff record SafeEntry check-in and check-out (Note: Supervisor is accountable for adherence)", ""));
-    }
-
-    private void addToSafetyChecklist(ArrayList<Checklist_item> list, String statement) {
+    private void addToChecklist(ArrayList<Checklist_item> list, String statement) {
         list.add(new Checklist_item(statement, ""));
-        safetyChecklistAdapter.notifyDataSetChanged();
+        checklistAdapter.notifyDataSetChanged();
     }
+
+    private void initChecklistSection(View view, String pathName) {
+        /*
+        * 1. Gets an ArrayList of questions for each sub-header in a section specified by the pathName
+        * 2. Matches each ArrayList to a recyclerView
+        * 3. Initialises the recyclerView
+        * */
+        boolean FIRST_SUB_HEADER = true;
+        RecyclerView recyclerView = null;
+        ArrayList<String> lines;
+        ArrayList<Checklist_item> checklistArray = new ArrayList<>();
+        QuestionBank qb = new QuestionBank(getActivity());
+        lines = qb.getQuestions(pathName);
+        Log.d(TAG, "initChecklistSection: first line: "+lines.get(0));
+        for (String line : lines) {
+            if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
+                if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
+                    init_recyclerView(recyclerView, checklistArray);
+                }
+                Log.d(TAG, "initChecklistSection: getting recyclerview using sub-header: "+line.substring(1));
+                try {
+                    recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+                FIRST_SUB_HEADER = false;
+            } else { // it is a question
+                if (Character.compare(line.charAt(0), '>') == 0) {
+                    Checklist_item item = checklistArray.get(checklistArray.size() - 1);
+                    item.setStatement(item.getStatement()+"\n"+line);
+                } else {
+                    checklistArray.add(new Checklist_item(line, ""));
+                }
+            }
+        }
+        init_recyclerView(recyclerView, checklistArray);
+    }
+
+    private RecyclerView getCorrespondingRecyclerView(View view, String subHeader) throws IllegalArgumentException {
+        /*
+        * Returns recyclerView corresponding to the subHeader given
+        * */
+
+        switch (subHeader) {
+            case "Professionalism":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: professionalism");
+                return view.findViewById(R.id.audit_checklist_recyclerview_professionalism);
+            case "Staff Hygiene":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Staff Hygiene");
+                return view.findViewById(R.id.audit_checklist_recyclerview_staff_hygiene);
+            case "General Environment Cleanliness":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: General Environment Cleanliness");
+                return view.findViewById(R.id.audit_checklist_recyclerview_environment);
+            case "Hand Hygiene Facilities":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Hand Hygiene Facilities");
+                return view.findViewById(R.id.audit_checklist_recyclerview_hand_hygiene);
+            case "Storage & Preparation of Food":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Storage & Preparation of Food");
+                return view.findViewById(R.id.audit_checklist_recyclerview_food_prep);
+            case "Storage of Food in Refrigerator/ Warmer":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Storage of Food in Refrigerator/ Warmer");
+                return view.findViewById(R.id.audit_checklist_recyclerview_food_storage);
+            case "Food":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Food");
+                return view.findViewById(R.id.audit_checklist_recyclerview_food_hpb);
+            case "Beverage":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Beverage");
+                return view.findViewById(R.id.audit_checklist_recyclerview_beverage_hpb);
+            case "General Safety":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: General Safety");
+                return view.findViewById(R.id.audit_checklist_recyclerview_general_safety);
+            case "Fire & Emergency Safety":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Fire & Emergency Safety");
+                return view.findViewById(R.id.audit_checklist_recyclerview_fire_safety);
+            case "Electrical Safety":
+                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Electrical Safety");
+                return view.findViewById(R.id.audit_checklist_recyclerview_electricity_safety);
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
 }

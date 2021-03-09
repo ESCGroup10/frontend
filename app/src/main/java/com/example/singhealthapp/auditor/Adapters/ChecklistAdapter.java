@@ -15,9 +15,7 @@ import com.example.singhealthapp.R;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-
-public class SafetyChecklistAdapter extends RecyclerView.Adapter<SafetyChecklistAdapter.ViewHolder> {
+public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.ViewHolder> {
 
     private final int green = Color.parseColor("#FF00FF00");
     private final int red = Color.parseColor("#FFFF0000");
@@ -25,9 +23,8 @@ public class SafetyChecklistAdapter extends RecyclerView.Adapter<SafetyChecklist
     private final int black = Color.parseColor("#FF000000");
 
     private ArrayList<Checklist_item> checklist_items_array = new ArrayList<>();
-    //private Context context = new Context();
 
-    public SafetyChecklistAdapter(ArrayList<Checklist_item> checklist_items_array) {
+    public ChecklistAdapter(ArrayList<Checklist_item> checklist_items_array) {
         this.checklist_items_array = checklist_items_array;
     }
 

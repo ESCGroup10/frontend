@@ -1,26 +1,20 @@
 package com.example.singhealthapp.auditor;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.Models.Checklist_item;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.StatisticsFragment;
-import com.example.singhealthapp.auditor.Adapters.SafetyChecklistAdapter;
+import com.example.singhealthapp.auditor.Adapters.ChecklistAdapter;
 
 import java.util.ArrayList;
 
@@ -31,7 +25,9 @@ public class SafetyChecklistFragment extends Fragment {
 
     private ArrayList<Checklist_item> checklist_items_array_part1;
     private ArrayList<Checklist_item> checklist_items_array_part2;
-    private SafetyChecklistAdapter safetyChecklistAdapter;
+    private ChecklistAdapter checklistAdapter;
+
+    private static final String TENANT_TYPE_KEY = "tenant_type_key";
 
     Button start_audit_button;
 
@@ -58,7 +54,12 @@ public class SafetyChecklistFragment extends Fragment {
         start_audit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AuditChecklistFragment()).commit();
+                Bundle bundle = new Bundle();
+                // if selected tenant type is fb, then put fb, if nfb, put nfb
+                bundle.putString(TENANT_TYPE_KEY, "nfb");
+                AuditChecklistFragment auditChecklistFragment = new AuditChecklistFragment();
+                auditChecklistFragment.setArguments(bundle);
+                SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, auditChecklistFragment).commit();
             }
         });
 
@@ -68,8 +69,8 @@ public class SafetyChecklistFragment extends Fragment {
     private void init_recyclerView(RecyclerView recyclerView, ArrayList<Checklist_item> list) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        safetyChecklistAdapter = new SafetyChecklistAdapter(list);
-        recyclerView.setAdapter(safetyChecklistAdapter);
+        checklistAdapter = new ChecklistAdapter(list);
+        recyclerView.setAdapter(checklistAdapter);
     }
 
     private void initSafetyChecklistPart1() {
@@ -91,9 +92,9 @@ public class SafetyChecklistFragment extends Fragment {
         checklist_items_array_part2.add(new Checklist_item("Check with supervisor that all staff record SafeEntry check-in and check-out (Note: Supervisor is accountable for adherence)", ""));
     }
 
-    private void addToSafetyChecklist(ArrayList<Checklist_item> list, String statement) {
+    private void addToChecklist(ArrayList<Checklist_item> list, String statement) {
         list.add(new Checklist_item(statement, ""));
-        safetyChecklistAdapter.notifyDataSetChanged();
+        checklistAdapter.notifyDataSetChanged();
     }
 
 }

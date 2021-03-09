@@ -109,6 +109,8 @@
             android:layout_below="@id/checkbox_level"
             android:layout_margin="10dp"
             android:hint="Remarks"
+            android:inputType="textShortMessage|textAutoCorrect"
+            android:imeOptions="actionDone"
             android:textSize="18dp"/>
 
 

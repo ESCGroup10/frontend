@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface DatabaseApiCaller {
 
@@ -33,5 +35,15 @@ public interface DatabaseApiCaller {
     @FormUrlEncoded
     @POST("/api/users/?format=json")
     Call<User> postUser (@FieldMap Map<String, String> fields);
+
+    // delete user using email
+    //@FormUrlEncoded
+    @DELETE("/api/users/?email={email}")
+    Call<User> deleteUser(@Path("email") String email);
+
+    // get user using email
+    //@FormUrlEncoded
+    @GET("/api/users/?email={email}")
+    Call<User> getUser(@Path("email") String email);
 
 }

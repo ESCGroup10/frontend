@@ -18,14 +18,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.DatabaseApiCaller;
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +43,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class AddTenantFragment extends Fragment {
+
+    private FirebaseAuth mAuth;
 
     ArrayList<EditText> editList = new ArrayList<EditText>();
     private final String[] name = {"TENANT REP NAME", "COMPANY NAME", "EMAIL", "LOCATION", "INSTITUTION"};
@@ -56,6 +64,8 @@ public class AddTenantFragment extends Fragment {
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Add New Tenant");
         View view = inflater.inflate(R.layout.fragment_add_tenant, container, false);
+
+        mAuth = FirebaseAuth.getInstance();
 
         editList.add(view.findViewById(R.id.text2));
         editList.add(view.findViewById(R.id.text3));
@@ -155,6 +165,25 @@ public class AddTenantFragment extends Fragment {
                 arguments.get(3), arguments.get(4), type);
         queryAddTenant(tenantObject);
         return true;
+    }
+
+    // add tenant email and (random) password to firebase
+    private void saveFirebaseDetails(String email) {
+        mAuth.createUserWithEmailAndPassword(email, "12345") //randomly generate password in the future?
+                .addOnCompleteListener((Executor) this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            // delete database entry if entry exists?
+                            CentralisedToast.makeText(getContext(), "Firebase failed to create user, check email field again.\nTenant add failed.", CentralisedToast.LENGTH_LONG);
+                        }
+                    }
+                });
+
+    }
+
+    protected void queryDeleteTenant() {
+
     }
 
     // calling server API to create a new object in the cloud
