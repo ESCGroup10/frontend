@@ -1,5 +1,7 @@
 package com.example.singhealthapp;
 
+import com.example.singhealthapp.auditor.ReportPreview;
+
 import java.util.List;
 import java.util.Map;
 
@@ -33,5 +35,8 @@ public interface DatabaseApiCaller {
     @FormUrlEncoded
     @POST("/api/users/?format=json")
     Call<User> postUser (@FieldMap Map<String, String> fields);
+
+    @GET("/api/previewReport/?format=json")
+    Call<List<ReportPreview>> getReportPreview();
 
 }
