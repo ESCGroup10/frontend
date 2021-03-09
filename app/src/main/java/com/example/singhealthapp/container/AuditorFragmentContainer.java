@@ -78,6 +78,18 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: ");
+
+
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
+                Intent intent = getIntent();
+                this.finish();
+                startActivity(intent);
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+
         if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
             auditor_drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -120,7 +132,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Add_Tenant:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment(), "addTenant").commit();
                 break;
 
             case R.id.nav_Test:

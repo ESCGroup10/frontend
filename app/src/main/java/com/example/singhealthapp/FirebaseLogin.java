@@ -48,6 +48,7 @@ public class FirebaseLogin extends AppCompatActivity {
 
     // call object to interact with the django api
     Call<List<User>> getAllUsersCall;
+    Button auditor, tenant;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,6 +59,19 @@ public class FirebaseLogin extends AppCompatActivity {
         textViewPassword = (EditText) findViewById(R.id.login_password);
         login_button = (Button) findViewById(R.id.loginButton);
         textViewResetPassword = (TextView) findViewById(R.id.reset_password_textView);
+
+        // buttons for ease of access in development phase
+        auditor = findViewById(R.id.auditorButton);
+        tenant = findViewById(R.id.tenantButton);
+
+        auditor.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AuditorFragmentContainer.class);
+            startActivity(intent);
+        });
+        tenant.setOnClickListener(v -> {
+            Intent intent = new Intent(this, TenantFragmentContainer.class);
+            startActivity(intent);
+        });
 
         mAuth = FirebaseAuth.getInstance();
 
