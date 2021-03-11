@@ -44,4 +44,7 @@ public interface DatabaseApiCaller {
     // get authentication of a single user
     @GET("auth/")
     Call<LoginInfo> authenticate(@Header("Authorization") String authHeader);
+    // get the details of all tenants
+    @GET("/api/tenants/?format=json")
+    Call<List<Tenant>> getTenants();
 }
