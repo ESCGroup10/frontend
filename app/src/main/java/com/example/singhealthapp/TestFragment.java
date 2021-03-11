@@ -105,7 +105,7 @@ public class TestFragment extends Fragment {
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
 
         // *** PLEASE CHANGE THE EMAIL EVERY TIME YOU DO A NEW POST REQUEST!!!! **
-        Call<User> call = apiCaller.postNewUser("Token" + token, "maylene@t.com", "1234","Alice", "Alice Bakery", "Blk 4 Lvl 1", "SGH", "F&B");
+        Call<User> call = apiCaller.postNewUser("Token " + token, "Joey@t.com", "1234","Joey", "Joey Bakery", "Blk 4 Lvl 1", "SGH", "F&B");
 
         // make a call to post a new User to the database
         call.enqueue(new Callback<User>() {
@@ -113,7 +113,7 @@ public class TestFragment extends Fragment {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 System.out.println("Response body: " + response.errorBody());
-                postTextView.setText("Post Success! Click on 'Get All Users' button to see changes! \n" + "Response Code: " + response.code());
+                postTextView.setText("Post Requested!\n" + "Response Code: " + response.code());
             }
 
             // on failure, the TextView shows a failure message
