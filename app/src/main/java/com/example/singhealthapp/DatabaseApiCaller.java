@@ -1,5 +1,6 @@
 package com.example.singhealthapp;
 
+import com.example.singhealthapp.auditor.Report;
 import com.example.singhealthapp.auditor.ReportPreview;
 
 import java.util.List;
@@ -38,5 +39,8 @@ public interface DatabaseApiCaller {
 
     @GET("/api/previewReport/?format=json")
     Call<List<ReportPreview>> getReportPreview();
+
+    @GET("/api/report/?format=json")
+    Call<List<Report>> getReport();
 
 }

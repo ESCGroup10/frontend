@@ -6,6 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.R;
@@ -15,11 +18,11 @@ import java.util.List;
 
 public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHolder>{
     List<ReportPreview> list = Collections.emptyList();
-    Context context;
+    FragmentActivity parent;
 
-    public ReportPreviewAdapter(List<ReportPreview> list, Context context) {
+    public ReportPreviewAdapter(List<ReportPreview> list, FragmentActivity parent) {
         this.list = list;
-        this.context = context;
+        this.parent = parent;
     }
 
     @NonNull
@@ -36,12 +39,9 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
         holder.reportName.setText(list.get(position).getReportName());
         holder.reportDate.setText(list.get(position).getReportDate());
         holder.resolution.setText(list.get(position).getResolution_date());
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                return ;
-            }
-        });
+        holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
+                .replace(parent.getSupportFragmentManager().findFragmentByTag("getReport").getId()
+                        , new AuditorViewReportFragment(list.get(position).getId()), "viewReport").commit());
     }
 
     @Override

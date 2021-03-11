@@ -10,7 +10,7 @@ public class ReportPreview {
     }
 
     public String getReportDate() {
-        return report_date.substring(0, 10) + " " + report_date.substring(11, 19);
+        return getReport_date().substring(0, 10) + " " + getReport_date().substring(11, 19);
     }
 
     public int getId() {

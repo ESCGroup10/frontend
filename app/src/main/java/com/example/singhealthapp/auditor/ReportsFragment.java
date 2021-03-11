@@ -27,8 +27,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ReportsFragment extends Fragment {
-
-    List<ReportPreview> list;
     ReportPreviewAdapter adapter;
 
     @Nullable
@@ -38,35 +36,37 @@ public class ReportsFragment extends Fragment {
         getActivity().setTitle("Reports");
 
         View view = inflater.inflate(R.layout.fragment_reports, container, false);
-        if ( ! queueList()) {
-            Toast.makeText(getActivity(), "Failure in query", Toast.LENGTH_LONG).show();
-        }
+        queueList();
         return view;
     }
 
-    private boolean queueList(){
+    private void queueList(){
         Retrofit retrofit = new Retrofit.Builder().baseUrl("http://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
         Call<List<ReportPreview>> call = apiCaller.getReportPreview();
+        List<ReportPreview> list = new ArrayList<>();
         call.enqueue(new Callback<List<ReportPreview>>() {
             @Override
             public void onResponse(Call<List<ReportPreview>> call, Response<List<ReportPreview>> response) {
                 if (!response.isSuccessful()) {
-                    Toast.makeText(getContext(), String.valueOf(response.code()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                     return ;
                 }
-                adapter = new ReportPreviewAdapter(response.body(), getContext());
-                RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerView);
-                view.setLayoutManager(new LinearLayoutManager(getActivity()));
-                view.setItemAnimator(new DefaultItemAnimator());
-                view.setAdapter(adapter);
+                adapter = new ReportPreviewAdapter(response.body(), getActivity());
+                list.addAll(response.body());
+                try {
+                    RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerView);
+                    view.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    view.setItemAnimator(new DefaultItemAnimator());
+                    view.setAdapter(adapter);
+                }
+                catch (Exception ignored) {}
             }
 
             @Override
             public void onFailure(Call<List<ReportPreview>> call, Throwable t) {
-                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Failure: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-        return true;
     }
 }

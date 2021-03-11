@@ -80,7 +80,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: ");
-        
+
+        // overwrite back press for each fragment
         try {
             if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
@@ -88,6 +89,24 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             }
         }
         catch (Exception ignored){ }
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId()
+                                , new ReportsFragment(), "getReport").commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+
+
 
         if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
             auditor_drawer.closeDrawer(GravityCompat.START);
