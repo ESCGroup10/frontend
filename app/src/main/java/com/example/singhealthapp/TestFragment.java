@@ -59,7 +59,7 @@ public class TestFragment extends Fragment {
     private void queryUsers() {
 
         // create an api caller to the webserver
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://10.0.2.2:8000").addConverterFactory(GsonConverterFactory.create()).build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
         Call<List<User>> call = apiCaller.getUsers("Token " + token); // let the call response be a List of User
 
@@ -99,7 +99,7 @@ public class TestFragment extends Fragment {
     private void addNewUser() {
         // create an api caller to the webserver
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8000")
+                .baseUrl("https://esc10-303807.et.r.appspot.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
