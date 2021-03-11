@@ -1,7 +1,6 @@
 package com.example.singhealthapp;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
 import org.junit.Rule;
@@ -21,8 +20,8 @@ import static org.hamcrest.Matchers.not;
 public class FirebaseLoginTest {
 
     @Rule
-    public ActivityScenarioRule<FirebaseLogin> activityRule =
-            new ActivityScenarioRule<>(FirebaseLogin.class);
+    public ActivityScenarioRule<LoginActivity> activityRule =
+            new ActivityScenarioRule<>(LoginActivity.class);
 
     @Test
     public void isActivityInView() {

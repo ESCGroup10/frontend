@@ -43,7 +43,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent;
-                intent = new Intent(ResetPasswordActivity.this, FirebaseLogin.class);
+                intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });

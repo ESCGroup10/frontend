@@ -1,5 +1,7 @@
 package com.example.singhealthapp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,6 +31,8 @@ public class TestFragment extends Fragment {
 
     TextView postTextView;
     Button postButton;
+
+    private String token;
 
     @Nullable
     @Override
@@ -47,14 +52,16 @@ public class TestFragment extends Fragment {
 
         testButton.setOnClickListener(v -> queryUsers());
         postButton.setOnClickListener(v -> addNewUser());
+
+        loadToken();
     }
 
-    public void queryUsers() {
+    private void queryUsers() {
 
         // create an api caller to the webserver
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://10.0.2.2:8000").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-        Call<List<User>> call = apiCaller.getUsers(); // let the call response be a List of User
+        Call<List<User>> call = apiCaller.getUsers("Token " + token); // let the call response be a List of User
 
         // make a call to get a response of a List of User
         call.enqueue(new Callback<List<User>>() {
@@ -89,18 +96,23 @@ public class TestFragment extends Fragment {
         });
     }
 
-    public void addNewUser() {
+    private void addNewUser() {
         // create an api caller to the webserver
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://10.0.2.2:8000")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-        Call<User> call = apiCaller.postNewUser("Alice", "Alice Bakery", "alice@t.com", "Blk 4 Lvl 1", "SGH", "F&B");
+
+        // *** PLEASE CHANGE THE EMAIL EVERY TIME YOU DO A NEW POST REQUEST!!!! **
+        Call<User> call = apiCaller.postNewUser("Token" + token, "maylene@t.com", "1234","Alice", "Alice Bakery", "Blk 4 Lvl 1", "SGH", "F&B");
 
         // make a call to post a new User to the database
         call.enqueue(new Callback<User>() {
-
             // on success, the TextView shows success message
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
+                System.out.println("Response body: " + response.errorBody());
                 postTextView.setText("Post Success! Click on 'Get All Users' button to see changes! \n" + "Response Code: " + response.code());
             }
 
@@ -110,5 +122,13 @@ public class TestFragment extends Fragment {
                 postTextView.setText("Failure! Error: "+ t);
             }
         });
+    }
+
+    private void loadToken() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN_KEY", null);
+
+        int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
+        System.out.println("User ID " + userId);
     }
 }

@@ -2,6 +2,7 @@ package com.example.singhealthapp.auditor;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -37,6 +38,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class AddTenantFragment extends Fragment {
+
+    private String token;
 
     ArrayList<EditText> editList = new ArrayList<EditText>();
     private final String[] name = {"TENANT REP NAME", "COMPANY NAME", "EMAIL", "LOCATION", "INSTITUTION"};
@@ -89,8 +92,7 @@ public class AddTenantFragment extends Fragment {
                 new androidx.appcompat.app.AlertDialog.Builder(getContext())
                         .setTitle("SUCCESS")
                         .setMessage("NEW TENANT ADDED!")
-                        .setPositiveButton(android.R.string.yes, (arg0, arg1) ->
-                                getActivity().onBackPressed()).create().show();
+                        .setPositiveButton(android.R.string.yes, null).create().show();
             }
         });
         return view;
@@ -138,6 +140,12 @@ public class AddTenantFragment extends Fragment {
         temp.requestFocus();
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+        loadToken();
+    }
+
     // helper method to create a tenant object with input of the user and call a query with it
     private boolean saveTenant(String type){
         ArrayList<String> arguments = new ArrayList<String>();
@@ -151,7 +159,7 @@ public class AddTenantFragment extends Fragment {
             }
             arguments.add(t.getText().toString());
         }
-        User tenantObject = new User(arguments.get(0), arguments.get(1), arguments.get(2),
+        User tenantObject = new User(arguments.get(2), "1234", arguments.get(0), arguments.get(1),
                 arguments.get(3), arguments.get(4), type);
         queryAddTenant(tenantObject);
         return true;
@@ -159,20 +167,21 @@ public class AddTenantFragment extends Fragment {
 
     // calling server API to create a new object in the cloud
     protected void queryAddTenant(User user) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com")
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://10.0.2.2:8000")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
 
         Map<String, String> fields = new HashMap<>();
+        fields.put("email", user.getEmail());
+        fields.put("password", user.getPassword());
         fields.put("name", user.getName());
         fields.put("company", user.getCompany());
         fields.put("location", user.getLocation());
         fields.put("type", user.getType());
         fields.put("institution", user.getInstitution());
-        fields.put("email", user.getEmail());
 
-        Call<User> call = apiCaller.postUser(fields);
+        Call<User> call = apiCaller.postUser("Token " + token, fields);
 
         call.enqueue(new Callback<User>() {
             @Override
@@ -181,7 +190,7 @@ public class AddTenantFragment extends Fragment {
                     // Toast
                     return ;
                 }
-                System.out.println(response.code() + ": New tenant added.");
+                //System.out.println(response.code() + ": New tenant added.");
             }
 
             @Override
@@ -190,5 +199,10 @@ public class AddTenantFragment extends Fragment {
                 return ;
             }
         });
+    }
+
+    private void loadToken() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN_KEY", null);
     }
 }
