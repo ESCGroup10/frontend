@@ -14,7 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.singhealthapp.FirebaseLogin;
+import com.example.singhealthapp.LoginActivity;
 import com.example.singhealthapp.TestFragment;
 import com.example.singhealthapp.tenant.LatestReportFragment;
 import com.example.singhealthapp.tenant.MyReportsFragment;
@@ -78,7 +78,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                     //AuditorFragmentContainer.super.onBackPressed();
                     dialog.dismiss();
                     mAuth.signOut();
-                    Intent intent = new Intent(TenantFragmentContainer.this, FirebaseLogin.class);
+                    Intent intent = new Intent(TenantFragmentContainer.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }

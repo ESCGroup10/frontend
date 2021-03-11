@@ -13,12 +13,12 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".container.AuditorFragmentContainer"
-            android:parentActivityName=".FirebaseLogin" />
+            android:parentActivityName=".LoginActivity" />
         <activity android:name=".container.TenantFragmentContainer"
-            android:parentActivityName=".FirebaseLogin" />
+            android:parentActivityName=".LoginActivity" />
         <activity android:name=".ResetPasswordActivity"
-            android:parentActivityName=".FirebaseLogin" />
-        <activity android:name=".FirebaseLogin">
+            android:parentActivityName=".LoginActivity" />
+        <activity android:name=".LoginActivity">
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
