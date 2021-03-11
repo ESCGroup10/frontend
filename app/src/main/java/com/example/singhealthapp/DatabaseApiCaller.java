@@ -9,41 +9,52 @@ import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface DatabaseApiCaller {
 
-    // test example: get a list of all users (auditors + tenants)
-    @GET("/api/users/?format=json")
-    Call<List<User>> getUsers();
+    // TEST EXAMPLE: get a list of all users (auditors + tenants)
+    @GET("/api/users/")
+    Call<List<User>> getUsers(
+            @Header("authorization") String token
+    );
 
-
-    // test example: post details of new user
+    // TEST EXAMPLE: post details of new user
     @FormUrlEncoded
-    @POST("/api/users/?format=json")
+    @POST("/api/users/")
     Call<User> postNewUser(
+            @Header("authorization") String token,
+            @Field("email") String email,
+            @Field("password") String password,
             @Field("name") String name,
             @Field("company") String company,
-            @Field("email") String email,
             @Field("location") String location,
             @Field("institution") String institution,
             @Field("type") String type
     );
 
+    // get a single user based on user email
+    @GET("/api/singleUser/")
+    Call<List<User>> getSingleUser(
+            @Header("authorization") String token,
+            @Query("email") String email
+    );
+
+    // login post request
+    @FormUrlEncoded
+    @POST("/login/")
+    Call<Token> postLogin(
+            @Field("username") String email,
+            @Field("password") String password
+    );
+
     // post details of new user i.e. add a new tenant/auditor to the database
     @FormUrlEncoded
-    @POST("/api/users/?format=json")
-    Call<User> postUser (@FieldMap Map<String, String> fields);
-
-    // delete user using email
-    //@FormUrlEncoded
-    @DELETE("/api/users/?email={email}")
-    Call<User> deleteUser(@Path("email") String email);
-
-    // get user using email
-    //@FormUrlEncoded
-    @GET("/api/users/?email={email}")
-    Call<User> getUser(@Path("email") String email);
-
+    @POST("/api/users/")
+    Call<User> postUser (
+            @Header("authorization") String token,
+            @FieldMap Map<String, String> fields
+    );
 }
