@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // create an api caller to the webserver
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8000")
+                .baseUrl("https://esc10-303807.et.r.appspot.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiCaller = retrofit.create(DatabaseApiCaller.class);

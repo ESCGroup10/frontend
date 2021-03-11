@@ -167,7 +167,7 @@ public class AddTenantFragment extends Fragment {
 
     // calling server API to create a new object in the cloud
     protected void queryAddTenant(User user) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://10.0.2.2:8000")
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
