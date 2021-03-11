@@ -24,6 +24,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
 
     EditText textViewEmail, textViewPassword;
     Button login_button, auditorBtn, tenantBtn;
@@ -89,8 +90,14 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Token> call, Throwable t) {
-                CentralisedToast.makeText(LoginActivity.this,
-                        "Error: " + t, CentralisedToast.LENGTH_LONG);
+                Log.d(TAG, "onFailure: "+t);
+                if (t.getMessage().contains("failed to connect")) {
+                    CentralisedToast.makeText(LoginActivity.this,
+                            "Login Error: Timeout after 10s \nPlease try again later", CentralisedToast.LENGTH_LONG);
+                } else {
+                    CentralisedToast.makeText(LoginActivity.this,
+                            "Error: " + t, CentralisedToast.LENGTH_LONG);
+                }
             }
         });
     }
@@ -116,6 +123,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
+                Log.d(TAG, "onFailure: "+t);
                 CentralisedToast.makeText(LoginActivity.this,
                         "Error: " + t, CentralisedToast.LENGTH_LONG);
             }
