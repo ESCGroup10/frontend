@@ -1,10 +1,13 @@
 package com.example.singhealthapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -18,7 +21,6 @@ import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.container.AuditorFragmentContainer;
 import com.example.singhealthapp.container.TenantFragmentContainer;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     Button login_button, auditorBtn, tenantBtn;
 
     String email, password;
-    HashMap<String, Integer> resetCount;
+    int resetCount;
     Call<List<User>> getUserCall;
 
     Retrofit retrofit;
@@ -61,6 +63,8 @@ public class LoginActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiCaller = retrofit.create(DatabaseApiCaller.class);
+
+
 
         textViewEmail = findViewById(R.id.login_email);
         textViewPassword = findViewById(R.id.login_password);
@@ -114,7 +118,22 @@ public class LoginActivity extends AppCompatActivity {
                     token = response.body();
                     login(); // check whether user is auditor or tenant to navigate to correct page
                 } else {
-                    CentralisedToast.makeText(LoginActivity.this, "Email or Password is wrong. Please try again.", CentralisedToast.LENGTH_LONG);
+                    if (resetCount != 4) {
+                        resetCount++;
+                        CentralisedToast.makeText(LoginActivity.this, String.format("You have entered the wrong password %d times. You have %d tries left.", resetCount, 5-resetCount), 0);
+                    } else {
+                        login_button.setEnabled(false); // disable login button
+                        CentralisedToast.makeText(LoginActivity.this, "You have entered the wrong password 5 times. Please wait 10s to retry.", 1);
+                        resetCount = 0;
+
+
+                        // schedule function to enable login after 10s
+                        final Handler handler = new Handler(Looper.getMainLooper());
+                        handler.postDelayed(() -> {
+                            login_button.setEnabled(true); // enable the login button
+
+                        }, 10000); // 10s
+                    }
                 }
             }
 
@@ -179,6 +198,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("USER_TYPE_KEY", userType);
         editor.commit();
     }
+
 
     // set up the extra auditor and tenant cheat buttons
     private void setUpNavBtns() {
