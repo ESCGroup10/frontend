@@ -2,6 +2,7 @@ package com.example.singhealthapp.container;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -30,14 +31,13 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
     DrawerLayout auditor_drawer;
 
-    FirebaseAuth mAuth;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auditor_fragment_container);
-
-        mAuth = FirebaseAuth.getInstance();
 
         Toolbar auditor_toolbar = findViewById(R.id.auditor_toolbar);
         setSupportActionBar(auditor_toolbar);
@@ -84,15 +84,13 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder.setMessage("Do you want to log out? ");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    //AuditorFragmentContainer.super.onBackPressed();
-                    dialog.dismiss();
-                    mAuth.signOut();
-                    Intent intent = new Intent(AuditorFragmentContainer.this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }
+            builder.setPositiveButton("OK", (dialog, id) -> {
+                //AuditorFragmentContainer.super.onBackPressed();
+                dialog.dismiss();
+                clearData(); // clear user type (to avoid auto login) and token (for safety)
+                Intent intent = new Intent(AuditorFragmentContainer.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -130,5 +128,13 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
         auditor_drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void clearData() {
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putString("TOKEN_KEY", "");
+        editor.putString("USER_TYPE_KEY", "");
+        editor.commit();
     }
 }

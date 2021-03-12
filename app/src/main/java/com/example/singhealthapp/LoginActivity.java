@@ -1,7 +1,9 @@
 package com.example.singhealthapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
@@ -16,6 +19,7 @@ import com.example.singhealthapp.container.AuditorFragmentContainer;
 import com.example.singhealthapp.container.TenantFragmentContainer;
 
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,14 +39,30 @@ public class LoginActivity extends AppCompatActivity {
     DatabaseApiCaller apiCaller;
 
     Token token;
+    String userType;
+    int userId;
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        loadUserType(); // load userType from SharedPreferences for auto login
+
+        if (Objects.nonNull(userType)) { // if the userType can be loaded from SharedPreferences (which means user has logged in before)
+            Intent intent;
+            if (userType.equals("Auditor")) { // check user type and log in
+                intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
+                startActivity(intent);
+            } else if (userType.equals("F&B") || userType.equals("Non F&B")) {
+                intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
+                startActivity(intent);
+            }
+        }
 
         // create an api caller to the webserver
         retrofit = new Retrofit.Builder()
@@ -103,15 +123,22 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 List<User> user = response.body();
 
-                saveData(user.get(0).getId());
+                userId = user.get(0).getId();
+                userType = user.get(0).getType();
+
+                saveData(); // save user type, user id and token
 
                 Intent intent;
-                if (user.get(0).getType().equals("Auditor")) {
+                if (userType.equals("Auditor")) { // if user logged in is Auditor, move to Auditor page
                     intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
-                } else {
+                    startActivity(intent);
+                } else if (userType.equals("F&B") || userType.equals("Non F&B")) { // else if user logged in is F&B or Non F&B, move to Tennat page
                     intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
+                    startActivity(intent);
+                } else { // else this user is not a valid user type!
+                    CentralisedToast.makeText(LoginActivity.this,
+                            "Invalid User Type! Please contact the administrator.", CentralisedToast.LENGTH_LONG);
                 }
-                startActivity(intent);
             }
 
             @Override
@@ -122,11 +149,19 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void saveData(int userId) {
+    // load the userType of the user for auto log in as long as the user never logs out
+    private void loadUserType() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        userType = sharedPreferences.getString("USER_TYPE_KEY", null);
+    }
+
+    // save token, user id and user type
+    private void saveData() {
         sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         editor = sharedPreferences.edit();
         editor.putString("TOKEN_KEY", token.getToken());
         editor.putInt("USER_ID_KEY", userId);
+        editor.putString("USER_TYPE_KEY", userType);
         editor.commit();
     }
 
