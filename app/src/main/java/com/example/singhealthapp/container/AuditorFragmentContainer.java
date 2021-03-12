@@ -1,6 +1,5 @@
 package com.example.singhealthapp.container;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
 import com.example.singhealthapp.auditor.SearchTenantFragment;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -92,11 +90,9 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                    //finish();
-                }
+            builder.setNegativeButton("Cancel", (dialog, id) -> {
+                dialog.dismiss();
+                //finish();
             });
             builder.show();
         }

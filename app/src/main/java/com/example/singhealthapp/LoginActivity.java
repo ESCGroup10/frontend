@@ -18,6 +18,7 @@ import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.container.AuditorFragmentContainer;
 import com.example.singhealthapp.container.TenantFragmentContainer;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     Button login_button, auditorBtn, tenantBtn;
 
     String email, password;
+    HashMap<String, Integer> resetCount;
     Call<List<User>> getUserCall;
 
     Retrofit retrofit;
@@ -51,18 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        loadUserType(); // load userType from SharedPreferences for auto login
-
-        if (Objects.nonNull(userType)) { // if the userType can be loaded from SharedPreferences (which means user has logged in before)
-            Intent intent;
-            if (userType.equals("Auditor")) { // check user type and log in
-                intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
-                startActivity(intent);
-            } else if (userType.equals("F&B") || userType.equals("Non F&B")) {
-                intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
-                startActivity(intent);
-            }
-        }
+        autoLogin(); // try to login automatically
 
         // create an api caller to the webserver
         retrofit = new Retrofit.Builder()
@@ -87,10 +78,30 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        setUpNavBtns();
+        // async task to set up faster
+        new Thread(() -> {
+            setUpNavBtns();
+        }).start();
     }
 
+    // try to navigate to home page immediately using data in SharedPreferences
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void autoLogin() {
+        loadUserType(); // load userType from SharedPreferences for auto login
 
+        if (Objects.nonNull(userType)) { // if the userType can be loaded from SharedPreferences (which means user has logged in before)
+            Intent intent;
+            if (userType.equals("Auditor")) { // check user type and log in
+                intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
+                startActivity(intent);
+            } else if (userType.equals("F&B") || userType.equals("Non F&B")) {
+                intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
+                startActivity(intent);
+            }
+        }
+    }
+
+    // get token of the user via login post request
     private void authenticate() {
         Call<Token> loginCall = apiCaller.postLogin(email, password);
 
@@ -99,9 +110,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Token> call, Response<Token> response) {
 
-                if (response.code() == 200) {
+                if (response.code() == 200) { // response code is valid
                     token = response.body();
-                    login();
+                    login(); // check whether user is auditor or tenant to navigate to correct page
                 } else {
                     CentralisedToast.makeText(LoginActivity.this, "Email or Password is wrong. Please try again.", CentralisedToast.LENGTH_LONG);
                 }
@@ -115,6 +126,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    // navigate to the next page based on the user type (auditor or tenant)
     private void login() {
         getUserCall = apiCaller.getSingleUser("Token " + token.getToken(), email);
 
@@ -126,7 +138,10 @@ public class LoginActivity extends AppCompatActivity {
                 userId = user.get(0).getId();
                 userType = user.get(0).getType();
 
-                saveData(); // save user type, user id and token
+                // use async task to save the token so that user can login faster
+                new Thread(() -> {
+                    saveData(); // save user type, user id and token
+                }).start();
 
                 Intent intent;
                 if (userType.equals("Auditor")) { // if user logged in is Auditor, move to Auditor page
@@ -165,6 +180,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.commit();
     }
 
+    // set up the extra auditor and tenant cheat buttons
     private void setUpNavBtns() {
         auditorBtn = findViewById(R.id.auditorButton);
         auditorBtn.setOnClickListener(v -> {
