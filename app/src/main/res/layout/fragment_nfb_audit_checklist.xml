@@ -19,7 +19,8 @@
             android:textSize="30dp"
             android:textColor="@color/black"
             android:textStyle="bold"
-            android:layout_marginHorizontal="5dp"/>
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginBottom="15dp"/>
 
         <androidx.cardview.widget.CardView
             android:orientation="horizontal"
@@ -35,13 +36,14 @@
                 android:textSize="25sp"
                 android:textColor="@color/purple_500"
                 android:textStyle="bold"
-                android:layout_marginHorizontal="15dp" />
+                android:layout_marginHorizontal="15dp"/>
         </androidx.cardview.widget.CardView>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/audit_checklist_recyclerview_professionalism"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"/>
 
         <androidx.cardview.widget.CardView
             android:orientation="horizontal"
@@ -73,7 +75,8 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_marginTop="20dp"
-            android:layout_marginHorizontal="5dp"/>
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginBottom="15dp"/>
 
         <androidx.cardview.widget.CardView
             android:orientation="horizontal"
@@ -105,7 +108,8 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_marginTop="20dp"
-            android:layout_marginHorizontal="5dp"/>
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginBottom="15dp"/>
 
         <androidx.cardview.widget.CardView
             android:orientation="horizontal"
@@ -127,7 +131,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/audit_checklist_recyclerview_general_safety"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"/>
 
         <androidx.cardview.widget.CardView
             android:orientation="horizontal"
@@ -149,7 +154,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/audit_checklist_recyclerview_fire_safety"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"/>
 
         <androidx.cardview.widget.CardView
             android:orientation="horizontal"

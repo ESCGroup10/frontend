@@ -56,7 +56,7 @@ public class SafetyChecklistFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 // if selected tenant type is fb, then put fb, if nfb, put nfb
-                bundle.putString(TENANT_TYPE_KEY, "nfb");
+                bundle.putString(TENANT_TYPE_KEY, "fb");
                 AuditChecklistFragment auditChecklistFragment = new AuditChecklistFragment();
                 auditChecklistFragment.setArguments(bundle);
                 SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, auditChecklistFragment).commit();

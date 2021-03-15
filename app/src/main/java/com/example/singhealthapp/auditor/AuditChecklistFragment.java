@@ -28,7 +28,7 @@ public class AuditChecklistFragment extends Fragment {
     Button submit_audit_button;
 
     private static final String TENANT_TYPE_KEY = "tenant_type_key";
-    private String[] headers;
+    private String[] header_files;
 
     @Nullable
     @Override
@@ -36,32 +36,13 @@ public class AuditChecklistFragment extends Fragment {
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Audit checklist");
 
-        // Gets result either "fb" or "nfb" which denotes the tenant type from previous fragment
         Bundle bundle = getArguments();
         String tenant_type = bundle.getString(TENANT_TYPE_KEY);
-        View view;
-        if (tenant_type.toLowerCase().equals("fb")) {
-            Log.d(TAG, "onCreateView: setting up for fb");
-            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
-            headers = new String[]{"fb_food_hygiene.txt", "fb_healthier_choice.txt", "fb_professionalism_and_staff_hygiene.txt", "fb_workplace_safety_and_health.txt", "fb_housekeeping_and_general_cleanliness.txt"};
-        } else if (tenant_type.toLowerCase().equals("nfb")) {
-            Log.d(TAG, "onCreateView: setting up for nfb");
-            view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
-            headers = new String[]{"nfb_professionalism_and_staff_hygiene.txt", "nfb_workplace_safety_and_health.txt", "nfb_housekeeping_and_general_cleanliness.txt"};
-        } else {
-            CentralisedToast.makeText(getContext(), "Error verifying tenant type, defaulting to Food and Beverage type", CentralisedToast.LENGTH_LONG);
-            Log.d(TAG, "onCreateView: invalid tenant type: "+tenant_type);
-            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
-        }
+        View view = inflateFrgamentLayout(tenant_type, container, inflater);
+
+        initRecyclerViews(view);
 
         submit_audit_button = view.findViewById(R.id.submit_audit_button);
-
-        // initialize and fill all recyclerViews using text files in assets directory
-        for (String pathName : headers) {
-            Log.d(TAG, "onCreateView: init checklist section for: "+pathName);
-            initChecklistSection(view, pathName);
-        }
-
         submit_audit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,9 +67,7 @@ public class AuditChecklistFragment extends Fragment {
 
     private void initChecklistSection(View view, String pathName) {
         /*
-        * 1. Gets an ArrayList of questions for each sub-header in a section specified by the pathName
-        * 2. Matches each ArrayList to a recyclerView
-        * 3. Initialises the recyclerView
+        * Reads a formatted text file and creates RecyclerViews for the checklists corresponding to the file
         * */
         boolean FIRST_SUB_HEADER = true;
         RecyclerView recyclerView = null;
@@ -100,24 +79,33 @@ public class AuditChecklistFragment extends Fragment {
         for (String line : lines) {
             if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
                 if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
+                    Log.d(TAG, "checklistArray first statement: "+checklistArray.get(0).getStatement());
+                    Log.d(TAG, "initChecklistSection: current recyclerview: "+recyclerView.toString());
                     init_recyclerView(recyclerView, checklistArray);
+                    checklistArray.clear();
+                    Log.d(TAG, "checklistArray number of else after clearing: "+checklistArray.size());
                 }
                 Log.d(TAG, "initChecklistSection: getting recyclerview using sub-header: "+line.substring(1));
                 try {
                     recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
+                    Log.d(TAG, "initChecklistSection: new recyclerview: "+recyclerView.toString());
                 } catch (IllegalArgumentException e) {
+                    Log.e(TAG, "initChecklistSection: ", e);
                     e.printStackTrace();
                 }
                 FIRST_SUB_HEADER = false;
             } else { // it is a question
                 if (Character.compare(line.charAt(0), '>') == 0) {
                     Checklist_item item = checklistArray.get(checklistArray.size() - 1);
-                    item.setStatement(item.getStatement()+"\n"+line);
+                    item.setStatement(item.getStatement()+"\n\n"+line);
                 } else {
                     checklistArray.add(new Checklist_item(line, ""));
                 }
             }
         }
+        // init the last one
+        Log.d(TAG, "initChecklistSection: current recyclerview: "+recyclerView.toString());
+        Log.d(TAG, "checklistArray first statement: "+checklistArray.get(0).getStatement());
         init_recyclerView(recyclerView, checklistArray);
     }
 
@@ -162,6 +150,34 @@ public class AuditChecklistFragment extends Fragment {
                 return view.findViewById(R.id.audit_checklist_recyclerview_electricity_safety);
             default:
                 throw new IllegalArgumentException();
+        }
+    }
+
+    private View inflateFrgamentLayout(String tenant_type, ViewGroup container, LayoutInflater inflater) {
+        // decides which fragment to inflate
+        View view;
+        if (tenant_type.toLowerCase().equals("fb")) {
+            Log.d(TAG, "onCreateView: setting up for fb");
+            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+            header_files = new String[]{"fb_food_hygiene.txt", "fb_healthier_choice.txt", "fb_professionalism_and_staff_hygiene.txt", "fb_workplace_safety_and_health.txt", "fb_housekeeping_and_general_cleanliness.txt"};
+        } else if (tenant_type.toLowerCase().equals("nfb")) {
+            Log.d(TAG, "onCreateView: setting up for nfb");
+            view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
+            header_files = new String[]{"nfb_professionalism_and_staff_hygiene.txt", "nfb_workplace_safety_and_health.txt", "nfb_housekeeping_and_general_cleanliness.txt"};
+        } else {
+            CentralisedToast.makeText(getContext(), "Error verifying tenant type, defaulting to Food and Beverage type", CentralisedToast.LENGTH_LONG);
+            Log.d(TAG, "onCreateView: invalid tenant type: "+tenant_type);
+            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+        }
+
+        return view;
+    }
+
+    private void initRecyclerViews(View view) {
+        // initialize and fill all recyclerViews using text files in assets directory
+        for (String pathName : header_files) {
+            Log.d(TAG, "onCreateView: init checklist section for: "+pathName);
+            initChecklistSection(view, pathName);
         }
     }
 
