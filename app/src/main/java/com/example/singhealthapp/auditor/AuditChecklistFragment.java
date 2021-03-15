@@ -10,12 +10,14 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.Models.Checklist_item;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.StatusConfirmationFragment;
 import com.example.singhealthapp.auditor.Adapters.ChecklistAdapter;
 
 import java.util.ArrayList;
@@ -23,9 +25,13 @@ import java.util.ArrayList;
 public class AuditChecklistFragment extends Fragment {
     private static final String TAG = "AuditChecklistFragment";
 
-    private ChecklistAdapter checklistAdapter;
+//    private ChecklistAdapter checklistAdapter;
 
     Button submit_audit_button;
+
+    private final String TITLE_KEY = "title_key";
+    private final String MSG_KEY = "message_key";
+    private final String BUTTON_TXT_KEY = "button_text_key";
 
     private static final String TENANT_TYPE_KEY = "tenant_type_key";
     private String[] header_files;
@@ -46,7 +52,21 @@ public class AuditChecklistFragment extends Fragment {
         submit_audit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AuditChecklistFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AuditChecklistFragment()).commit();
+                Bundle bundle = new Bundle();
+                bundle.putString(TITLE_KEY, "Audit Submitted");
+                bundle.putString(MSG_KEY, "Audit Complete!");
+                bundle.putString(BUTTON_TXT_KEY, "Return");
+                StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
+                statusConfirmationFragment.setArguments(bundle);
+                Bundle bundleReply = statusConfirmationFragment.getArguments();
+                Log.d(TAG, "title: "+bundle.getString(TITLE_KEY));
+                Log.d(TAG, "msg: "+bundle.getString(MSG_KEY));
+                Log.d(TAG, "button text: "+bundle.getString(BUTTON_TXT_KEY));
+                AuditChecklistFragment.this.getParentFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.auditor_fragment_container, statusConfirmationFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 
@@ -54,16 +74,17 @@ public class AuditChecklistFragment extends Fragment {
     }
 
     private void init_recyclerView(RecyclerView recyclerView, ArrayList<Checklist_item> list) {
+        ChecklistAdapter checklistAdapter;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
         checklistAdapter = new ChecklistAdapter(list);
         recyclerView.setAdapter(checklistAdapter);
     }
 
-    private void addToChecklist(ArrayList<Checklist_item> list, String statement) {
-        list.add(new Checklist_item(statement, ""));
-        checklistAdapter.notifyDataSetChanged();
-    }
+//    private void addToChecklist(ArrayList<Checklist_item> list, String statement) {
+//        list.add(new Checklist_item(statement, ""));
+//        checklistAdapter.notifyDataSetChanged();
+//    }
 
     private void initChecklistSection(View view, String pathName) {
         /*
@@ -75,22 +96,22 @@ public class AuditChecklistFragment extends Fragment {
         ArrayList<Checklist_item> checklistArray = new ArrayList<>();
         QuestionBank qb = new QuestionBank(getActivity());
         lines = qb.getQuestions(pathName);
-        Log.d(TAG, "initChecklistSection: first line: "+lines.get(0));
+//        Log.d(TAG, "initChecklistSection: first line: "+lines.get(0));
         for (String line : lines) {
             if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
                 if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
-                    Log.d(TAG, "checklistArray first statement: "+checklistArray.get(0).getStatement());
-                    Log.d(TAG, "initChecklistSection: current recyclerview: "+recyclerView.toString());
+//                    Log.d(TAG, "checklistArray first statement: "+checklistArray.get(0).getStatement());
+//                    Log.d(TAG, "initChecklistSection: current recyclerview: "+recyclerView.toString());
                     init_recyclerView(recyclerView, checklistArray);
                     checklistArray.clear();
-                    Log.d(TAG, "checklistArray number of else after clearing: "+checklistArray.size());
+//                    Log.d(TAG, "checklistArray number of else after clearing: "+checklistArray.size());
                 }
-                Log.d(TAG, "initChecklistSection: getting recyclerview using sub-header: "+line.substring(1));
+//                Log.d(TAG, "initChecklistSection: getting recyclerview using sub-header: "+line.substring(1));
                 try {
                     recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
-                    Log.d(TAG, "initChecklistSection: new recyclerview: "+recyclerView.toString());
+//                    Log.d(TAG, "initChecklistSection: new recyclerview: "+recyclerView.toString());
                 } catch (IllegalArgumentException e) {
-                    Log.e(TAG, "initChecklistSection: ", e);
+//                    Log.e(TAG, "initChecklistSection: ", e);
                     e.printStackTrace();
                 }
                 FIRST_SUB_HEADER = false;
@@ -104,8 +125,46 @@ public class AuditChecklistFragment extends Fragment {
             }
         }
         // init the last one
-        Log.d(TAG, "initChecklistSection: current recyclerview: "+recyclerView.toString());
-        Log.d(TAG, "checklistArray first statement: "+checklistArray.get(0).getStatement());
+//        Log.d(TAG, "initChecklistSection: current recyclerview: "+recyclerView.toString());
+//        Log.d(TAG, "checklistArray first statement: "+checklistArray.get(0).getStatement());
+        init_recyclerView(recyclerView, checklistArray);
+    }
+
+    private void initChecklistSectionCorrect(View view, String pathName) {
+        /*
+         * 1. Gets an ArrayList of questions for each sub-header in a section specified by the pathName
+         * 2. Matches each ArrayList to a recyclerView
+         * 3. Initialises the recyclerView
+         * */
+        boolean FIRST_SUB_HEADER = true;
+        RecyclerView recyclerView = null;
+        ArrayList<String> lines;
+        ArrayList<Checklist_item> checklistArray = new ArrayList<>();
+        QuestionBank qb = new QuestionBank(getActivity());
+        lines = qb.getQuestions(pathName);
+//        Log.d(TAG, "initChecklistSection: first line: "+lines.get(0));
+        for (String line : lines) {
+            if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
+                if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
+                    init_recyclerView(recyclerView, checklistArray);
+                    checklistArray.clear();
+                }
+//                Log.d(TAG, "initChecklistSection: getting recyclerview using sub-header: "+line.substring(1));
+                try {
+                    recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+                FIRST_SUB_HEADER = false;
+            } else { // it is a question
+                if (Character.compare(line.charAt(0), '>') == 0) {
+                    Checklist_item item = checklistArray.get(checklistArray.size() - 1);
+                    item.setStatement(item.getStatement()+"\n"+line);
+                } else {
+                    checklistArray.add(new Checklist_item(line, ""));
+                }
+            }
+        }
         init_recyclerView(recyclerView, checklistArray);
     }
 
@@ -116,37 +175,37 @@ public class AuditChecklistFragment extends Fragment {
 
         switch (subHeader) {
             case "Professionalism":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: professionalism");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: professionalism");
                 return view.findViewById(R.id.audit_checklist_recyclerview_professionalism);
             case "Staff Hygiene":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Staff Hygiene");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Staff Hygiene");
                 return view.findViewById(R.id.audit_checklist_recyclerview_staff_hygiene);
             case "General Environment Cleanliness":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: General Environment Cleanliness");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: General Environment Cleanliness");
                 return view.findViewById(R.id.audit_checklist_recyclerview_environment);
             case "Hand Hygiene Facilities":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Hand Hygiene Facilities");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Hand Hygiene Facilities");
                 return view.findViewById(R.id.audit_checklist_recyclerview_hand_hygiene);
             case "Storage & Preparation of Food":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Storage & Preparation of Food");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Storage & Preparation of Food");
                 return view.findViewById(R.id.audit_checklist_recyclerview_food_prep);
             case "Storage of Food in Refrigerator/ Warmer":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Storage of Food in Refrigerator/ Warmer");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Storage of Food in Refrigerator/ Warmer");
                 return view.findViewById(R.id.audit_checklist_recyclerview_food_storage);
             case "Food":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Food");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Food");
                 return view.findViewById(R.id.audit_checklist_recyclerview_food_hpb);
             case "Beverage":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Beverage");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Beverage");
                 return view.findViewById(R.id.audit_checklist_recyclerview_beverage_hpb);
             case "General Safety":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: General Safety");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: General Safety");
                 return view.findViewById(R.id.audit_checklist_recyclerview_general_safety);
             case "Fire & Emergency Safety":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Fire & Emergency Safety");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Fire & Emergency Safety");
                 return view.findViewById(R.id.audit_checklist_recyclerview_fire_safety);
             case "Electrical Safety":
-                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Electrical Safety");
+//                Log.d(TAG, "getCorrespondingRecyclerView: returning recyclerview: Electrical Safety");
                 return view.findViewById(R.id.audit_checklist_recyclerview_electricity_safety);
             default:
                 throw new IllegalArgumentException();
@@ -177,7 +236,7 @@ public class AuditChecklistFragment extends Fragment {
         // initialize and fill all recyclerViews using text files in assets directory
         for (String pathName : header_files) {
             Log.d(TAG, "onCreateView: init checklist section for: "+pathName);
-            initChecklistSection(view, pathName);
+            initChecklistSectionCorrect(view, pathName);
         }
     }
 
