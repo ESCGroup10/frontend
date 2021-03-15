@@ -12,6 +12,7 @@ import com.example.singhealthapp.TestFragment;
 import com.example.singhealthapp.auditor.AddTenantFragment;
 import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
+import com.example.singhealthapp.auditor.SafetyChecklistFragment;
 import com.example.singhealthapp.auditor.SearchTenantFragment;
 import com.google.android.material.navigation.NavigationView;
 
@@ -96,7 +97,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Tenants:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SafetyChecklistFragment()).commit();
                 break;
 
             case R.id.nav_Reports:
