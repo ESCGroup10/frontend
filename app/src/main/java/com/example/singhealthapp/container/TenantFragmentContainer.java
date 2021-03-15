@@ -10,6 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -27,7 +28,8 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
 
     private static final String TAG = "TenantFragmentContainer";
 
-    FirebaseAuth mAuth;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     DrawerLayout drawer;
 
@@ -35,8 +37,6 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tenant_fragmentcontainer);
-
-        mAuth = FirebaseAuth.getInstance();
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -77,7 +77,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 public void onClick(DialogInterface dialog, int id) {
                     //AuditorFragmentContainer.super.onBackPressed();
                     dialog.dismiss();
-                    mAuth.signOut();
+                    clearData(); // clear user type (to avoid auto login) and token (for safety)
                     Intent intent = new Intent(TenantFragmentContainer.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -114,5 +114,13 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void clearData() {
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putString("TOKEN_KEY", "");
+        editor.putString("USER_TYPE_KEY", "");
+        editor.commit();
     }
 }

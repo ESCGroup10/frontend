@@ -1,5 +1,8 @@
 package com.example.singhealthapp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
@@ -17,7 +20,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
 
 @RunWith(AndroidJUnit4ClassRunner.class)
-public class FirebaseLoginTest {
+public class LoginTest {
 
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule =
@@ -30,8 +33,8 @@ public class FirebaseLoginTest {
 
     @Test
     public void CorrectAuditorLogin() {
-        onView(withId(R.id.login_email)).perform(typeText("testauditor@gmail.com"));
-        onView(withId(R.id.login_password)).perform(typeText("testpw"));
+        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com"));
+        onView(withId(R.id.login_password)).perform(typeText("1234"));
 
         onView(withId(R.id.loginButton)).perform(click());
         onView(withId(R.id.auditor_main_page)).check(matches(isDisplayed()));
@@ -42,8 +45,8 @@ public class FirebaseLoginTest {
 
     @Test
     public void CorrectTenantLogin() {
-        onView(withId(R.id.login_email)).perform(typeText("testtenant@gmail.com"));
-        onView(withId(R.id.login_password)).perform(typeText("testpw"));
+        onView(withId(R.id.login_email)).perform(typeText("tenant@test.com"));
+        onView(withId(R.id.login_password)).perform(typeText("1234"));
 
         onView(withId(R.id.loginButton)).perform(click());
         onView(withId(R.id.tenant_main_page)).check(matches(isDisplayed()));
@@ -54,8 +57,8 @@ public class FirebaseLoginTest {
 
     @Test
     public void WrongEmailLogin() {
-        onView(withId(R.id.login_email)).perform(typeText("wrongemail@gmail.com"));
-        onView(withId(R.id.login_password)).perform(typeText("testpw"));
+        onView(withId(R.id.login_email)).perform(typeText("xxxx@test.com"));
+        onView(withId(R.id.login_password)).perform(typeText("1234"));
 
         onView(withId(R.id.loginButton)).perform(click());
         onView(withId(R.id.login_page)).check(matches(isDisplayed()));
@@ -63,8 +66,8 @@ public class FirebaseLoginTest {
 
     @Test
     public void WrongPasswordLogin() {
-        onView(withId(R.id.login_email)).perform(typeText("testauditor@gmail.com"));
-        onView(withId(R.id.login_password)).perform(typeText("wrongpw"));
+        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com"));
+        onView(withId(R.id.login_password)).perform(typeText("xxxx"));
 
         onView(withId(R.id.loginButton)).perform(click());
         onView(withId(R.id.login_page)).check(matches(isDisplayed()));
@@ -72,7 +75,7 @@ public class FirebaseLoginTest {
 
     @Test
     public void EmptyPasswordLogin() {
-        onView(withId(R.id.login_email)).perform(typeText("testauditor@gmail.com"));
+        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com"));
         onView(withId(R.id.login_password)).perform(typeText(""));
 
         onView(withId(R.id.loginButton)).perform(click());
@@ -82,11 +85,10 @@ public class FirebaseLoginTest {
     @Test
     public void EmptyEmailLogin() {
         onView(withId(R.id.login_email)).perform(typeText(""));
-        onView(withId(R.id.login_password)).perform(typeText("testpw"));
+        onView(withId(R.id.login_password)).perform(typeText("1234"));
 
         onView(withId(R.id.loginButton)).perform(click());
         onView(withId(R.id.login_page)).check(matches(isDisplayed()));
     }
-
 
 }
