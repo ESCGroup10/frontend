@@ -25,8 +25,6 @@ import java.util.ArrayList;
 public class AuditChecklistFragment extends Fragment {
     private static final String TAG = "AuditChecklistFragment";
 
-//    private ChecklistAdapter checklistAdapter;
-
     Button submit_audit_button;
 
     private final String TITLE_KEY = "title_key";
@@ -44,7 +42,7 @@ public class AuditChecklistFragment extends Fragment {
 
         Bundle bundle = getArguments();
         String tenant_type = bundle.getString(TENANT_TYPE_KEY);
-        View view = inflateFrgamentLayout(tenant_type, container, inflater);
+        View view = inflateFragmentLayout(tenant_type, container, inflater);
 
         initRecyclerViews(view);
 
@@ -81,56 +79,7 @@ public class AuditChecklistFragment extends Fragment {
         recyclerView.setAdapter(checklistAdapter);
     }
 
-//    private void addToChecklist(ArrayList<Checklist_item> list, String statement) {
-//        list.add(new Checklist_item(statement, ""));
-//        checklistAdapter.notifyDataSetChanged();
-//    }
-
     private void initChecklistSection(View view, String pathName) {
-        /*
-        * Reads a formatted text file and creates RecyclerViews for the checklists corresponding to the file
-        * */
-        boolean FIRST_SUB_HEADER = true;
-        RecyclerView recyclerView = null;
-        ArrayList<String> lines;
-        ArrayList<Checklist_item> checklistArray = new ArrayList<>();
-        QuestionBank qb = new QuestionBank(getActivity());
-        lines = qb.getQuestions(pathName);
-//        Log.d(TAG, "initChecklistSection: first line: "+lines.get(0));
-        for (String line : lines) {
-            if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
-                if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
-//                    Log.d(TAG, "checklistArray first statement: "+checklistArray.get(0).getStatement());
-//                    Log.d(TAG, "initChecklistSection: current recyclerview: "+recyclerView.toString());
-                    init_recyclerView(recyclerView, checklistArray);
-                    checklistArray.clear();
-//                    Log.d(TAG, "checklistArray number of else after clearing: "+checklistArray.size());
-                }
-//                Log.d(TAG, "initChecklistSection: getting recyclerview using sub-header: "+line.substring(1));
-                try {
-                    recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
-//                    Log.d(TAG, "initChecklistSection: new recyclerview: "+recyclerView.toString());
-                } catch (IllegalArgumentException e) {
-//                    Log.e(TAG, "initChecklistSection: ", e);
-                    e.printStackTrace();
-                }
-                FIRST_SUB_HEADER = false;
-            } else { // it is a question
-                if (Character.compare(line.charAt(0), '>') == 0) {
-                    Checklist_item item = checklistArray.get(checklistArray.size() - 1);
-                    item.setStatement(item.getStatement()+"\n\n"+line);
-                } else {
-                    checklistArray.add(new Checklist_item(line, ""));
-                }
-            }
-        }
-        // init the last one
-//        Log.d(TAG, "initChecklistSection: current recyclerview: "+recyclerView.toString());
-//        Log.d(TAG, "checklistArray first statement: "+checklistArray.get(0).getStatement());
-        init_recyclerView(recyclerView, checklistArray);
-    }
-
-    private void initChecklistSectionCorrect(View view, String pathName) {
         /*
          * 1. Gets an ArrayList of questions for each sub-header in a section specified by the pathName
          * 2. Matches each ArrayList to a recyclerView
@@ -142,14 +91,12 @@ public class AuditChecklistFragment extends Fragment {
         ArrayList<Checklist_item> checklistArray = new ArrayList<>();
         QuestionBank qb = new QuestionBank(getActivity());
         lines = qb.getQuestions(pathName);
-//        Log.d(TAG, "initChecklistSection: first line: "+lines.get(0));
         for (String line : lines) {
             if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
                 if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
                     init_recyclerView(recyclerView, checklistArray);
-                    checklistArray.clear();
+                    checklistArray = new ArrayList<>();
                 }
-//                Log.d(TAG, "initChecklistSection: getting recyclerview using sub-header: "+line.substring(1));
                 try {
                     recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
                 } catch (IllegalArgumentException e) {
@@ -212,7 +159,7 @@ public class AuditChecklistFragment extends Fragment {
         }
     }
 
-    private View inflateFrgamentLayout(String tenant_type, ViewGroup container, LayoutInflater inflater) {
+    private View inflateFragmentLayout(String tenant_type, ViewGroup container, LayoutInflater inflater) {
         // decides which fragment to inflate
         View view;
         if (tenant_type.toLowerCase().equals("fb")) {
@@ -236,7 +183,7 @@ public class AuditChecklistFragment extends Fragment {
         // initialize and fill all recyclerViews using text files in assets directory
         for (String pathName : header_files) {
             Log.d(TAG, "onCreateView: init checklist section for: "+pathName);
-            initChecklistSectionCorrect(view, pathName);
+            initChecklistSection(view, pathName);
         }
     }
 
