@@ -4,11 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".user.SearchTenantFragment">
+    android:id="@+id/search_tenant_view"
+    tools:context=".auditor.SearchTenantFragment">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/list_text_view"
         android:text="List of all Tenants" />
 
 </LinearLayout>

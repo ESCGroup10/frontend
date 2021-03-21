@@ -14,8 +14,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class SearchTenantFragment extends Fragment {
 
-    FirebaseAuth mAuth;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,

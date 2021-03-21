@@ -64,8 +64,6 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
         apiCaller = retrofit.create(DatabaseApiCaller.class);
 
-
-
         textViewEmail = findViewById(R.id.login_email);
         textViewPassword = findViewById(R.id.login_password);
 
