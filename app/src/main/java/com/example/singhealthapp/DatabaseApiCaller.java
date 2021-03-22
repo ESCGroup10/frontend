@@ -1,50 +1,73 @@
 package com.example.singhealthapp;
 
-import com.example.singhealthapp.ObjectsFromDatabase.LoginInfo;
+import com.example.singhealthapp.auditor.Report;
+import com.example.singhealthapp.auditor.ReportPreview;
 
 import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface DatabaseApiCaller {
 
-    // test example: get a list of all users (auditors + tenants)
-    @GET("/api/users/?format=json")
-    Call<List<User>> getUsers();
+    // TEST EXAMPLE: get a list of all users (auditors + tenants)
+    @GET("/api/users/")
+    Call<List<User>> getUsers(
+            @Header("authorization") String token
+    );
 
-
-    // test example: post details of new user
+    // TEST EXAMPLE: post details of new user
     @FormUrlEncoded
-    @POST("/api/users/?format=json")
+    @POST("/api/users/")
     Call<User> postNewUser(
+            @Header("authorization") String token,
+            @Field("email") String email,
+            @Field("password") String password,
             @Field("name") String name,
             @Field("company") String company,
-            @Field("email") String email,
             @Field("location") String location,
             @Field("institution") String institution,
             @Field("type") String type
     );
 
+    // get a single user based on user email
+    @GET("/api/singleUser/")
+    Call<List<User>> getSingleUser(
+            @Header("authorization") String token,
+            @Query("email") String email
+    );
+
+    // login post request
+    @FormUrlEncoded
+    @POST("/login/")
+    Call<Token> postLogin(
+            @Field("username") String email,
+            @Field("password") String password
+    );
+
     // post details of new user i.e. add a new tenant/auditor to the database
     @FormUrlEncoded
-    @POST("/api/users/?format=json")
-    Call<User> postUser (@FieldMap Map<String, String> fields);
+    @POST("/api/users/")
+    Call<User> postUser (
+            @Header("authorization") String token,
+            @FieldMap Map<String, String> fields
+    );
 
-    // get the details of a single user
-    @GET("users/")
-    Call<List<com.example.singhealthapp.User>> getUser();
+    @GET("/api/previewReport/")
+    Call<List<ReportPreview>> getReportPreview (
+            @Header("authorization") String token
+    );
 
-    // get authentication of a single user
-    @GET("auth/")
-    Call<LoginInfo> authenticate(@Header("Authorization") String authHeader);
-    // get the details of all tenants
-    @GET("/api/tenants/?format=json")
-    Call<List<Tenant>> getTenants();
+    @GET("/api/report/")
+    Call<List<Report>> getReport (
+            @Header("authorization") String token
+    );
 }

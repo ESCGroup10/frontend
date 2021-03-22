@@ -1,24 +1,31 @@
 package com.example.singhealthapp;
 
 public class User {
-    private String name, email, company, location, institution, type;
+    private String email, password, name, company, location, institution, type;
     private int id;
 
-    public User(String name, String company, String email, String location, String institution, String type) {
+    public User(String email, String password, String name, String company, String location, String institution, String type) {
+        this.email = email;
+        this.password = password;
         this.name = name;
         this.company = company;
-        this.email = email;
         this.location = location;
         this.institution = institution;
         this.type = type;
     }
 
-    public String getName() {
-        return name;
+    public int getId() {
+        return id;
     }
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPassword() { return password; }
+
+    public String getName() {
+        return name;
     }
 
     public String getCompany() {
@@ -35,9 +42,5 @@ public class User {
 
     public String getType() {
         return type;
-    }
-
-    public int getId() {
-        return id;
     }
 }

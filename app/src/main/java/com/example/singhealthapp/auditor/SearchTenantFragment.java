@@ -10,8 +10,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SearchTenantFragment extends Fragment {
+
+    FirebaseAuth mAuth;
 
     @Nullable
     @Override
@@ -21,4 +24,5 @@ public class SearchTenantFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_tenants, container, false);
 
     }
+
 }

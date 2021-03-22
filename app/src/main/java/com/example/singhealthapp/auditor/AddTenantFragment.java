@@ -2,6 +2,7 @@ package com.example.singhealthapp.auditor;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -18,14 +19,22 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.DatabaseApiCaller;
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,10 +45,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AddTenantFragment extends Fragment {
 
+    private String token;
+
     ArrayList<EditText> editList = new ArrayList<EditText>();
-    String[] name = {"TENANT REP NAME", "COMPANY NAME", "EMAIL", "LOCATION", "INSTITUTION"};
-    List<String> nameList = Arrays.asList(name);
-    String[] type = {"F&B", "Non F&B"};
+    private final String[] name = {"TENANT REP NAME", "COMPANY NAME", "EMAIL", "LOCATION", "INSTITUTION"};
+    private final List<String> nameList = Arrays.asList(name);
+    private final String[] type = {"F&B", "Non F&B"};
+    private final String regExpnEmail =
+            "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
+                    +"((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                    +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                    +"([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                    +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
+                    +"([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$";
 
     @Nullable
     @Override
@@ -69,16 +87,20 @@ public class AddTenantFragment extends Fragment {
 
         // for setting type of the tenant
         Spinner spin = view.findViewById(R.id.spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, type);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
+                android.R.layout.simple_list_item_1, type);
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
         spin.setAdapter(adapter);
 
-        // save the new tenant
+        // button for saving the new tenant
         view.findViewById(R.id.addTenantConfirm).setOnClickListener(v -> {
-            boolean status = saveTenant(spin.getSelectedItem().toString());
-            if ( status ) getActivity().onBackPressed();
+            if ( saveTenant(spin.getSelectedItem().toString()) ) {
+                new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                        .setTitle("SUCCESS")
+                        .setMessage("NEW TENANT ADDED!")
+                        .setPositiveButton(android.R.string.yes, null).create().show();
+            }
         });
-
         return view;
     }
 
@@ -89,11 +111,30 @@ public class AddTenantFragment extends Fragment {
         EditText temp = new EditText(getContext());
         temp.setMaxLines(1);
         temp.setInputType(InputType.TYPE_CLASS_TEXT);
+        if (name.equals("EMAIL")) temp.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
         temp.setText(t.getText());
         alert.setView(temp);
-        InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imgr = (InputMethodManager) getActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
 
         alert.setPositiveButton("Ok", (dialog, whichButton) -> {
+
+            // check email format
+            if ( name.equals("EMAIL") && ! temp.getText().toString().isEmpty()) {
+                CharSequence inputStr = temp.getText().toString();
+                Pattern pattern = Pattern.compile(regExpnEmail, Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(inputStr);
+
+                if ( ! matcher.matches() ) {
+                    new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                            .setTitle("ERROR")
+                            .setMessage("INVALID EMAIL FORMAT!")
+                            .setPositiveButton(android.R.string.yes, (arg0, arg1) ->
+                                    t.performClick()).create().show();
+                    return ;
+                }
+            }
             t.setText(temp.getText());
             imgr.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         });
@@ -105,66 +146,69 @@ public class AddTenantFragment extends Fragment {
         temp.requestFocus();
     }
 
-    // helper method to create a tenant object with input of the user
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+        loadToken();
+    }
+
+    // helper method to create a tenant object with input of the user and call a query with it
     private boolean saveTenant(String type){
         ArrayList<String> arguments = new ArrayList<String>();
         for (EditText t : editList){
             if (t.getText().toString().isEmpty()) {
-                Toast.makeText(getContext(), "There are still blank fields left.", Toast.LENGTH_SHORT)
-                        .show();
+                new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                        .setTitle("ERROR")
+                        .setMessage("THERE ARE STILL BLANK FIELD LEFT!")
+                        .setPositiveButton(android.R.string.yes, null).create().show();
                 return false;
             }
             arguments.add(t.getText().toString());
         }
-        User tenantObject = new User(arguments.get(0), arguments.get(1), arguments.get(2),
+        User tenantObject = new User(arguments.get(2), "1234", arguments.get(0), arguments.get(1),
                 arguments.get(3), arguments.get(4), type);
         queryAddTenant(tenantObject);
         return true;
     }
 
+    // calling server API to create a new object in the cloud
     protected void queryAddTenant(User user) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com")
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-        /*Call<User> call = apiCaller.postUser(user.getName(), user.getCompany(),
-                user.getEmail(), user.getLocation(),
-                user.getInstitution(), user.getType()); */
+
         Map<String, String> fields = new HashMap<>();
+        fields.put("email", user.getEmail());
+        fields.put("password", user.getPassword());
         fields.put("name", user.getName());
         fields.put("company", user.getCompany());
         fields.put("location", user.getLocation());
         fields.put("type", user.getType());
         fields.put("institution", user.getInstitution());
-        fields.put("email", user.getEmail());
 
-        Call<User> call = apiCaller.postUser(fields);
-
-        // for testing placeholder site
-        //fields = new HashMap<>();
-        //fields.put("title", "we");
-        // Call<User> call = apiCaller.postTest(fields);
+        Call<User> call = apiCaller.postUser("Token " + token, fields);
 
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (!response.isSuccessful()) {
-                    //Toast.makeText(getContext(), String.valueOf(response.code()), Toast.LENGTH_LONG).show();
-                    System.out.println(response.code() + "\n\n");
+                    // Toast
                     return ;
                 }
-                System.out.println(response.code() + " New tenant added.");
+                //System.out.println(response.code() + ": New tenant added.");
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                try {
-                    throw t;
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                }
+                // Toast
                 return ;
             }
         });
+    }
+
+    private void loadToken() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN_KEY", null);
     }
 }
