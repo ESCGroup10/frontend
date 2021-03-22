@@ -21,7 +21,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 @RunWith(AndroidJUnit4ClassRunner.class)
-public class LoginTest {
+public class LoginInstrumentedTest {
 
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule =

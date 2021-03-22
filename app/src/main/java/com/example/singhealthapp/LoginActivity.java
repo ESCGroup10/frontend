@@ -1,6 +1,5 @@
 package com.example.singhealthapp;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -32,22 +30,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText textViewEmail, textViewPassword;
-    Button login_button, auditorBtn, tenantBtn;
+    private EditText textViewEmail, textViewPassword;
+    private Button login_button, auditorBtn, tenantBtn;
 
     String email, password;
     int resetCount;
     Call<List<User>> getUserCall;
 
-    Retrofit retrofit;
     DatabaseApiCaller apiCaller;
 
-    Token token;
-    String userType;
+    private Token token;
+    private String userType;
     int userId;
 
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -58,32 +55,13 @@ public class LoginActivity extends AppCompatActivity {
         autoLogin(); // try to login automatically
 
         // create an api caller to the webserver
-        retrofit = new Retrofit.Builder()
+        apiCaller = new Retrofit.Builder()
                 .baseUrl("https://esc10-303807.et.r.appspot.com/")
                 .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        apiCaller = retrofit.create(DatabaseApiCaller.class);
+                .build()
+                .create(DatabaseApiCaller.class);
 
-        textViewEmail = findViewById(R.id.login_email);
-        textViewPassword = findViewById(R.id.login_password);
-
-        login_button = findViewById(R.id.loginButton);
-        login_button.setOnClickListener(v -> {
-            email = textViewEmail.getText().toString();
-            password = textViewPassword.getText().toString();
-
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                CentralisedToast.makeText(this,
-                        "Email or password is empty", CentralisedToast.LENGTH_LONG);
-            } else {
-                authenticate();
-            }
-        });
-
-        // async task to set up faster
-        new Thread(() -> {
-            setUpNavBtns();
-        }).start();
+        setUpView();
     }
 
     // try to navigate to home page immediately using data in SharedPreferences
@@ -105,32 +83,21 @@ public class LoginActivity extends AppCompatActivity {
 
     // get token of the user via login post request
     private void authenticate() {
-        Call<Token> loginCall = apiCaller.postLogin(email, password);
+        Call<Token> authCall = apiCaller.postLogin(email, password);
 
         // make a call to post a new User to the database
-        loginCall.enqueue(new Callback<Token>() {
+        authCall.enqueue(new Callback<Token>() {
             @Override
             public void onResponse(Call<Token> call, Response<Token> response) {
-
                 if (response.code() == 200) { // response code is valid
                     token = response.body();
-                    login(); // check whether user is auditor or tenant to navigate to correct page
+                    getUserInfo(); // check whether user is auditor or tenant to navigate to correct page
                 } else {
                     if (resetCount != 4) {
                         resetCount++;
                         CentralisedToast.makeText(LoginActivity.this, String.format("You have entered the wrong password %d times. You have %d tries left.", resetCount, 5-resetCount), 0);
                     } else {
-                        login_button.setEnabled(false); // disable login button
-                        CentralisedToast.makeText(LoginActivity.this, "You have entered the wrong password 5 times. Please wait 10s to retry.", 1);
-                        resetCount = 0;
-
-
-                        // schedule function to enable login after 10s
-                        final Handler handler = new Handler(Looper.getMainLooper());
-                        handler.postDelayed(() -> {
-                            login_button.setEnabled(true); // enable the login button
-
-                        }, 10000); // 10s
+                        disableLogin();
                     }
                 }
             }
@@ -143,8 +110,22 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    // disable login for 10s if user fails login 5 times
+    private void disableLogin() {
+        login_button.setEnabled(false); // disable login button
+        CentralisedToast.makeText(LoginActivity.this, "You have entered the wrong password 5 times. Please wait 10s to retry.", 1);
+        resetCount = 0;
+
+        // schedule function to enable login after 10s
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(() -> {
+            login_button.setEnabled(true); // enable the login button
+
+        }, 10000); // 10s
+    }
+
     // navigate to the next page based on the user type (auditor or tenant)
-    private void login() {
+    private void getUserInfo() {
         getUserCall = apiCaller.getSingleUser("Token " + token.getToken(), email);
 
         getUserCall.enqueue(new Callback<List<User>>() {
@@ -160,25 +141,30 @@ public class LoginActivity extends AppCompatActivity {
                     saveData(); // save user type, user id and token
                 }).start();
 
-                Intent intent;
-                if (userType.equals("Auditor")) { // if user logged in is Auditor, move to Auditor page
-                    intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
-                    startActivity(intent);
-                } else if (userType.equals("F&B") || userType.equals("Non F&B")) { // else if user logged in is F&B or Non F&B, move to Tennat page
-                    intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
-                    startActivity(intent);
-                } else { // else this user is not a valid user type!
-                    CentralisedToast.makeText(LoginActivity.this,
-                            "Invalid User Type! Please contact the administrator.", CentralisedToast.LENGTH_LONG);
-                }
+                navigate(userType);
             }
-
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
                 CentralisedToast.makeText(LoginActivity.this,
                         "Error: " + t, CentralisedToast.LENGTH_LONG);
             }
         });
+    }
+
+    // navigate to home page
+    private void navigate(String userType) {
+        Intent intent;
+        if (userType.equals("Auditor")) { // if user logged in is Auditor, move to Auditor page
+            intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
+            startActivity(intent);
+        } else if (userType.equals("F&B") || userType.equals("Non F&B")) { // else if user logged in is F&B or Non F&B, move to Tennat page
+            intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
+            startActivity(intent);
+        } else { // else this user is not a valid user type!
+            CentralisedToast.makeText(LoginActivity.this,
+                    "Invalid User Type! Please contact the administrator.", CentralisedToast.LENGTH_LONG);
+        }
+
     }
 
     // load the userType of the user for auto log in as long as the user never logs out
@@ -197,9 +183,24 @@ public class LoginActivity extends AppCompatActivity {
         editor.commit();
     }
 
-
     // set up the extra auditor and tenant cheat buttons
-    private void setUpNavBtns() {
+    private void setUpView() {
+        textViewEmail = findViewById(R.id.login_email);
+        textViewPassword = findViewById(R.id.login_password);
+
+        login_button = findViewById(R.id.loginButton);
+        login_button.setOnClickListener(v -> {
+            email = textViewEmail.getText().toString();
+            password = textViewPassword.getText().toString();
+
+            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+                CentralisedToast.makeText(this,
+                        "Email or password is empty", CentralisedToast.LENGTH_LONG);
+            } else {
+                authenticate();
+            }
+        });
+
         auditorBtn = findViewById(R.id.auditorButton);
         auditorBtn.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
