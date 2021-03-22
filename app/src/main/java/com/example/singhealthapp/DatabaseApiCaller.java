@@ -1,5 +1,8 @@
 package com.example.singhealthapp;
 
+import com.example.singhealthapp.auditor.Report;
+import com.example.singhealthapp.auditor.ReportPreview;
+
 import java.util.List;
 import java.util.Map;
 
@@ -56,5 +59,15 @@ public interface DatabaseApiCaller {
     Call<User> postUser (
             @Header("authorization") String token,
             @FieldMap Map<String, String> fields
+    );
+
+    @GET("/api/previewReport/")
+    Call<List<ReportPreview>> getReportPreview (
+            @Header("authorization") String token
+    );
+
+    @GET("/api/report/")
+    Call<List<Report>> getReport (
+            @Header("authorization") String token
     );
 }
