@@ -1,17 +1,27 @@
 package com.example.singhealthapp.auditor;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.Models.Checklist_item;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.auditor.Adapters.ChecklistAdapter;
@@ -96,5 +106,36 @@ public class SafetyChecklistFragment extends Fragment {
         list.add(new Checklist_item(statement, ""));
         checklistAdapter.notifyDataSetChanged();
     }
+
+//    @Override
+//    public void onPhotoReturnListener(ImageButton cameraButton) {
+//        ActivityResultLauncher<Intent> takePhotoResultLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                new ActivityResultCallback<ActivityResult>() {
+//                    @Override
+//                    public void onActivityResult(ActivityResult result) {
+//                        if (result.getResultCode() == Activity.RESULT_OK) {
+//                            Intent data = result.getData();
+//                            Bundle extras = data.getExtras();
+//                            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//                            cameraButton.setBackground(null);
+//                            cameraButton.setImageBitmap(imageBitmap);
+//                        }
+//                    }
+//                });
+//
+//        openCameraForResult(takePhotoResultLauncher);
+//    }
+//
+//    private void openCameraForResult(ActivityResultLauncher<Intent> takePhotoResultLauncher) {
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        String chooser_title = "Take picture with";
+//        Intent chooser = Intent.createChooser(takePictureIntent, chooser_title);
+//        if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+//            takePhotoResultLauncher.launch(chooser);
+//        } else {
+//            CentralisedToast.makeText(getContext(), "Unable to find camera", CentralisedToast.LENGTH_SHORT);
+//        }
+//    }
 
 }

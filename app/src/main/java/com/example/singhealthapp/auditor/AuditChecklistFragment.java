@@ -1,12 +1,22 @@
 package com.example.singhealthapp.auditor;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,17 +32,19 @@ import com.example.singhealthapp.auditor.Adapters.ChecklistAdapter;
 
 import java.util.ArrayList;
 
+import static android.app.Activity.RESULT_OK;
+
 public class AuditChecklistFragment extends Fragment {
-    private static final String TAG = "AuditChecklistFragment";
+    public static final String TAG = "AuditChecklistFragment";
 
     Button submit_audit_button;
+
+    private static final String TENANT_TYPE_KEY = "tenant_type_key";
+    private String[] header_files;
 
     private final String TITLE_KEY = "title_key";
     private final String MSG_KEY = "message_key";
     private final String BUTTON_TXT_KEY = "button_text_key";
-
-    private static final String TENANT_TYPE_KEY = "tenant_type_key";
-    private String[] header_files;
 
     @Nullable
     @Override
@@ -75,7 +87,7 @@ public class AuditChecklistFragment extends Fragment {
         ChecklistAdapter checklistAdapter;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        checklistAdapter = new ChecklistAdapter(list);
+        checklistAdapter = new ChecklistAdapter(getContext(), list);
         recyclerView.setAdapter(checklistAdapter);
     }
 
@@ -187,4 +199,34 @@ public class AuditChecklistFragment extends Fragment {
         }
     }
 
+//    @Override
+//    public void onPhotoReturnListener(ImageButton cameraButton) {
+//        ActivityResultLauncher<Intent> takePhotoResultLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                new ActivityResultCallback<ActivityResult>() {
+//                    @Override
+//                    public void onActivityResult(ActivityResult result) {
+//                        if (result.getResultCode() == Activity.RESULT_OK) {
+//                            Intent data = result.getData();
+//                            Bundle extras = data.getExtras();
+//                            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//                            cameraButton.setBackground(null);
+//                            cameraButton.setImageBitmap(imageBitmap);
+//                        }
+//                    }
+//                });
+//
+//        openCameraForResult(takePhotoResultLauncher);
+//    }
+//
+//    private void openCameraForResult(ActivityResultLauncher<Intent> takePhotoResultLauncher) {
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        String chooser_title = "Take picture with";
+//        Intent chooser = Intent.createChooser(takePictureIntent, chooser_title);
+//        if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+//            takePhotoResultLauncher.launch(chooser);
+//        } else {
+//            CentralisedToast.makeText(getContext(), "Unable to find camera", CentralisedToast.LENGTH_SHORT);
+//        }
+//    }
 }
