@@ -10,6 +10,7 @@ android {
     defaultConfig {
         applicationId "com.example.singhealthapp"
         minSdkVersion 16
+        multiDexEnabled true
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -62,4 +63,10 @@ dependencies {
     // recyclerview
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "androidx.recyclerview:recyclerview:1.1.0"
+    // bar chart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
 }
