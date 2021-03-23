@@ -19,7 +19,7 @@ import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
 import com.example.singhealthapp.auditor.SafetyChecklistFragment;
 import com.example.singhealthapp.auditor.SearchTenantFragment;
-import com.example.singhealthapp.auditor.TakePhotoInterface;
+import com.example.singhealthapp.TakePhotoInterface;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -162,10 +162,14 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     }
 
     public void takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition) {
-//        GetPhotoConcurrently getPhoto = new GetPhotoConcurrently();
-//        Thread thread = new Thread(getPhoto);
-//        thread.start();
-
+        /*
+        * === Params ===
+        * checklistAdapter: The ChecklistAdapter that called this method
+        * adapterPosition: The position of the item in the adapter that called this method
+        * === Description ===
+        * - Opens camera app to take photo
+        * - Updates global variables mChecklistAdapter and mAdapterPosition
+        * */
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
             try {
@@ -182,6 +186,9 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        /*
+        * Gets photo taken and updates recyclerview with a thumbnail
+        * */
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
@@ -189,36 +196,4 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             mChecklistAdapter.updateAdapter(imageBitmap, mAdapterPosition);
         }
     }
-
-//    @Override
-//    public void onPhotoReturnListener(ImageButton cameraButton) {
-//        ActivityResultLauncher<Intent> takePhotoResultLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                new ActivityResultCallback<ActivityResult>() {
-//                    @Override
-//                    public void onActivityResult(ActivityResult result) {
-//                        if (result.getResultCode() == Activity.RESULT_OK) {
-//                            Intent data = result.getData();
-//                            Bundle extras = data.getExtras();
-//                            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//                            cameraButton.setBackground(null);
-//                            cameraButton.setImageBitmap(imageBitmap);
-//                        }
-//                    }
-//                });
-//
-//        openCameraForResult(takePhotoResultLauncher);
-//    }
-//
-//    private void openCameraForResult(ActivityResultLauncher<Intent> takePhotoResultLauncher) {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        String chooser_title = "Take picture with";
-//        Intent chooser = Intent.createChooser(takePictureIntent, chooser_title);
-//        if (takePictureIntent.resolveActivity(AuditorFragmentContainer.this.getPackageManager()) != null) {
-//            takePhotoResultLauncher.launch(chooser);
-//        } else {
-//            CentralisedToast.makeText(AuditorFragmentContainer.this, "Unable to find camera", CentralisedToast.LENGTH_SHORT);
-//        }
-//    }
-
 }

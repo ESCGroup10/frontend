@@ -106,36 +106,4 @@ public class SafetyChecklistFragment extends Fragment {
         list.add(new Checklist_item(statement, ""));
         checklistAdapter.notifyDataSetChanged();
     }
-
-//    @Override
-//    public void onPhotoReturnListener(ImageButton cameraButton) {
-//        ActivityResultLauncher<Intent> takePhotoResultLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                new ActivityResultCallback<ActivityResult>() {
-//                    @Override
-//                    public void onActivityResult(ActivityResult result) {
-//                        if (result.getResultCode() == Activity.RESULT_OK) {
-//                            Intent data = result.getData();
-//                            Bundle extras = data.getExtras();
-//                            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//                            cameraButton.setBackground(null);
-//                            cameraButton.setImageBitmap(imageBitmap);
-//                        }
-//                    }
-//                });
-//
-//        openCameraForResult(takePhotoResultLauncher);
-//    }
-//
-//    private void openCameraForResult(ActivityResultLauncher<Intent> takePhotoResultLauncher) {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        String chooser_title = "Take picture with";
-//        Intent chooser = Intent.createChooser(takePictureIntent, chooser_title);
-//        if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
-//            takePhotoResultLauncher.launch(chooser);
-//        } else {
-//            CentralisedToast.makeText(getContext(), "Unable to find camera", CentralisedToast.LENGTH_SHORT);
-//        }
-//    }
-
 }

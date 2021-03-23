@@ -1,10 +1,6 @@
 package com.example.singhealthapp.auditor;
 
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,14 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.TakePhotoInterface;
 import com.example.singhealthapp.Models.Checklist_item;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.StatusConfirmationFragment;
 import com.example.singhealthapp.auditor.Adapters.ChecklistAdapter;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 public class AuditChecklistFragment extends Fragment {
     public static final String TAG = "AuditChecklistFragment";
@@ -38,8 +33,6 @@ public class AuditChecklistFragment extends Fragment {
     private final String TITLE_KEY = "title_key";
     private final String MSG_KEY = "message_key";
     private final String BUTTON_TXT_KEY = "button_text_key";
-
-    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Nullable
     @Override
@@ -193,44 +186,4 @@ public class AuditChecklistFragment extends Fragment {
             initChecklistSection(view, pathName);
         }
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-
-        }
-    }
-
-//    @Override
-//    public void onPhotoReturnListener(ImageButton cameraButton) {
-//        ActivityResultLauncher<Intent> takePhotoResultLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                new ActivityResultCallback<ActivityResult>() {
-//                    @Override
-//                    public void onActivityResult(ActivityResult result) {
-//                        if (result.getResultCode() == Activity.RESULT_OK) {
-//                            Intent data = result.getData();
-//                            Bundle extras = data.getExtras();
-//                            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//                            cameraButton.setBackground(null);
-//                            cameraButton.setImageBitmap(imageBitmap);
-//                        }
-//                    }
-//                });
-//
-//        openCameraForResult(takePhotoResultLauncher);
-//    }
-//
-//    private void openCameraForResult(ActivityResultLauncher<Intent> takePhotoResultLauncher) {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        String chooser_title = "Take picture with";
-//        Intent chooser = Intent.createChooser(takePictureIntent, chooser_title);
-//        if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
-//            takePhotoResultLauncher.launch(chooser);
-//        } else {
-//            CentralisedToast.makeText(getContext(), "Unable to find camera", CentralisedToast.LENGTH_SHORT);
-//        }
-//    }
 }

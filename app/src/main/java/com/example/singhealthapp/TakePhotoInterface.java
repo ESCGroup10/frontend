@@ -1,4 +1,4 @@
-package com.example.singhealthapp.auditor;
+package com.example.singhealthapp;
 
 import com.example.singhealthapp.auditor.Adapters.ChecklistAdapter;
 
