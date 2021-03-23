@@ -1,18 +1,16 @@
 package com.example.singhealthapp.auditor.Adapters;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.auditor.Case;
-import com.example.singhealthapp.auditor.CasePreviewHolder;
+
 import java.util.List;
 
 public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
