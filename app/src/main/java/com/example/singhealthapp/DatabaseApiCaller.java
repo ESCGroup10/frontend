@@ -1,5 +1,6 @@
 package com.example.singhealthapp;
 
+import com.example.singhealthapp.auditor.Case;
 import com.example.singhealthapp.auditor.Report;
 import com.example.singhealthapp.auditor.ReportPreview;
 import com.example.singhealthapp.auditor.SearchMain;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -79,5 +81,12 @@ public interface DatabaseApiCaller {
     @GET("/api/tenants/")
     Call<List<SearchMain>> getSearchMain(
             @Header("authorization") String token
+    );
+
+    @GET("/api/filterCases/")
+    Call<List<Case>> getCasesById (
+            @Header("authorization") String token,
+            @Query("report_id") int report_id,
+            @Query("is_resolved") int is_resolved
     );
 }
