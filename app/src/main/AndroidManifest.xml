@@ -12,13 +12,13 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".container.AuditorFragmentContainer"
-            android:parentActivityName=".LoginActivity" />
-        <activity android:name=".container.TenantFragmentContainer"
-            android:parentActivityName=".LoginActivity" />
-        <activity android:name=".ResetPasswordActivity"
-            android:parentActivityName=".LoginActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Container.AuditorFragmentContainer"
+            android:parentActivityName=".Views.Login.LoginActivity" />
+        <activity android:name=".Container.TenantFragmentContainer"
+            android:parentActivityName=".Views.Login.LoginActivity" />
+        <activity android:name=".Views.Login.ResetPasswordActivity"
+            android:parentActivityName=".Views.Login.LoginActivity" />
+        <activity android:name=".Views.Login.LoginActivity">
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

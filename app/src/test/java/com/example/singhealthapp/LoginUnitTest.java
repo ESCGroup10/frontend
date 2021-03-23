@@ -1,12 +1,15 @@
 package com.example.singhealthapp;
 
+import com.example.singhealthapp.Models.DatabaseApiCaller;
+import com.example.singhealthapp.Models.Token;
+import com.example.singhealthapp.Models.User;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

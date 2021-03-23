@@ -6,6 +6,8 @@ import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
+import com.example.singhealthapp.Views.Login.LoginActivity;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
