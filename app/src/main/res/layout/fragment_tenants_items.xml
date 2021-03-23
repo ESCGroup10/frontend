@@ -18,7 +18,6 @@
         android:id="@+id/itemLayout"
         android:focusable="true"
         android:clickable="true"
-        android:background="#C3C3C3"
         android:layout_margin="10dp"
         tools:context=".auditor.Tenant"
         >
@@ -28,6 +27,7 @@
             android:layout_height="50dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/tenantCardCompany"
+            android:gravity="center_horizontal"
             android:padding="5dp"
             android:textStyle="bold"
             android:textColor="#121212"/>
@@ -36,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:padding="5dp"
+            android:gravity="center_horizontal"
             android:textColor="#121212"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/tenantCardInstitution" />
@@ -44,6 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:padding="5dp"
+            android:gravity="center_horizontal"
             android:textColor="#121212"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/tenantCardType" />
