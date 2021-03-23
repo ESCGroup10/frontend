@@ -25,13 +25,17 @@ public class CaseFragment extends Fragment {
     TextView companyView, locationView;
     String company, location;
     View view;
+    private Report report;
+    private String token;
 
-    public CaseFragment(List<Case> unresolvedCases, List<Case> resolvedCases, int id, String company, String location){
+    public CaseFragment(List<Case> unresolvedCases, List<Case> resolvedCases, int id, String company, String location, Report report, String token){
         this.unresolvedCases = unresolvedCases;
         this.resolvedCases = resolvedCases;
         this.id = id;
         this.company = company;
         this.location = location;
+        this.report = report;
+        this.token = token;
     }
 
     @Override
@@ -66,5 +70,13 @@ public class CaseFragment extends Fragment {
         companyView.setText("Company: " + company);
         locationView.setText("Location: " + location);
         return view;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public Report getReport() {
+        return report;
     }
 }

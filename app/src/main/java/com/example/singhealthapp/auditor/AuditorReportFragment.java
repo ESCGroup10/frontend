@@ -122,7 +122,7 @@ public class AuditorReportFragment extends Fragment {
                             button.setBackgroundColor(Color.rgb(115, 194, 239));
                             button.setOnClickListener(v -> getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(getActivity().getSupportFragmentManager().findFragmentByTag("viewReport").getId()
-                                            , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation()),
+                                            , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation(), report, token),
                                             "viewCase").commit());
                         }
                     }
