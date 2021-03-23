@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -62,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
-                    android:textSize="10dp"
+                    android:textSize="12dp"
                     android:text="Professionalism and Staff Hygiene (10%)"
                     android:layout_gravity="center" />
 
@@ -74,7 +74,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
-                    android:textSize="10dp"
+                    android:textSize="12dp"
                     android:text="Housekeeping &amp; General Cleanliness (20%)"
                     android:layout_gravity="center" />
 
@@ -86,7 +86,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
-                    android:textSize="10dp"
+                    android:textSize="12dp"
                     android:text="Food Hygiene (35%)"
                     android:layout_gravity="center" />
 
@@ -98,7 +98,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
-                    android:textSize="10dp"
+                    android:textSize="12dp"
                     android:text="Healthier Choice (15%)"
                     android:layout_gravity="center" />
 
@@ -110,15 +110,87 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
-                    android:textSize="10dp"
+                    android:textSize="12dp"
                     android:text="Workplace Safety &amp; Health (20%)"
                     android:layout_gravity="center" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:textSize="16dp"
+                    android:textColor="@color/black"
+                    android:text="Resolved Cases: "
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:textSize="16dp"
+                    android:text="~"
+                    android:textColor="@color/green"
+                    android:id="@+id/auditorReportResolved"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:textSize="16dp"
+                    android:textColor="@color/black"
+                    android:text="Unresolved Cases: "
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:textSize="16dp"
+                    android:text="~"
+                    android:textColor="@color/red"
+                    android:id="@+id/auditorReportUnresolved"
+                    android:gravity="center" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/auditorReportViewCases"
+            android:layout_width="180dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="20dp"
+            android:enabled="false"
+            android:layout_marginBottom="10dp"
+            android:background="@color/grey"
+            android:textColor="@color/black"
+            android:layout_gravity="center"
+            android:text="view cases" />
+
     </LinearLayout>
 
 
 
-</androidx.core.widget.NestedScrollView>
+</ScrollView>
