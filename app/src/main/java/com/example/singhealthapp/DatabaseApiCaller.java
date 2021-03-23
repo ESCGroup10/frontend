@@ -1,9 +1,13 @@
 package com.example.singhealthapp;
 
+import com.example.singhealthapp.auditor.Report;
+import com.example.singhealthapp.auditor.ReportPreview;
+
 import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -55,5 +59,15 @@ public interface DatabaseApiCaller {
     Call<User> postUser (
             @Header("authorization") String token,
             @FieldMap Map<String, String> fields
+    );
+
+    @GET("/api/previewReport/")
+    Call<List<ReportPreview>> getReportPreview (
+            @Header("authorization") String token
+    );
+
+    @GET("/api/report/")
+    Call<List<Report>> getReport (
+            @Header("authorization") String token
     );
 }

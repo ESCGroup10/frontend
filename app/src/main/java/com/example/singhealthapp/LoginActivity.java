@@ -10,12 +10,12 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.container.AuditorFragmentContainer;
 import com.example.singhealthapp.container.TenantFragmentContainer;
 
@@ -29,6 +29,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
 
     private EditText textViewEmail, textViewPassword;
     private Button login_button, auditorBtn, tenantBtn;
@@ -95,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     if (resetCount != 4) {
                         resetCount++;
-                        CentralisedToast.makeText(LoginActivity.this, String.format("You have entered the wrong password %d times. You have %d tries left.", resetCount, 5-resetCount), 0);
+                        Toast.makeText(LoginActivity.this, String.format("You have entered the wrong password %d times. You have %d tries left.", resetCount, 5-resetCount), Toast.LENGTH_SHORT).show();
                     } else {
                         disableLogin();
                     }
@@ -104,8 +105,13 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Token> call, Throwable t) {
-                CentralisedToast.makeText(LoginActivity.this,
-                        "Error: " + t, CentralisedToast.LENGTH_LONG);
+                if (t.getMessage().contains("failed to connect")) {
+                    Toast.makeText(LoginActivity.this,
+                            "Login Error: Timeout after 10s \nPlease try again later", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(LoginActivity.this,
+                            "Error: " + t, Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -113,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
     // disable login for 10s if user fails login 5 times
     private void disableLogin() {
         login_button.setEnabled(false); // disable login button
-        CentralisedToast.makeText(LoginActivity.this, "You have entered the wrong password 5 times. Please wait 10s to retry.", 1);
+        Toast.makeText(LoginActivity.this, "You have entered the wrong password 5 times. Please wait 10s to retry.", Toast.LENGTH_LONG).show();
         resetCount = 0;
 
         // schedule function to enable login after 10s
@@ -145,8 +151,8 @@ public class LoginActivity extends AppCompatActivity {
             }
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
-                CentralisedToast.makeText(LoginActivity.this,
-                        "Error: " + t, CentralisedToast.LENGTH_LONG);
+                Toast.makeText(LoginActivity.this,
+                        "Error: " + t, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -161,8 +167,8 @@ public class LoginActivity extends AppCompatActivity {
             intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
             startActivity(intent);
         } else { // else this user is not a valid user type!
-            CentralisedToast.makeText(LoginActivity.this,
-                    "Invalid User Type! Please contact the administrator.", CentralisedToast.LENGTH_LONG);
+            Toast.makeText(LoginActivity.this,
+                    "Invalid User Type! Please contact the administrator.", Toast.LENGTH_LONG).show();
         }
 
     }
@@ -194,8 +200,8 @@ public class LoginActivity extends AppCompatActivity {
             password = textViewPassword.getText().toString();
 
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                CentralisedToast.makeText(this,
-                        "Email or password is empty", CentralisedToast.LENGTH_LONG);
+                Toast.makeText(this,
+                        "Email or password is empty", Toast.LENGTH_LONG).show();
             } else {
                 authenticate();
             }

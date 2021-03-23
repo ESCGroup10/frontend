@@ -12,6 +12,7 @@ import com.example.singhealthapp.TestFragment;
 import com.example.singhealthapp.auditor.AddTenantFragment;
 import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
+import com.example.singhealthapp.auditor.SafetyChecklistFragment;
 import com.example.singhealthapp.auditor.SearchTenantFragment;
 import com.google.android.material.navigation.NavigationView;
 
@@ -53,16 +54,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
-//            auditor_drawer.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-//        super.onBackPressed();
-//    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -76,6 +67,31 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: ");
+
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId()
+                                , new ReportsFragment(), "getReport").commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+
         if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
             auditor_drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -106,15 +122,16 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Tenants:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SafetyChecklistFragment()).commit();
                 break;
 
             case R.id.nav_Reports:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport").commit();
                 break;
 
             case R.id.nav_Add_Tenant:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment(), "addTenant").commit();
                 break;
 
             case R.id.nav_Test:
