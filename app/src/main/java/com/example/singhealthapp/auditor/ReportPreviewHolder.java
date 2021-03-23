@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.singhealthapp.R;
 
 public class ReportPreviewHolder extends RecyclerView.ViewHolder {
-    TextView reportName, reportDate, resolution, id;
-    View view;
+    public TextView reportName, reportDate, resolution, id;
+    public View view;
 
     public ReportPreviewHolder(@NonNull View itemView) {
         super(itemView);
