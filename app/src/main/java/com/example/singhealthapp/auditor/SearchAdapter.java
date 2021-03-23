@@ -37,9 +37,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder>{
         holder.tenantCompany.setText(list.get(position).getCompany());
         holder.tenantInstitution.setText(list.get(position).getInstitution());
         holder.tenantType.setText(list.get(position).getType());
-       /* holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
+        holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
                 .replace(parent.getSupportFragmentManager().findFragmentByTag("getTenant").getId()
-                        , new TenantFragment(tenants.get(position)), "viewTenant").commit()); */
+                        , new TenantFragment(tenants.get(position)), "viewTenant").commit());
     }
 
     @Override

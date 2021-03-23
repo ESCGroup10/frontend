@@ -51,7 +51,7 @@ public class SearchTenantFragment extends Fragment {
             public void onResponse(Call<List<SearchMain>> call, Response<List<SearchMain>> response) {
                 if (!response.isSuccessful()) {
                     Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
-                    return ;
+                    return;
                 }
                 System.out.println("response " + response.code());
                 queueReport(token, response.body());
@@ -77,7 +77,7 @@ public class SearchTenantFragment extends Fragment {
                 System.out.println(response.body().get(0).getId());
                 adapter = new SearchAdapter(tenantSearch, response.body(), getActivity());
                 try {
-                    RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerView);
+                    RecyclerView view = (RecyclerView) getView().findViewById(R.id.tenantRecycler);
                     view.setLayoutManager(new LinearLayoutManager(getActivity()));
                     view.setItemAnimator(new DefaultItemAnimator());
                     view.setAdapter(adapter);
