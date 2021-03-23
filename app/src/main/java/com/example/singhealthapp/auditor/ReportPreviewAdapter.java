@@ -1,19 +1,15 @@
 package com.example.singhealthapp.auditor;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.R;
 
-import java.util.Collections;
 import java.util.List;
 
 public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHolder>{
