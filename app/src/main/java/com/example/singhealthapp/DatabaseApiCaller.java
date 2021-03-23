@@ -1,5 +1,6 @@
 package com.example.singhealthapp;
 
+import com.example.singhealthapp.auditor.Case;
 import com.example.singhealthapp.auditor.Report;
 import com.example.singhealthapp.auditor.ReportPreview;
 
@@ -69,5 +70,12 @@ public interface DatabaseApiCaller {
     @GET("/api/report/")
     Call<List<Report>> getReport (
             @Header("authorization") String token
+    );
+
+    @GET("/api/filterCases/")
+    Call<List<Case>> getCasesById (
+            @Header("authorization") String token,
+            @Query("report_id") int report_id,
+            @Query("is_resolved") int is_resolved
     );
 }

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,21 +45,26 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class AuditorReportFragment extends Fragment {
     Report report;
     View view;
-    TextView company, location;
+    TextView company, location, resolved, unresolved;
     HorizontalBarChart chart1, chart2, chart3, chart4, chart5;
     ArrayList<BarEntry> barEntries;
     BarData barData;
     BarDataSet barDataSet;
     float[][] data;
-    int[] colors = new int[]{Color.GREEN, Color.GRAY};
+    int[] colors;
+    private final String token;
+    List<Case> resolvedCases, unresolvedCases;
 
-    public AuditorReportFragment(Report report) {
+    public AuditorReportFragment(Report report, String token) {
         this.report = report;
         data = new float[][]{new float[]{report.getStaffhygiene_score()*100f, 100f - report.getStaffhygiene_score()*100f},
                 new float[]{report.getHousekeeping_score()*100f, 100f - report.getHousekeeping_score()*100f},
                 new float[]{report.getSafety_score()*100f,  100f - report.getSafety_score()*100f},
                 new float[]{report.getHealthierchoice_score()*100f,  100f - report.getHealthierchoice_score()*100f},
                 new float[]{report.getFoodhygiene_score()*100f,  100f - report.getFoodhygiene_score()*100f}};
+        this.token = token;
+        resolvedCases = new ArrayList<>();
+        unresolvedCases = new ArrayList<>();
     }
 
     @Override
@@ -83,6 +89,54 @@ public class AuditorReportFragment extends Fragment {
         location = view.findViewById(R.id.reportLocation);
         location.setText("LOCATION: " + report.getLocation());
 
+        resolved = view.findViewById(R.id.auditorReportResolved);
+        unresolved = view.findViewById(R.id.auditorReportUnresolved);
+        Button button = view.findViewById(R.id.auditorReportViewCases);
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/").addConverterFactory(GsonConverterFactory.create()).build();
+        DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
+        Call<List<Case>> call = apiCaller.getCasesById("Token " + token, report.getId(), 1);
+        call.enqueue(new Callback<List<Case>>() {
+            @Override
+            public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
+                if (!response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
+                    return ;
+                }
+                if (response.body().isEmpty()) resolved.setText("0");
+                else resolved.setText(String.valueOf(response.body().size()));
+                resolvedCases.addAll(response.body());
+                call = apiCaller.getCasesById("Token " + token, report.getId(), 0);
+                call.enqueue(new Callback<List<Case>>() {
+                    @Override
+                    public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
+                        if (!response.isSuccessful()) {
+                            Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
+                            return ;
+                        }
+                        if (response.body().isEmpty()) unresolved.setText("0");
+                        else unresolved.setText(String.valueOf(response.body().size()));
+                        unresolvedCases.addAll(response.body());
+                        if ( ! resolved.getText().toString().equals("0") || ! resolved.getText().toString().equals("0")) {
+                            button.setEnabled(true);
+                            button.setBackgroundColor(Color.rgb(115, 194, 239));
+                            button.setOnClickListener(v -> getActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(getActivity().getSupportFragmentManager().findFragmentByTag("viewReport").getId()
+                                            , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation()),
+                                            "viewCase").commit());
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<List<Case>> call, Throwable t) {
+                        unresolved.setText("error");
+                    }
+                });
+            }
+            @Override
+            public void onFailure(Call<List<Case>> call, Throwable t) {
+                resolved.setText("error");
+            }
+        });
         return view;
     }
 
@@ -90,6 +144,9 @@ public class AuditorReportFragment extends Fragment {
         barEntries = new ArrayList<>();
         barEntries.add(new BarEntry(0, data[i]));
         barDataSet = new BarDataSet(barEntries, "");
+        if ( data[i][0] >= 70 ) colors = new int[]{Color.rgb(159, 221, 88), Color.rgb(170, 170, 170)};
+        else if ( data[i][0] >= 35 ) colors = new int[]{Color.rgb(237, 135, 40), Color.rgb(170, 170, 170)};
+        else colors = new int[]{Color.rgb(221, 57, 48), Color.rgb(170, 170, 170)};
         barDataSet.setColors(colors);
         barDataSet.setValueTextSize(8);
         barDataSet.setValueFormatter(new ValueFormatter() {

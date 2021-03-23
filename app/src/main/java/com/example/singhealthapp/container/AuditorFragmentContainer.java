@@ -10,6 +10,7 @@ import com.example.singhealthapp.LoginActivity;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.TestFragment;
 import com.example.singhealthapp.auditor.AddTenantFragment;
+import com.example.singhealthapp.auditor.AuditorReportFragment;
 import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
 import com.example.singhealthapp.auditor.SafetyChecklistFragment;
@@ -86,6 +87,15 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId()
+                                , new ReportsFragment(), "getReport").commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
                                 , new ReportsFragment(), "getReport").commit();
                 return;
             }
