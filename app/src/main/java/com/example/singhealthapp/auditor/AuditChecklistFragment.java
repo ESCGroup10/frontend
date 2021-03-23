@@ -1,6 +1,6 @@
 package com.example.singhealthapp.auditor;
 
-import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -10,17 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +38,8 @@ public class AuditChecklistFragment extends Fragment {
     private final String TITLE_KEY = "title_key";
     private final String MSG_KEY = "message_key";
     private final String BUTTON_TXT_KEY = "button_text_key";
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Nullable
     @Override
@@ -87,7 +82,7 @@ public class AuditChecklistFragment extends Fragment {
         ChecklistAdapter checklistAdapter;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        checklistAdapter = new ChecklistAdapter(getContext(), list);
+        checklistAdapter = new ChecklistAdapter((TakePhotoInterface)getActivity(), list);
         recyclerView.setAdapter(checklistAdapter);
     }
 
@@ -196,6 +191,15 @@ public class AuditChecklistFragment extends Fragment {
         for (String pathName : header_files) {
             Log.d(TAG, "onCreateView: init checklist section for: "+pathName);
             initChecklistSection(view, pathName);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
         }
     }
 

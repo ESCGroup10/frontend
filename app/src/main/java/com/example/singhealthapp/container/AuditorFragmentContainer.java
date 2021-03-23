@@ -1,19 +1,25 @@
 package com.example.singhealthapp.container;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.LoginActivity;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.TestFragment;
+import com.example.singhealthapp.auditor.Adapters.ChecklistAdapter;
 import com.example.singhealthapp.auditor.AddTenantFragment;
 import com.example.singhealthapp.auditor.ReportsFragment;
 import com.example.singhealthapp.StatisticsFragment;
 import com.example.singhealthapp.auditor.SafetyChecklistFragment;
 import com.example.singhealthapp.auditor.SearchTenantFragment;
+import com.example.singhealthapp.auditor.TakePhotoInterface;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -24,9 +30,13 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        TakePhotoInterface {
 
     private static final String TAG = "AuditorFragmentContain";
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    ChecklistAdapter mChecklistAdapter;
+    int mAdapterPosition;
 
     DrawerLayout auditor_drawer;
 
@@ -149,6 +159,35 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         editor.putString("TOKEN_KEY", "");
         editor.putString("USER_TYPE_KEY", "");
         editor.commit();
+    }
+
+    public void takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition) {
+//        GetPhotoConcurrently getPhoto = new GetPhotoConcurrently();
+//        Thread thread = new Thread(getPhoto);
+//        thread.start();
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
+            try {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                mChecklistAdapter = checklistAdapter;
+                mAdapterPosition = adapterPosition;
+            } catch (ActivityNotFoundException e) {
+                CentralisedToast.makeText(this, "Unable to find camera", CentralisedToast.LENGTH_SHORT);
+            }
+        } else {
+            CentralisedToast.makeText(this, "Camera does not exist", CentralisedToast.LENGTH_SHORT);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mChecklistAdapter.updateAdapter(imageBitmap, mAdapterPosition);
+        }
     }
 
 //    @Override
