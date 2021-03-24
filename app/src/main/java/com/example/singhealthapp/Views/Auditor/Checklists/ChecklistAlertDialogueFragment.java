@@ -1,4 +1,4 @@
-package com.example.singhealthapp.auditor;
+package com.example.singhealthapp.Views.Auditor.Checklists;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

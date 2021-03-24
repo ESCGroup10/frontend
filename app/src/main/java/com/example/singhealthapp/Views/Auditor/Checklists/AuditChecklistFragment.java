@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.AuditChecklist;
+package com.example.singhealthapp.Views.Auditor.Checklists;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -14,12 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
-import com.example.singhealthapp.TakePhotoInterface;
+import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
-import com.example.singhealthapp.Views.Auditor.SafetyChecklist.ChecklistAdapter;
 
 import java.util.ArrayList;
 

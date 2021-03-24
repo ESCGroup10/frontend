@@ -4,11 +4,16 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Token;
 import com.example.singhealthapp.Models.User;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import okhttp3.mockwebserver.MockResponse;
@@ -144,4 +149,5 @@ public class LoginUnitTest {
         Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "");
         assertNotEquals(200, authCall.execute().code());
     }
+
 }

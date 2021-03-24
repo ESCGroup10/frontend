@@ -1,7 +1,8 @@
-package com.example.singhealthapp.Views.Auditor.SafetyChecklist;
+package com.example.singhealthapp.Views.Auditor.Checklists;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.TakePhotoInterface;
+import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
 
 import java.util.ArrayList;
 
@@ -31,7 +32,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
 
     private TakePhotoInterface photoFragment;
 
-    public ChecklistAdapter(TakePhotoInterface photoFragment, ArrayList<Checklist_item> checklist_items_array) {
+    public ChecklistAdapter(TakePhotoInterface photoFragment, ArrayList<ChecklistItem> checklist_items_array) {
         this.checklist_items_array = checklist_items_array;
         this.photoFragment = photoFragment;
     }
@@ -52,22 +53,12 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.textViewQuestion.setText(checklist_items_array.get(position).getStatement());
-        // TODO: find a way to get remarks saved to the checklist_item just before changing fragment
         checklist_items_array.get(position).setRemarks(holder.editTextRemarks.getText().toString());
-        Bitmap imageBitmap = checklist_items_array.get(position).getImageBitmap();
-        if (imageBitmap != null) {
-            holder.cameraButton.setImageBitmap(imageBitmap);
-        }
     }
 
     @Override
     public int getItemCount() {
         return checklist_items_array.size();
-    }
-
-    public void updateAdapter(Bitmap photo, int adapterPosition) {
-        checklist_items_array.get(adapterPosition).setImageBitmap(photo);
-        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -90,11 +81,10 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             cameraButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    System.out.println("registered camera click");
+                    //Log.d(TAG, "onClick: registered camera click");
                     photoFragment.takePhoto(ChecklistAdapter.this, getAdapterPosition());
                 }
             });
-
 
             textViewTrue.setOnClickListener(new View.OnClickListener() {
                 @Override

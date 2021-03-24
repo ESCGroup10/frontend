@@ -1,41 +1,66 @@
-package com.example.singhealthapp.Container;
+package com.example.singhealthapp.Containers;
 
-import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.Models.Case;
+import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.TakePhotoInterface;
+import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.TestFragment;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
 import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
-import com.example.singhealthapp.Views.Auditor.SafetyChecklist.SafetyChecklistFragment;
+import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         TakePhotoInterface {
 
     private static final String TAG = "AuditorFragmentContain";
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
     ChecklistAdapter mChecklistAdapter;
     int mAdapterPosition;
+    String currentPhotoPath;
+
+    private static DatabaseApiCaller apiCaller;
+    private static Call<List<Case>> getCaseCall;
+    private static Call<ResponseBody> delCaseCall;
+    private static String token;
+    private ArrayList<Case> caseArrayList = new ArrayList<Case>();
 
     DrawerLayout auditor_drawer;
 
@@ -61,6 +86,14 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
         }
+
+        Gson gson = new Gson();
+        apiCaller = gson.fromJson(getIntent().getStringExtra("API_CALLER_JSON_KEY"), DatabaseApiCaller.class);
+        loadToken();
+    }
+
+    private void createApiCaller() {
+
     }
 
     @Override
@@ -126,7 +159,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             });
             builder.setNegativeButton("Cancel", (dialog, id) -> {
                 dialog.dismiss();
-                //finish();
             });
             builder.show();
         }
@@ -171,21 +203,32 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
     public void takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition) {
         /*
-        * === Params ===
-        * checklistAdapter: The ChecklistAdapter that called this method
-        * adapterPosition: The position of the item in the adapter that called this method
-        * === Description ===
+        * Params
+        * - checklistAdapter: The ChecklistAdapter that called this method
+        * - adapterPosition: The position of the item in the adapter that called this method
+        * Description
         * - Opens camera app to take photo
         * - Updates global variables mChecklistAdapter and mAdapterPosition
         * */
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
+            File photoFile = null;
             try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                Log.d(TAG, "takePhoto: error in creating file for image to go into");
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 mChecklistAdapter = checklistAdapter;
                 mAdapterPosition = adapterPosition;
-            } catch (ActivityNotFoundException e) {
-                CentralisedToast.makeText(this, "Unable to find camera", CentralisedToast.LENGTH_SHORT);
+            } else {
+                Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
+                CentralisedToast.makeText(this, "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
             }
         } else {
             CentralisedToast.makeText(this, "Camera does not exist", CentralisedToast.LENGTH_SHORT);
@@ -199,9 +242,92 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         * */
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            mChecklistAdapter.updateAdapter(imageBitmap, mAdapterPosition);
+
         }
+    }
+
+    /*
+    * Parameters
+    * - int caseID
+    * Usage
+    * - creates a new case object for a specific case ID if one does not already exist
+    * - else, deletes the old one and creates a new one
+    * */
+//    private static synchronized void addCase(int caseID) {
+//        if (token != null) {
+//            getCaseCall = apiCaller.getCaseByCaseId("Token " + token, caseID);
+//            getCaseCall.enqueue(new Callback<List<Case>>() {
+//                @Override
+//                public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
+//                    Log.d(TAG, "addCase onResponse: "+response.code());
+//                    List<Case> caseList = response.body();
+//                    Case returnedCase = caseList.get(0);
+//                    if (returnedCase != null) { // if there is a case with this case ID
+//                        deleteCase(caseID);
+//                    }
+//                    //postCase(caseID, );
+//
+//                }
+//
+//                @Override
+//                public void onFailure(Call<List<Case>> call, Throwable t) {
+//                    Log.d(TAG, "addCase onFailure: "+t.toString());
+//                }
+//            });
+//        }
+//
+//    }
+
+//    private static synchronized void postCase(int caseID, int reportID, String question, String unresolved_photo, String unresolved_comments, String resolved_photo, String resolved_comments) {
+//        Call<ResponseBody> call = apiCaller.postNewCase("Token " + token, caseID, reportID, question, unresolved_photo, unresolved_comments, resolved_photo, resolved_comments);
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                Log.d(TAG, "createCase onResponse: "+response.code());
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                Log.d(TAG, "createCase onFailure: "+t.toString());
+//            }
+//        });
+//    }
+//
+//    private static synchronized void deleteCase(int caseID) {
+//        if (token != null) {
+//            delCaseCall = apiCaller.deleteCaseByCaseId("Token " + token, caseID);
+//            delCaseCall.enqueue(new Callback<ResponseBody>() {
+//                @Override
+//                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                    Log.d(TAG, "deleteCase onResponse: "+response.code());
+//                }
+//
+//                @Override
+//                public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                    Log.d(TAG, "deleteCase onFailure: "+t.toString());
+//                }
+//            });
+//        }
+//    }
+
+    private void loadToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN_KEY", null);
+    }
+
+    public File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 }

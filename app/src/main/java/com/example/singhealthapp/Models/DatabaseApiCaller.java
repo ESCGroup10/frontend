@@ -5,7 +5,9 @@ import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchMain;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -83,5 +85,44 @@ public interface DatabaseApiCaller {
             @Header("authorization") String token,
             @Query("report_id") int report_id,
             @Query("is_resolved") int is_resolved
+    );
+
+    // temp fake request
+    @GET("/api/filterCases2/")
+    Call<List<Case>> getCaseByCaseId (
+            @Header("authorization") String token,
+            @Query("case_id") int case_id
+    );
+
+    @DELETE("/api/filterCases2/")
+    Call<ResponseBody> deleteCaseByCaseId (
+            @Header("authorization") String token,
+            @Query("case_id") int case_id
+    );
+
+//    @FormUrlEncoded
+//    @POST("/api/report/")
+//    Call<ResponseBody> postNewReport(
+//            @Header("authorization") String token,
+////            @Field("email") String email,
+////            @Field("password") String password,
+////            @Field("name") String name,
+////            @Field("company") String company,
+////            @Field("location") String location,
+////            @Field("institution") String institution,
+////            @Field("type") String type
+//    );
+
+    @FormUrlEncoded
+    @POST("/api/case/")
+    Call<ResponseBody> postNewCase(
+            @Header("authorization") String token,
+            @Field("id") int case_id,
+            @Field("report_id") int report_id,
+            @Field("question") String question,
+            @Field("unresolved_photo") String unresolved_photo,
+            @Field("unresolved_comments") String unresolved_comments,
+            @Field("resolved_photo") String resolved_photo,
+            @Field("resolved_comments") String resolved_comments
     );
 }
