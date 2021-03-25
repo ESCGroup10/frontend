@@ -60,18 +60,18 @@ public class DatabaseApiPostNewReportTest {
         // map result to constructor parameters (each inner list corresponds to the inputs to the constructor)
         return Arrays.asList (new Object [][] {
                 // TODO: should token have letters etc?
-                {200, "Token 1234", 123, 234, "company", "location", "fb", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, true},
-                {200, "Token 1234", 123, 234, "company", "location", "fb", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.222, false},
-                {200, "Token 1234", 123, 234, "company", "location", "fb", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, -1.2, true},
-                {200, "Token 1234", 123, 234, "company", "location", "fb", false, "notes", 123, null, 0.5, 3.45, 34, 0, 1.2, false},
-                {200, "Token 1234", 123, 234, "company", "location", "fb", false, 123, "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
-                {200, "Token 1234", 123, 234, "company", "location", "fb", "false", "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
-                {200, "1234", 123, 234, "company", "location", "fb", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
-                {200, "Token1234", 123, 234, "company", "location", "fb", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
-                {200, 1234, 123, 234, "company", "location", "fb", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
-                {200, "Token 1234", 123, 234, "company", "location", "fb", true, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, true},
-                {200, "Token 1234", 123, 234, "company", "location", "fb", false, "notes", "12/04/2021", "", 0.5, 3.45, 34, 0, 1.2, true},
-                {200, "Token 1234", 123, 234, "company", "location", "fb", false, "notes", "12/04/2021", null, null, 3.45, 34, 0, 1.2, false}
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, true},
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.222, false},
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, -1.2, true},
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", false, "notes", 123, null, 0.5, 3.45, 34, 0, 1.2, false},
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", false, 123, "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", "false", "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
+                {200, "1234", 123, 234, "company", "location", "F&B", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
+                {200, "Token1234", 123, 234, "company", "location", "F&B", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
+                {200, 1234, 123, 234, "company", "location", "F&B", false, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, false},
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", true, "notes", "12/04/2021", null, 0.5, 3.45, 34, 0, 1.2, true},
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", false, "notes", "12/04/2021", "", 0.5, 3.45, 34, 0, 1.2, true},
+                {200, "Token 1234", 123, 234, "company", "location", "F&B", false, "notes", "12/04/2021", null, null, 3.45, 34, 0, 1.2, false}
         });
     }
 

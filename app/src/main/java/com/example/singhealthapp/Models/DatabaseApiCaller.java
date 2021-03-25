@@ -87,20 +87,6 @@ public interface DatabaseApiCaller {
             @Query("is_resolved") int is_resolved
     );
 
-    // temp fake request
-    @GET("/api/filterCases2/")
-    Call<List<Case>> getCaseByCaseId (
-            @Header("authorization") String token,
-            @Query("case_id") int case_id
-    );
-
-    // temp fake request
-    @DELETE("/api/filterCases2/")
-    Call<ResponseBody> deleteCaseByCaseId (
-            @Header("authorization") String token,
-            @Query("case_id") int case_id
-    );
-
     @POST("/api/filterCases/")
     Call<ResponseBody> postCase (
             @Header("authorization") String token,
@@ -110,7 +96,6 @@ public interface DatabaseApiCaller {
             @Query("non_compliance_type") String non_compliance_type,
             @Query("unresolved_photo") String unresolved_photo,
             @Query("unresolved_comments") String unresolved_comments,
-            @Query("unresolved_date") String unresolved_date,
             @Query("resolved_photo") String resolved_photo,
             @Query("resolved_comments") String resolved_comments,
             @Query("resolved_date") String resolved_date
@@ -118,7 +103,7 @@ public interface DatabaseApiCaller {
 
     @FormUrlEncoded
     @POST("/api/report/")
-    Call<ResponseBody> postNewReport(
+    Call<Report> postNewReport(
             @Header("authorization") String token,
             @Field("auditor_id") int auditor_id,
             @Field("tenant_id") int tenant_id,
@@ -127,7 +112,6 @@ public interface DatabaseApiCaller {
             @Field("outlet_type") String outlet_type,
             @Field("status") boolean status,
             @Field("report_notes") String report_notes,
-            @Field("report_date") String report_date,
             @Field("resolution_date") String resolution_date,
             @Field("staff_hygiene_score") float staff_hygiene_score,
             @Field("housekeeping_score") float housekeeping_score,

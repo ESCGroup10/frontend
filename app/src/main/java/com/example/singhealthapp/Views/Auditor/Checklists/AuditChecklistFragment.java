@@ -22,19 +22,14 @@ import com.example.singhealthapp.Containers.AuditorFragmentContainer;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
-import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
+import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.ResponseBody;
@@ -54,7 +49,6 @@ public class AuditChecklistFragment extends Fragment {
     private String[] header_files;
     private ArrayList<ChecklistAdapter> checklistAdapterArrayList = new ArrayList<>();
     private ArrayList<String> recyclerViewNameArrayList = new ArrayList<>();
-    String formattedDate;
     int numCases;
     String passFail;
     private String company;
@@ -73,6 +67,7 @@ public class AuditChecklistFragment extends Fragment {
     private int userID;
     private int tenantID;
     String tenantType;
+    private int reportID = -2;
 
     //scores
     private float staff_hygiene_score = 0;
@@ -92,7 +87,7 @@ public class AuditChecklistFragment extends Fragment {
     private int healthierchoice_percent_weightage = 0;
     private int foodhygiene_percent_weightage = 0;
 
-    Call<ResponseBody> reportCall;
+    Call<Report> reportCall;
     Call<ResponseBody> caseCall;
 
     private DecimalFormat df = new DecimalFormat("0.00");
@@ -118,7 +113,8 @@ public class AuditChecklistFragment extends Fragment {
         submit_audit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createReportAndCases();
+                createReport();
+                createCases(reportID);
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                 builder.setTitle("Confirm Submission?")
                         .setMessage("Total non compliance cases: "+numCases+"\nResult: "+passFail)
@@ -152,20 +148,6 @@ public class AuditChecklistFragment extends Fragment {
         company = "company";
         location = "location";
         outletType = "outletType";
-    }
-
-    private void createReportAndCases() {
-        Log.d(TAG, "createReportAndCases: called");
-        int reportID = createReport(); // calculates scores and creates report
-        if (reportID == -1) {
-            Log.d(TAG, "onClick: error in calculating scores");
-            return;
-        } else if (reportID == -2) {
-            Log.d(TAG, "onClick: error in getting response from database");
-            return;
-        } else {
-            createCases(reportID);
-        }
     }
 
     private void submit() {
@@ -232,39 +214,42 @@ public class AuditChecklistFragment extends Fragment {
             Log.d(TAG, "calculateScores IllegalArgumentException: "+ex);
             return -1;
         }
-        Date c = Calendar.getInstance().getTime();
-        System.out.println("Current time => " + c);
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        formattedDate = df.format(c);
 
-        if (tenantType.equals("fb")) {
+        if (tenantType.equals("F&B")) {
             reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, company, location, tenantType,
-                    false, getOverallNotes(), formattedDate, null, round(staff_hygiene_score, 2),
+                    false, getOverallNotes(), null, round(staff_hygiene_score, 2),
                     round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
                     round(foodhygiene_score, 2));
         } else {
             reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, company, location, tenantType,
-                    false, getOverallNotes(), formattedDate, null, round(staff_hygiene_score, 2),
+                    false, getOverallNotes(), null, round(staff_hygiene_score, 2),
                     round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
         }
 
-        int reportID=-2;
-        reportCall.enqueue(new Callback<ResponseBody>() {
+        getReportID();
+        return reportID;
+    }
+
+    private void getReportID() {
+        Log.d(TAG, "getReportID: called");
+        reportCall.enqueue(new Callback<Report>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d(TAG, "onResponse: code: "+response.code());
-                Log.d(TAG, "onResponse: toString: "+response.toString());
-                Log.d(TAG, "onResponse: message: "+response.message());
-                Log.d(TAG, "onResponse: raw: "+response.raw());
-                //reportID = body
+            public void onResponse(Call<Report> call, Response<Report> response) {
+                Log.d(TAG, "onResponse: code: " + response.code());
+                reportID = response.body().getId();
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.d(TAG, "onFailure: "+t.toString());
+            public void onFailure(Call<Report> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t.toString());
+                reportID = -2;
             }
         });
-        return reportID;
+        if (reportID == -1) {
+            Log.d(TAG, "onClick: error in calculating scores");
+        } else if (reportID == -2) {
+            Log.d(TAG, "onClick: error in getting response from database");
+        }
     }
 
     private void createCases(int reportID) {
@@ -277,16 +262,11 @@ public class AuditChecklistFragment extends Fragment {
                 numCases++;
                 String question = caseList.remove(j);
                 String comments = caseList.remove(j);
-                if (formattedDate == null) {
-                    Log.d(TAG, "createCases error: call createReport before createCases! i="+i+" j="+j);
-                    return;
-                }
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
-                        (String)questionAndPhotoPathHashMap.get(question), comments, formattedDate, null,
+                        (String)questionAndPhotoPathHashMap.get(question), comments, null,
                         null, null);
             }
         }
-
     }
 
     private void calculateScores() throws IllegalArgumentException {
@@ -436,17 +416,17 @@ public class AuditChecklistFragment extends Fragment {
         Log.d(TAG, "inflateFragmentLayout: called");
         // decides which fragment to inflate
         View view;
-        if (tenantType.toLowerCase().equals("fb")) {
-            Log.d(TAG, "onCreateView: setting up for fb");
+        if (tenantType.equals("F&B")) {
+            Log.d(TAG, "onCreateView: setting up for F&B");
             view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
-            header_files = new String[]{"fb_food_hygiene.txt", "fb_healthier_choice.txt", "fb_professionalism_and_staff_hygiene.txt", "fb_workplace_safety_and_health.txt", "fb_housekeeping_and_general_cleanliness.txt"};
-        } else if (tenantType.toLowerCase().equals("nfb")) {
-            Log.d(TAG, "onCreateView: setting up for nfb");
+            header_files = new String[]{"F&B_food_hygiene.txt", "F&B_healthier_choice.txt", "F&B_professionalism_and_staff_hygiene.txt", "F&B_workplace_safety_and_health.txt", "F&B_housekeeping_and_general_cleanliness.txt"};
+        } else if (tenantType.equals("Non F&B")) {
+            Log.d(TAG, "onCreateView: setting up for Non F&B");
             view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
-            header_files = new String[]{"nfb_professionalism_and_staff_hygiene.txt", "nfb_workplace_safety_and_health.txt", "nfb_housekeeping_and_general_cleanliness.txt"};
+            header_files = new String[]{"Non_F&B_professionalism_and_staff_hygiene.txt", "Non_F&B_workplace_safety_and_health.txt", "Non_F&B_housekeeping_and_general_cleanliness.txt"};
         } else {
-            CentralisedToast.makeText(getContext(), "Error verifying tenant type, defaulting to Food and Beverage type", CentralisedToast.LENGTH_LONG);
             Log.d(TAG, "onCreateView: invalid tenant type: "+tenantType);
+            Log.d(TAG, "inflateFragmentLayout: maybe check file names?");
             view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
         }
 
@@ -476,7 +456,7 @@ public class AuditChecklistFragment extends Fragment {
 
     private void initScoresAndPercentages(String tenantType) {
         Log.d(TAG, "initScoresAndPercentages: called");
-        if (tenantType.toLowerCase().equals("fb")) {
+        if (tenantType.toLowerCase().equals("F&B")) {
             staff_hygiene_score = 13;
             housekeeping_score = 17;
             safety_score = 18;
@@ -492,7 +472,7 @@ public class AuditChecklistFragment extends Fragment {
             safety_percent_weightage = 20;
             healthierchoice_percent_weightage = 15;
             foodhygiene_percent_weightage = 35;
-        } else if (tenantType.toLowerCase().equals("nfb")) {
+        } else if (tenantType.toLowerCase().equals("Non F&B")) {
             staff_hygiene_score = 6;
             housekeeping_score = 12;
             safety_score = 16;

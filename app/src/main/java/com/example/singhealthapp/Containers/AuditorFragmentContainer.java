@@ -1,31 +1,73 @@
 package com.example.singhealthapp.Containers;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
+
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.Models.Case;
+import com.example.singhealthapp.Models.DatabaseApiCaller;
+import com.example.singhealthapp.R;
+import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
+import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
+import com.example.singhealthapp.Views.Login.LoginActivity;
+import com.example.singhealthapp.Views.TestFragment;
+import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
+import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
+import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
+import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
+import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
+import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
-import com.example.singhealthapp.Views.Login.LoginActivity;
-import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
-import com.example.singhealthapp.Views.TestFragment;
-import com.google.android.material.navigation.NavigationView;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        TakePhotoInterface, AuditChecklistFragment.HandlePhotoListener {
 
     private static final String TAG = "AuditorFragmentContain";
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    ChecklistAdapter mChecklistAdapter;
+    int mAdapterPosition;
+    String mCurrentPhotoPath;
+    String mCurrentQuestion;
+
+    private static Call<List<Case>> getCaseCall;
+    private static Call<ResponseBody> delCaseCall;
+    private static String token;
+    Map<String, String> photoPathHashMap = new HashMap<>();
+
+    //keys
+    private final String USER_TYPE_KEY = "USER_TYPE_KEY";
+    private final String USER_ID_KEY = "USER_ID_KEY";
+    private final String TOKEN_KEY = "TOKEN_KEY";
 
     DrawerLayout auditor_drawer;
 
@@ -51,6 +93,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment(), "getTenant").commit();
         }
+
+        loadToken();
     }
 
     @Override
@@ -99,7 +143,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             }
         }
         catch (Exception ignored){ }
-
         try {
             if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
                 getSupportFragmentManager().beginTransaction()
@@ -126,7 +169,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             });
             builder.setNegativeButton("Cancel", (dialog, id) -> {
                 dialog.dismiss();
-                //finish();
             });
             builder.show();
         }
@@ -164,8 +206,97 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     private void clearData() {
         sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        editor.putString("TOKEN_KEY", "");
-        editor.putString("USER_TYPE_KEY", "");
+        editor.putString(TOKEN_KEY, "");
+        editor.putString(USER_TYPE_KEY, "");
         editor.commit();
+    }
+
+    public void takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition, String question) {
+        /*
+        * Params
+        * - checklistAdapter: The ChecklistAdapter that called this method
+        * - adapterPosition: The position of the item in the adapter that called this method
+        * Description
+        * - Opens camera app to take photo
+        * - Updates global variables mChecklistAdapter and mAdapterPosition
+        * */
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                Log.d(TAG, "takePhoto: error in creating file for image to go into");
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                mChecklistAdapter = checklistAdapter;
+                mAdapterPosition = adapterPosition;
+                mCurrentQuestion = question;
+            } else {
+                Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
+                CentralisedToast.makeText(this, "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
+            }
+        } else {
+            CentralisedToast.makeText(this, "Camera does not exist", CentralisedToast.LENGTH_SHORT);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        /*
+        * Gets photo taken and updates recyclerview with a thumbnail
+        * */
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            //Bundle extras = data.getExtras();
+            //Bitmap imageBitmap = (Bitmap)extras.get("data");
+            updatePhotoPathHashMap();
+        }
+    }
+
+    private void loadToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("TOKEN_KEY", null);
+    }
+
+    public File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void updatePhotoPathHashMap() {
+        photoPathHashMap.put(mCurrentQuestion, mCurrentPhotoPath);
+        clearCurrentPhotoData();
+    }
+
+    private void clearCurrentPhotoData() {
+        mCurrentPhotoPath = null;
+        mCurrentQuestion = null;
+    }
+
+    @Override
+    public Map getPhotoPathHashMap() {
+        return photoPathHashMap;
+    }
+
+    @Override
+    public void clearPhotoPathHashMap() {
+        photoPathHashMap.clear();
     }
 }

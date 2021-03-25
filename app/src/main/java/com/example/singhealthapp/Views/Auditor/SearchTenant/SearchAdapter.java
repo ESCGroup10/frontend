@@ -42,7 +42,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder>{
         holder.cardView.setClickable(false);
         holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
                 .replace(parent.getSupportFragmentManager().findFragmentByTag("getTenant").getId()
-                        , new TenantsFragment(tenants.get(position)), "viewTenant").commit());
+                        , new TenantsFragment(tenants.get(position)), "viewTenant").commit()); //tenants.get(position)
     }
 
     @Override

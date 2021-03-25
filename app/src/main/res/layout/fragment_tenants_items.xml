@@ -1,67 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="5dp"
+    android:id="@+id/cardView">
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="5dp"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="5dp"
-        android:clickable="true">
+        android:id="@+id/itemLayout"
+        android:layout_margin="10dp"
+        tools:context=".Models.Tenant"
+        >
 
-        <LinearLayout
-            android:orientation="vertical"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/itemLayout"
-            android:focusable="true"
-            android:clickable="true"
-            android:layout_margin="10dp"
-            tools:context=".Models.Tenant"
-            >
+            android:layout_height="50dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/tenantCardCompany"
+            android:gravity="center_horizontal"
+            android:padding="5dp"
+            android:textStyle="bold"
+            android:textColor="#121212"/>
 
-            <Button
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:id="@+id/button"
-                />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:gravity="center_horizontal"
+            android:textColor="#121212"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/tenantCardInstitution" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/tenantCardCompany"
-                android:gravity="center_horizontal"
-                android:padding="5dp"
-                android:textStyle="bold"
-                android:textColor="#121212"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:gravity="center_horizontal"
+            android:textColor="#121212"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/tenantCardType" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:padding="5dp"
-                android:gravity="center_horizontal"
-                android:textColor="#121212"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/tenantCardInstitution" />
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:padding="5dp"
-                android:gravity="center_horizontal"
-                android:textColor="#121212"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/tenantCardType" />
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-</RelativeLayout>
+</androidx.cardview.widget.CardView>
