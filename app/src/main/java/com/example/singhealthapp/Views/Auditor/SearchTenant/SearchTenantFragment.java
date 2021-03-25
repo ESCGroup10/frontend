@@ -19,6 +19,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -29,6 +30,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SearchTenantFragment extends Fragment {
     SearchAdapter adapter;
+    private ArrayList<SearchMain> tenantPreviews, getTenantPreviews;
+    private ArrayList<Tenant> tenants, displayTenants;
 
     @Nullable
     @Override
@@ -76,7 +79,7 @@ public class SearchTenantFragment extends Fragment {
                     return ;
                 }
                 System.out.println(response.body().get(0).getId());
-                adapter = new SearchAdapter(tenantSearch, response.body(), getActivity());
+                adapter = new SearchAdapter(tenantSearch, response.body(), getActivity(), loadToken());
                 try {
                     RecyclerView view = (RecyclerView) getView().findViewById(R.id.tenantRecycler);
                     view.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -93,6 +96,7 @@ public class SearchTenantFragment extends Fragment {
             }
         });
     }
+
 
     private String loadToken() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
