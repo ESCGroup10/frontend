@@ -18,7 +18,6 @@
             android:layout_height="match_parent"
             android:inputType="text"
             android:maxLines="1"
-            android:id="@+id/tenantSearch"
             android:layout_weight="1"
             android:autofillHints="Search Tenants" />
         <Button
