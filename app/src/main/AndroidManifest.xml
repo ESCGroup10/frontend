@@ -12,9 +12,9 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".Container.AuditorFragmentContainer"
+        <activity android:name=".Containers.AuditorFragmentContainer"
             android:parentActivityName=".Views.Login.LoginActivity" />
-        <activity android:name=".Container.TenantFragmentContainer"
+        <activity android:name=".Containers.TenantFragmentContainer"
             android:parentActivityName=".Views.Login.LoginActivity" />
         <activity android:name=".Views.Login.ResetPasswordActivity"
             android:parentActivityName=".Views.Login.LoginActivity" />

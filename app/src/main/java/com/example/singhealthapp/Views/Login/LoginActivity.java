@@ -16,8 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.singhealthapp.Container.AuditorFragmentContainer;
-import com.example.singhealthapp.Container.TenantFragmentContainer;
+import com.example.singhealthapp.Containers.AuditorFragmentContainer;
+import com.example.singhealthapp.Containers.TenantFragmentContainer;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Token;
 import com.example.singhealthapp.Models.User;

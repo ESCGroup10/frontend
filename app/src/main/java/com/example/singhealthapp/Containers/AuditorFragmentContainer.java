@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Container;
+package com.example.singhealthapp.Containers;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

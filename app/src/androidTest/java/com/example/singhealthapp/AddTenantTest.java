@@ -2,7 +2,7 @@ package com.example.singhealthapp;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.singhealthapp.Container.AuditorFragmentContainer;
+import com.example.singhealthapp.Containers.AuditorFragmentContainer;
 
 import org.junit.Before;
 import org.junit.Rule;
