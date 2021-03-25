@@ -85,7 +85,7 @@ public class AuditorReportFragment extends Fragment {
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-        Call<List<Case>> call = apiCaller.getCasesById("Token " + token, report.getId(), 1);
+        Call<List<Case>> call = apiCaller.getCasesById("Token " + token, 12, 0);
         call.enqueue(new Callback<List<Case>>() {
             @Override
             public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
@@ -112,7 +112,7 @@ public class AuditorReportFragment extends Fragment {
                             button.setBackgroundColor(Color.rgb(115, 194, 239));
                             button.setOnClickListener(v -> getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(getActivity().getSupportFragmentManager().findFragmentByTag("viewReport").getId()
-                                            , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation()),
+                                            , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation(), report, token),
                                             "viewCase").commit());
                         }
                     }

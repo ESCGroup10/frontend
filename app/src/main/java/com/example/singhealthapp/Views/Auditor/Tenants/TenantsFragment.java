@@ -22,12 +22,9 @@ public class TenantsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getActivity().setTitle("Report " + tenant.getId());
+        getActivity().setTitle(tenant.getCompany());
+
         view = inflater.inflate(R.layout.fragment_tenant_expanded, container, false);
-
-
-        company = view.findViewById(R.id.tenantCompany);
-        company.setText("COMPANY: " + tenant.getCompany());
 
         location = view.findViewById(R.id.tenantLocation);
         location.setText("LOCATION: " + tenant.getLocation());
