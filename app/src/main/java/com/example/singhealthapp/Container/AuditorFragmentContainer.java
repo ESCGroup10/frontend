@@ -17,29 +17,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
 import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
-import com.example.singhealthapp.Views.Auditor.SafetyChecklist.SafetyChecklistFragment;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
-import com.example.singhealthapp.Views.Login.LoginActivity;
-import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
-import com.example.singhealthapp.Views.TestFragment;
-import com.google.android.material.navigation.NavigationView;
-import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
-import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
-import com.example.singhealthapp.Views.Login.LoginActivity;
-import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.TestFragment;
-import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
-import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
-import com.example.singhealthapp.Views.Auditor.SafetyChecklist.SafetyChecklistFragment;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
-import com.google.android.material.navigation.NavigationView;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
@@ -125,10 +102,9 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
         try {
             if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
                 getSupportFragmentManager().beginTransaction()
                         .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
+                                , new ReportsFragment(), "getReport").commit();
                 return;
             }
         }
