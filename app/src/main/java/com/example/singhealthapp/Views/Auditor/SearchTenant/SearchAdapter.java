@@ -31,7 +31,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder>{
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_tenants_items, null);
 
-        return new SearchHolder(view);
+        return new SearchHolder(view, this.parent, tenants);
     }
 
     @Override
@@ -39,6 +39,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder>{
         holder.tenantCompany.setText(list.get(position).getCompany());
         holder.tenantInstitution.setText(list.get(position).getInstitution());
         holder.tenantType.setText(list.get(position).getType());
+        holder.cardView.setClickable(false);
         holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
                 .replace(parent.getSupportFragmentManager().findFragmentByTag("getTenant").getId()
                         , new TenantsFragment(tenants.get(position)), "viewTenant").commit());
