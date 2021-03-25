@@ -19,7 +19,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder>{
     FragmentActivity parent;
     List<Tenant> tenants;
 
-    public SearchAdapter(List<SearchMain> list, List<Tenant> tenants, FragmentActivity parent) {
+    public SearchAdapter(List<SearchMain> list, List<Tenant> tenants, FragmentActivity parent, String s) {
         this.list = list;
         this.tenants = tenants;
         this.parent = parent;

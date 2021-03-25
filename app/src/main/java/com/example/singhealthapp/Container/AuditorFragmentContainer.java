@@ -6,23 +6,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.singhealthapp.Views.Login.LoginActivity;
-import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.TestFragment;
-import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
-import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
-import com.example.singhealthapp.Views.Auditor.SafetyChecklist.SafetyChecklistFragment;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
-import com.google.android.material.navigation.NavigationView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
+import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
+import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
+import com.example.singhealthapp.Views.Login.LoginActivity;
+import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
+import com.example.singhealthapp.Views.TestFragment;
+import com.google.android.material.navigation.NavigationView;
 
 public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -50,7 +49,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment(), "getTenant").commit();
         }
     }
 
@@ -131,8 +130,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Tenants:
-                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SafetyChecklistFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SafetyChecklistFragment()).commit();
                 break;
 
             case R.id.nav_Reports:
