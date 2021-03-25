@@ -114,6 +114,16 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         }
         catch (Exception ignored){ }
         try {
+            if (getSupportFragmentManager().findFragmentByTag("viewTenant").isVisible()) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(getSupportFragmentManager().findFragmentByTag("viewTenant").getId()
+                                , new SearchTenantFragment(), "getTenant").commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+
+        try {
             if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
                 CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
                 getSupportFragmentManager().beginTransaction()
