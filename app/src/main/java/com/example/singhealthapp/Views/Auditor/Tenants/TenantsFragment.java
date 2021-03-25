@@ -25,7 +25,6 @@ public class TenantsFragment extends Fragment {
         getActivity().setTitle("Report " + tenant.getId());
         view = inflater.inflate(R.layout.fragment_tenant_expanded, container, false);
 
-
         company = view.findViewById(R.id.tenantCompany);
         company.setText("COMPANY: " + tenant.getCompany());
 
@@ -41,10 +40,6 @@ public class TenantsFragment extends Fragment {
         name = view.findViewById(R.id.tenantName);
         name.setText("OWNER NAME: " + tenant.getName());
 
-
-
         return view;
     }
-
-
 }

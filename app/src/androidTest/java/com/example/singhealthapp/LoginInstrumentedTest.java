@@ -33,13 +33,6 @@ public class LoginInstrumentedTest {
     public void setUp() {
         Log.d("Tag", "starting up");
 
-        try {
-            onView(withId(R.id.login_page)).check(matches(isDisplayed()));
-        } catch (NoMatchingViewException notExist) {
-            //proceed to the next screen
-            pressBack();
-            onView(withId(android.R.id.button1)).perform(click());
-        }
     }
 
     @Test
@@ -49,7 +42,7 @@ public class LoginInstrumentedTest {
 
     @Test
     public void WrongEmailLogin() {
-        onView(withId(R.id.login_email)).perform(typeText("xxxx@test.com"));
+        onView(withId(R.id.login_email)).perform(typeText("xxxx@test.com")).perform(closeSoftKeyboard());
         onView(withId(R.id.login_password)).perform(typeText("1234")).perform(closeSoftKeyboard());
 
         onView(withId(R.id.loginButton)).perform(click());
@@ -58,7 +51,7 @@ public class LoginInstrumentedTest {
 
     @Test
     public void WrongPasswordLogin() {
-        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com"));
+        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com")).perform(closeSoftKeyboard());
         onView(withId(R.id.login_password)).perform(typeText("xxxx")).perform(closeSoftKeyboard());
 
         onView(withId(R.id.loginButton)).perform(click());
@@ -67,7 +60,7 @@ public class LoginInstrumentedTest {
 
     @Test
     public void EmptyPasswordLogin() {
-        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com"));
+        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com")).perform(closeSoftKeyboard());
         onView(withId(R.id.login_password)).perform(typeText("")).perform(closeSoftKeyboard());
 
         onView(withId(R.id.loginButton)).perform(click());
@@ -75,7 +68,7 @@ public class LoginInstrumentedTest {
 
     @Test
     public void EmptyEmailLogin() {
-        onView(withId(R.id.login_email)).perform(typeText(""));
+        onView(withId(R.id.login_email)).perform(typeText("")).perform(closeSoftKeyboard());
         onView(withId(R.id.login_password)).perform(typeText("1234")).perform(closeSoftKeyboard());
 
         onView(withId(R.id.loginButton)).perform(click());
@@ -84,22 +77,29 @@ public class LoginInstrumentedTest {
 
     @Test
     public void CorrectAuditorLogin() throws InterruptedException {
-        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com"));
+        onView(withId(R.id.login_email)).perform(typeText("auditor@test.com")).perform(closeSoftKeyboard());
         onView(withId(R.id.login_password)).perform(typeText("1234")).perform(closeSoftKeyboard());
 
         onView(withId(R.id.loginButton)).perform(click());
         Thread.sleep(3000);
         onView(withId(R.id.auditor_main_page)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.tenant_search_bar)).perform(closeSoftKeyboard());
+        pressBack();
+        onView(withId(android.R.id.button1)).perform(click());
     }
 
     @Test
     public void CorrectTenantLogin() throws InterruptedException {
-        onView(withId(R.id.login_email)).perform(typeText("tenant@test.com"));
+        onView(withId(R.id.login_email)).perform(typeText("tenant@test.com")).perform(closeSoftKeyboard());
         onView(withId(R.id.login_password)).perform(typeText("1234")).perform(closeSoftKeyboard());
 
         onView(withId(R.id.loginButton)).perform(click());
         Thread.sleep(3000);
         onView(withId(R.id.tenant_main_page)).check(matches(isDisplayed()));
+
+        pressBack();
+        onView(withId(android.R.id.button1)).perform(click());
     }
 
 }
