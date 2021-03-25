@@ -91,7 +91,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment(), "getTenant").commit();
         }
 
         loadToken();
@@ -135,6 +135,15 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         }
         catch (Exception ignored){ }
         try {
+            if (getSupportFragmentManager().findFragmentByTag("viewTenant").isVisible()) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(getSupportFragmentManager().findFragmentByTag("viewTenant").getId()
+                                , new SearchTenantFragment(), "getTenant").commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+        try {
             if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
@@ -173,8 +182,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Tenants:
-                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SafetyChecklistFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SafetyChecklistFragment()).commit();
                 break;
 
             case R.id.nav_Reports:
