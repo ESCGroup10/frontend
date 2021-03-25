@@ -13,6 +13,7 @@
         android:layout_height="45dp"
         android:orientation="horizontal" >
         <EditText
+            android:id="@+id/tenant_search_bar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:inputType="text"
