@@ -94,35 +94,45 @@ public interface DatabaseApiCaller {
             @Query("case_id") int case_id
     );
 
+    // temp fake request
     @DELETE("/api/filterCases2/")
     Call<ResponseBody> deleteCaseByCaseId (
             @Header("authorization") String token,
             @Query("case_id") int case_id
     );
 
-//    @FormUrlEncoded
-//    @POST("/api/report/")
-//    Call<ResponseBody> postNewReport(
-//            @Header("authorization") String token,
-////            @Field("email") String email,
-////            @Field("password") String password,
-////            @Field("name") String name,
-////            @Field("company") String company,
-////            @Field("location") String location,
-////            @Field("institution") String institution,
-////            @Field("type") String type
-//    );
+    @POST("/api/filterCases/")
+    Call<ResponseBody> postCase (
+            @Header("authorization") String token,
+            @Query("report_id") int report_id,
+            @Query("question") String question,
+            @Query("is_resolved") boolean is_resolved,
+            @Query("non_compliance_type") String non_compliance_type,
+            @Query("unresolved_photo") String unresolved_photo,
+            @Query("unresolved_comments") String unresolved_comments,
+            @Query("unresolved_date") String unresolved_date,
+            @Query("resolved_photo") String resolved_photo,
+            @Query("resolved_comments") String resolved_comments,
+            @Query("resolved_date") String resolved_date
+    );
 
     @FormUrlEncoded
-    @POST("/api/case/")
-    Call<ResponseBody> postNewCase(
+    @POST("/api/report/")
+    Call<ResponseBody> postNewReport(
             @Header("authorization") String token,
-            @Field("id") int case_id,
-            @Field("report_id") int report_id,
-            @Field("question") String question,
-            @Field("unresolved_photo") String unresolved_photo,
-            @Field("unresolved_comments") String unresolved_comments,
-            @Field("resolved_photo") String resolved_photo,
-            @Field("resolved_comments") String resolved_comments
+            @Field("auditor_id") int auditor_id,
+            @Field("tenant_id") int tenant_id,
+            @Field("company") String company,
+            @Field("location") String location,
+            @Field("outlet_type") String outlet_type,
+            @Field("status") boolean status,
+            @Field("report_notes") String report_notes,
+            @Field("report_date") String report_date,
+            @Field("resolution_date") String resolution_date,
+            @Field("staff_hygiene_score") float staff_hygiene_score,
+            @Field("housekeeping_score") float housekeeping_score,
+            @Field("safety_score") float safety_score,
+            @Field("healthierchoice_score") float healthierchoice_score,
+            @Field("foodhygiene_score") float foodhygiene_score
     );
 }

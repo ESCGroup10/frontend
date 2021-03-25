@@ -18,8 +18,10 @@ import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.ViewHolder> {
+public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.ViewHolder>
+        implements AuditChecklistFragment.OnAuditSubmitListener {
 
     private static final String TAG = "ChecklistAdapter";
 
@@ -30,11 +32,11 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
 
     private ArrayList<ChecklistItem> checklist_items_array = new ArrayList<>();
 
-    private TakePhotoInterface photoFragment;
+    private TakePhotoInterface TakePhotoActivity;
 
-    public ChecklistAdapter(TakePhotoInterface photoFragment, ArrayList<ChecklistItem> checklist_items_array) {
+    public ChecklistAdapter(TakePhotoInterface takePhotoActivity, ArrayList<ChecklistItem> checklist_items_array) {
         this.checklist_items_array = checklist_items_array;
-        this.photoFragment = photoFragment;
+        this.TakePhotoActivity = takePhotoActivity;
     }
 
     public ChecklistAdapter(ArrayList<ChecklistItem> checklist_items_array) {
@@ -56,9 +58,34 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
         checklist_items_array.get(position).setRemarks(holder.editTextRemarks.getText().toString());
     }
 
+    public void callTakePhoto(int position) {
+        /*
+        * Usage: allows adapter to ask underlying activity to take photo.
+        * */
+        String question = checklist_items_array.get(position).getStatement();
+        TakePhotoActivity.takePhoto(ChecklistAdapter.this, position, question);
+    }
+
     @Override
     public int getItemCount() {
         return checklist_items_array.size();
+    }
+
+    @Override
+    public ArrayList<String> sendCases() {
+        /*
+        * Usage:
+        * - sends a list of pairs of statements(questions) and remarks(comments)
+        * */
+        ArrayList<String> cases  = new ArrayList<>();
+
+        for (ChecklistItem item : checklist_items_array) {
+            if (item.isCase()) {
+                cases.add(item.getStatement());
+                cases.add(item.getRemarks());
+            }
+        }
+        return cases;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -81,8 +108,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             cameraButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Log.d(TAG, "onClick: registered camera click");
-                    photoFragment.takePhoto(ChecklistAdapter.this, getAdapterPosition());
+                    callTakePhoto(getAdapterPosition());
                 }
             });
 

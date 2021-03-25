@@ -15,6 +15,7 @@ import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.TestFragment;
@@ -38,29 +39,34 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        TakePhotoInterface {
+        TakePhotoInterface, AuditChecklistFragment.HandlePhotoListener {
 
     private static final String TAG = "AuditorFragmentContain";
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     ChecklistAdapter mChecklistAdapter;
     int mAdapterPosition;
-    String currentPhotoPath;
+    String mCurrentPhotoPath;
+    String mCurrentQuestion;
 
-    private static DatabaseApiCaller apiCaller;
     private static Call<List<Case>> getCaseCall;
     private static Call<ResponseBody> delCaseCall;
     private static String token;
-    private ArrayList<Case> caseArrayList = new ArrayList<Case>();
+    private HashMap photoPathHashMap;
+
+    //keys
+    private final String USER_TYPE_KEY = "USER_TYPE_KEY";
+    private final String USER_ID_KEY = "USER_ID_KEY";
+    private final String TOKEN_KEY = "TOKEN_KEY";
 
     DrawerLayout auditor_drawer;
 
@@ -87,13 +93,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
         }
 
-        Gson gson = new Gson();
-        apiCaller = gson.fromJson(getIntent().getStringExtra("API_CALLER_JSON_KEY"), DatabaseApiCaller.class);
         loadToken();
-    }
-
-    private void createApiCaller() {
-
     }
 
     @Override
@@ -196,12 +196,12 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     private void clearData() {
         sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        editor.putString("TOKEN_KEY", "");
-        editor.putString("USER_TYPE_KEY", "");
+        editor.putString(TOKEN_KEY, "");
+        editor.putString(USER_TYPE_KEY, "");
         editor.commit();
     }
 
-    public void takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition) {
+    public void takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition, String question) {
         /*
         * Params
         * - checklistAdapter: The ChecklistAdapter that called this method
@@ -226,6 +226,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 mChecklistAdapter = checklistAdapter;
                 mAdapterPosition = adapterPosition;
+                mCurrentQuestion = question;
             } else {
                 Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
                 CentralisedToast.makeText(this, "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
@@ -242,7 +243,9 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         * */
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-
+            //Bundle extras = data.getExtras();
+            //Bitmap imageBitmap = (Bitmap)extras.get("data");
+            updatePhotoPathHashMap();
         }
     }
 
@@ -327,7 +330,27 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
+        mCurrentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    private void updatePhotoPathHashMap() {
+        photoPathHashMap.put(mCurrentQuestion, mCurrentPhotoPath);
+        clearCurrentPhotoData();
+    }
+
+    private void clearCurrentPhotoData() {
+        mCurrentPhotoPath = null;
+        mCurrentQuestion = null;
+    }
+
+    @Override
+    public HashMap getPhotoPathHashMap() {
+        return photoPathHashMap;
+    }
+
+    @Override
+    public void clearPhotoPathHashMap() {
+        photoPathHashMap.clear();
     }
 }

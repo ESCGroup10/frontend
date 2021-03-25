@@ -180,9 +180,10 @@
             android:layout_height="wrap_content"/>
 
         <EditText
+            android:id="@+id/overallReportNotes"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Findings/Remarks"
+            android:layout_height="70dp"
+            android:hint="Overall findings/remarks"
             android:layout_marginVertical="10dp"/>
 
         <Button

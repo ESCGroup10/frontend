@@ -53,7 +53,6 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
 
     //keys
-    private final String API_CALLER_JSON_KEY = "API_CALLER_JSON_KEY";
     private final String USER_TYPE_KEY = "USER_TYPE_KEY";
     private final String USER_ID_KEY = "USER_ID_KEY";
     private final String TOKEN_KEY = "TOKEN_KEY";
@@ -171,15 +170,11 @@ public class LoginActivity extends AppCompatActivity {
     // navigate to home page
     private void navigate(String userType) {
         Intent intent;
-        Gson gson = new Gson();
-        String apiCallerJson = gson.toJson(apiCaller);
         if (userType.equals("Auditor")) { // if user logged in is Auditor, move to Auditor page
             intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
-            intent.putExtra(API_CALLER_JSON_KEY, apiCallerJson);
             startActivity(intent);
         } else if (userType.equals("F&B") || userType.equals("Non F&B")) { // else if user logged in is F&B or Non F&B, move to Tennat page
             intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
-            intent.putExtra(API_CALLER_JSON_KEY, apiCallerJson);
             startActivity(intent);
         } else { // else this user is not a valid user type!
             Toast.makeText(LoginActivity.this,
