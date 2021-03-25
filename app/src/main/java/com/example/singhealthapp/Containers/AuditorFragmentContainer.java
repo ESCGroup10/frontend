@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -61,7 +62,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     private static Call<List<Case>> getCaseCall;
     private static Call<ResponseBody> delCaseCall;
     private static String token;
-    private HashMap photoPathHashMap;
+    Map<String, String> photoPathHashMap = new HashMap<>();
 
     //keys
     private final String USER_TYPE_KEY = "USER_TYPE_KEY";
@@ -345,7 +346,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     }
 
     @Override
-    public HashMap getPhotoPathHashMap() {
+    public Map getPhotoPathHashMap() {
         return photoPathHashMap;
     }
 

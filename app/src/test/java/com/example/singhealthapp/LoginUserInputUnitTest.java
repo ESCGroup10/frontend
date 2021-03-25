@@ -51,7 +51,7 @@ public class LoginUserInputUnitTest {
     }
 
     @Test
-    public void additionTest() throws IOException {
+    public void postLoginTest() throws IOException {
         Call<Token> authCall = apiCaller.postLogin(email, password);
         if (expected) {
             assertEquals(response_code, authCall.execute().code());
