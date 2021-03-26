@@ -29,12 +29,6 @@ public class LoginInstrumentedTest {
     public ActivityScenarioRule<LoginActivity> activityRule =
             new ActivityScenarioRule<>(LoginActivity.class);
 
-    @Before
-    public void setUp() {
-        Log.d("Tag", "starting up");
-
-    }
-
     @Test
     public void isActivityInView() {
         onView(withId(R.id.login_page)).check(matches(isDisplayed()));
