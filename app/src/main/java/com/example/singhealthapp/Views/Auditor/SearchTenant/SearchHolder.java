@@ -27,8 +27,7 @@ public class SearchHolder extends RecyclerView.ViewHolder {
         super(itemView);
         view = itemView;
         cardView = view.findViewById(R.id.cardView);
-//        button = view.findViewById(R.id.button);
-//        view.setOnClickListener(new View.OnClickListener() {
+//        cardView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                Log.d(TAG, "view onClick: called");
@@ -37,6 +36,7 @@ public class SearchHolder extends RecyclerView.ViewHolder {
 //                                , new TenantsFragment(tenants.get(getAdapterPosition())), "viewTenant").commit();
 //            }
 //        });
+
 
         tenantType = view.findViewById(R.id.tenantCardType);
         tenantCompany = view.findViewById(R.id.tenantCardCompany);

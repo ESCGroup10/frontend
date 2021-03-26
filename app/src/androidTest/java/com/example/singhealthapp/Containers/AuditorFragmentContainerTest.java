@@ -50,26 +50,58 @@ public class AuditorFragmentContainerTest {
     public ActivityScenarioRule<AuditorFragmentContainer> activityRule
             = new ActivityScenarioRule<>(AuditorFragmentContainer.class);
 
+    public void sleep() {
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            System.out.println("caught "+e);
+        }
+    }
+
     @Test
-    public void NavTenantsTest() {
+    public void NavMakingAuditTest() {
+        // tenant search fragment should be the first fragment displayed
+//        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+//        onView(withId(R.id.tenantRecycler)).check(matches(isDisplayed()));
+
+        // we can go to tenant search fragment by pressing the Tenants button in the drawer
         onView(withId(R.id.auditor_drawer_layout))
                 .check(matches(isClosed(Gravity.LEFT)))
                 .perform(DrawerActions.open());
+        sleep();
         onView(withId(R.id.nav_Tenants)).perform(click());
-
+        sleep();
         onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
         onView(withId(R.id.tenantRecycler)).check(matches(isDisplayed()));
+        sleep();
+
+        // we can click on a recyclerView item to go to an expanded view of the Tenant
         onView(withId(R.id.tenantRecycler)).perform(
         RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.cardView)));
-
+        sleep();
         onView(withId(R.id.expandedTenantFragment)).check(matches(isDisplayed()));
+
+        // we can click a button to start the safety checklist
         onView(withId(R.id.startSafetyChecklistButton)).perform(click());
-
+        sleep();
         onView(withId(R.id.safetyChecklistFragment)).check(matches(isDisplayed()));
+
+        // we can click on a button to go to the audit checklist
         onView(withId(R.id.start_audit_button)).perform(click());
+        sleep();
+        onView(withId(R.id.auditChecklistFragment)).check(matches(isDisplayed()));
 
+        // we can go to status confirmation page
+        onView(withId(R.id.submit_audit_button)).perform(click());
+        sleep();
+        onView(withId(R.id.statusConfirmationFragment)).check(matches(isDisplayed()));
 
+        // we can go to the report fragment
+        onView(withId(R.id.button_return)).perform(click());
+        sleep();
+        onView(withId(R.id.auditor_fragment_container)).check(matches(isDisplayed()));
     }
+
 
 
 }

@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.WindowManager;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.Models.Case;
@@ -77,6 +78,10 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         setContentView(R.layout.activity_auditor_fragment_container);
 
         Toolbar auditor_toolbar = findViewById(R.id.auditor_toolbar);
