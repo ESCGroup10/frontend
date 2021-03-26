@@ -50,7 +50,6 @@ public class AddTenantInstrumentedTest {
     public void TestEmptyFieldInput(){
         onView(withId(R.id.addTenantConfirm)).perform(click());
         onView(withText("ERROR")).check(matches(isDisplayed()));
-        pressBack();
     }
 
     @Test
@@ -65,7 +64,6 @@ public class AddTenantInstrumentedTest {
 
         onView(withId(R.id.addTenantConfirm)).perform(click());
         onView(withText("SUCCESS")).check(matches(isDisplayed()));
-        pressBack();
     }
 
     static void fillText(String string, Integer id){
@@ -82,9 +80,6 @@ public class AddTenantInstrumentedTest {
         onView(withInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)).perform(typeText("w"+"@test.u"));
         onView(withText("OK")).perform(click());
         onView(withText("ERROR")).check(matches(isDisplayed()));
-        pressBack();
-        pressBack();
-
     }
 
     static String generateString(int length){

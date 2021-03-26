@@ -1,8 +1,13 @@
 package com.example.singhealthapp;
 
-import com.example.singhealthapp.Models.DatabaseApiCaller;
-import com.example.singhealthapp.Models.User;
+import android.widget.Toast;
 
+import com.example.singhealthapp.Models.DatabaseApiCaller;
+import com.example.singhealthapp.Models.Token;
+import com.example.singhealthapp.Models.User;
+import com.example.singhealthapp.Views.Login.LoginActivity;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -13,6 +18,8 @@ import static org.junit.Assert.*;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -22,6 +29,25 @@ public class AddTenantUnitTest {
             .build();
     DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
     String mockToken = "127bc352b84eead35cc28340349a8dda9";
+    Token token;
+
+    @Before
+    public void login() throws InterruptedException {
+        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "1234");
+
+        authCall.enqueue(new Callback<Token>() {
+            @Override
+            public void onResponse(Call<Token> call, Response<Token> response) {
+                    token = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<Token> call, Throwable t) {
+
+            }
+        });
+        Thread.sleep(3000);
+    }
 
 
     @Test
@@ -41,19 +67,19 @@ public class AddTenantUnitTest {
 
     @Test
     public void correctAddTenantTest() throws IOException {
-        Call<Void> call = apiCaller.postUser("Token " + mockToken, generateField(true));
-        assertEquals(Code.successCode, call.execute().code());
+        Call<Void> call = apiCaller.postUser("Token " + token.getToken(), generateField(true));
+        assertEquals(201, call.execute().code());
     }
 
     @Test
     public void wrongTokenAddTenantTest() throws IOException {
-        Call<Void>  call = apiCaller.postUser("Token ", generateField(true));
+        Call<Void>  call = apiCaller.postUser("Token " + token.getToken(), generateField(true));
         assertNotEquals(200, call.execute().code());
     }
 
     @Test
     public void wrongFieldAddTenantTest() throws IOException {
-        Call<Void>  call = apiCaller.postUser("Token ", generateField(false));
+        Call<Void>  call = apiCaller.postUser("Token " + token.getToken(), generateField(false));
         assertNotEquals(200, call.execute().code());
     }
 
