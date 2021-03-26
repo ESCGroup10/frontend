@@ -16,12 +16,13 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.singhealthapp.Container.AuditorFragmentContainer;
-import com.example.singhealthapp.Container.TenantFragmentContainer;
+import com.example.singhealthapp.Containers.AuditorFragmentContainer;
+import com.example.singhealthapp.Containers.TenantFragmentContainer;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Token;
 import com.example.singhealthapp.Models.User;
 import com.example.singhealthapp.R;
+import com.google.gson.Gson;
 
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +51,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+
+    //keys
+    private final String USER_TYPE_KEY = "USER_TYPE_KEY";
+    private final String USER_ID_KEY = "USER_ID_KEY";
+    private final String TOKEN_KEY = "TOKEN_KEY";
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -187,9 +193,9 @@ public class LoginActivity extends AppCompatActivity {
     private void saveData() {
         sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        editor.putString("TOKEN_KEY", token.getToken());
-        editor.putInt("USER_ID_KEY", userId);
-        editor.putString("USER_TYPE_KEY", userType);
+        editor.putString(TOKEN_KEY, token.getToken());
+        editor.putInt(USER_ID_KEY, userId);
+        editor.putString(USER_TYPE_KEY, userType);
         editor.commit();
     }
 

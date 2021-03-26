@@ -5,7 +5,9 @@ import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchMain;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -83,5 +85,38 @@ public interface DatabaseApiCaller {
             @Header("authorization") String token,
             @Query("report_id") int report_id,
             @Query("is_resolved") int is_resolved
+    );
+
+    @POST("/api/filterCases/")
+    Call<ResponseBody> postCase (
+            @Header("authorization") String token,
+            @Query("report_id") int report_id,
+            @Query("question") String question,
+            @Query("is_resolved") boolean is_resolved,
+            @Query("non_compliance_type") String non_compliance_type,
+            @Query("unresolved_photo") String unresolved_photo,
+            @Query("unresolved_comments") String unresolved_comments,
+            @Query("resolved_photo") String resolved_photo,
+            @Query("resolved_comments") String resolved_comments,
+            @Query("resolved_date") String resolved_date
+    );
+
+    @FormUrlEncoded
+    @POST("/api/report/")
+    Call<Report> postNewReport(
+            @Header("authorization") String token,
+            @Field("auditor_id") int auditor_id,
+            @Field("tenant_id") int tenant_id,
+            @Field("company") String company,
+            @Field("location") String location,
+            @Field("outlet_type") String outlet_type,
+            @Field("status") boolean status,
+            @Field("report_notes") String report_notes,
+            @Field("resolution_date") String resolution_date,
+            @Field("staff_hygiene_score") float staff_hygiene_score,
+            @Field("housekeeping_score") float housekeeping_score,
+            @Field("safety_score") float safety_score,
+            @Field("healthierchoice_score") float healthierchoice_score,
+            @Field("foodhygiene_score") float foodhygiene_score
     );
 }

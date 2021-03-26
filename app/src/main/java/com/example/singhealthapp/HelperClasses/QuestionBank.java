@@ -37,21 +37,4 @@ public class QuestionBank {
 
         return groupedChecklistQuestions;
     }
-
-    String readLineIgnoreCR(BufferedReader reader) throws IOException {
-        int c = reader.read();
-        String line = "";
-        while(c >= 0)
-        {
-            if((char) c == '>') {
-                line += '\n';
-                line += '-';
-            }
-            else if((char) c == '\n' || (char) c == '\r')
-                return line;
-            line += (char) c;
-
-        }
-        return line;
-    }
 }
