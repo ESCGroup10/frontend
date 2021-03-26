@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
 
 public class TenantsFragment extends Fragment {
@@ -55,7 +54,7 @@ public class TenantsFragment extends Fragment {
                 bundle.putString(TENANT_TYPE_KEY, tenant.getType());
                 SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
                 safetyChecklistFragment.setArguments(bundle);
-                TenantsFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, safetyChecklistFragment).commit();
+                TenantsFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyFragment").commit();
             }
         });
 

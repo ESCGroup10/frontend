@@ -27,20 +27,18 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class LoginUnitTest {
+public class LoginAPIUnitTest {
 
-    DatabaseApiCaller apiCaller = new Retrofit.Builder()
-            .baseUrl("https://esc10-303807.et.r.appspot.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(DatabaseApiCaller.class);
+    // Use mock server to Test api calls (to simulate real response results)
+    // ensure errors are due to code implementation and not backend
 
-    // test api call using mock server (to simulate real response results)
+    // POST token authentication request to get token
     @Test
     public void mockPostLoginTest() throws IOException { // test if interface works
-        String mockTokenJson = "{\"token\": \"127bc352b84eead35cc28340349a8dda9\"}";
 
         MockWebServer server = new MockWebServer();
+
+        String mockTokenJson = "{\"token\": \"127bc352b84eead35cc28340349a8dda9\"}";
         server.enqueue(new MockResponse().setBody(mockTokenJson));
 
         DatabaseApiCaller mockApiCaller = new Retrofit.Builder()
@@ -58,8 +56,12 @@ public class LoginUnitTest {
         server.shutdown();
     }
 
+    // GET user type for auto login (if user has logged in before)
     @Test
     public void mockGetSingleUserTest() throws IOException {
+
+        MockWebServer server = new MockWebServer();
+
         String mockSingleUserJson = "[{" +
                 "\"email\": \"auditor@test.com\", " +
                 "\"password\": \"pbkdf2_sha256$216000$Sz\", " +
@@ -69,10 +71,6 @@ public class LoginUnitTest {
                 "\"location\": \"\", " +
                 "\"institution\": \"SGH\", " +
                 "\"type\": \"Auditor\"}]";
-        String mockToken = "127bc352b84eead35cc28340349a8dda9";
-        String mockEmail = "auditor@test.com";
-
-        MockWebServer server = new MockWebServer();
         server.enqueue(new MockResponse().setBody(mockSingleUserJson));
 
         DatabaseApiCaller mockApiCaller = new Retrofit.Builder()
@@ -80,6 +78,9 @@ public class LoginUnitTest {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(DatabaseApiCaller.class);
+
+        String mockToken = "127bc352b84eead35cc28340349a8dda9";
+        String mockEmail = "auditor@test.com";
 
         Call<List<User>> authCall = mockApiCaller.getSingleUser("Token " + mockToken, mockEmail);
 
@@ -118,35 +119,66 @@ public class LoginUnitTest {
 //        assert(authCall.isExecuted()).onLoadFailed(IOException.class);
 //    }
 
+//    // testing REST API with live Integration Tests (with JSON payload)
+//    @Test
+//    public void correctTenantTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("tenant@test.com", "1234");
+//        assertEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void wrongEmailTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("xxxx@test.com", "1234");
+//        assertNotEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void wrongPasswordTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "xxxx");
+//        assertNotEquals(200, authCall.execute().code());
+//    }
+
+    //    DatabaseApiCaller apiCaller = new Retrofit.Builder()
+//            .baseUrl("https://esc10-303807.et.r.appspot.com/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+//            .create(DatabaseApiCaller.class);
+
     // testing REST API with live Integration Tests (with JSON payload)
-    @Test
-    public void correctTenantTest() throws IOException {
-        Call<Token> authCall = apiCaller.postLogin("tenant@test.com", "1234");
-        assertEquals(200, authCall.execute().code());
-    }
-
-    @Test
-    public void wrongEmailTest() throws IOException {
-        Call<Token> authCall = apiCaller.postLogin("xxxx@test.com", "1234");
-        assertNotEquals(200, authCall.execute().code());
-    }
-
-    @Test
-    public void wrongPasswordTest() throws IOException {
-        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "xxxx");
-        assertNotEquals(200, authCall.execute().code());
-    }
-
-    @Test
-    public void emptyEmailTest() throws IOException {
-        Call<Token> authCall = apiCaller.postLogin("", "xxxx");
-        assertNotEquals(200, authCall.execute().code());
-    }
-
-    @Test
-    public void emptyPasswordTest() throws IOException {
-        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "");
-        assertNotEquals(200, authCall.execute().code());
-    }
+//    @Test
+//    public void correctAuditorTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "1234");
+//        assertEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void correctTenantTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("tenant@test.com", "1234");
+//        assertEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void wrongEmailTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("xxxx@test.com", "1234");
+//        assertNotEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void wrongPasswordTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "xxxx");
+//        assertNotEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void emptyEmailTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("", "xxxx");
+//        assertNotEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void emptyPasswordTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "");
+//        assertNotEquals(200, authCall.execute().code());
+//    }
 
 }
