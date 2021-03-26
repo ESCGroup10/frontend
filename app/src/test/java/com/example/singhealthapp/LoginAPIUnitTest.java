@@ -1,36 +1,26 @@
 package com.example.singhealthapp;
 
-import android.widget.Toast;
-
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Token;
 import com.example.singhealthapp.Models.User;
-import com.example.singhealthapp.Views.Login.LoginActivity;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginAPIUnitTest {
 
     // Use mock server to Test api calls (to simulate real response results)
-    // ensure errors are due to code implementation and not backend
+    // ensure test errors are due to code implementation and not backend
 
     // POST token authentication request to get token
     @Test
@@ -90,95 +80,4 @@ public class LoginAPIUnitTest {
 
         server.shutdown();
     }
-//
-//    @Test
-//    public void mockTimeoutTest () throws IOException {
-//
-//        MockWebServer server = new MockWebServer();
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(server.url("").toString())
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
-//
-//        MockResponse response = new MockResponse()
-//                .addHeader("Content-Type", "application/json; charset=utf-8")
-//                .addHeader("Cache-Control", "no-cache")
-//                .setBody("{}");
-//        response.throttleBody(1024, 1, TimeUnit.SECONDS);
-//
-//        server.enqueue(response);
-//        DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "1234");
-//
-//        try {
-//            String token = authCall.execute().body().getToken();
-//        } finally {
-//
-//        }
-//
-//        assert(authCall.isExecuted()).onLoadFailed(IOException.class);
-//    }
-
-//    // testing REST API with live Integration Tests (with JSON payload)
-//    @Test
-//    public void correctTenantTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("tenant@test.com", "1234");
-//        assertEquals(200, authCall.execute().code());
-//    }
-//
-//    @Test
-//    public void wrongEmailTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("xxxx@test.com", "1234");
-//        assertNotEquals(200, authCall.execute().code());
-//    }
-//
-//    @Test
-//    public void wrongPasswordTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "xxxx");
-//        assertNotEquals(200, authCall.execute().code());
-//    }
-
-    //    DatabaseApiCaller apiCaller = new Retrofit.Builder()
-//            .baseUrl("https://esc10-303807.et.r.appspot.com/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//            .create(DatabaseApiCaller.class);
-
-    // testing REST API with live Integration Tests (with JSON payload)
-//    @Test
-//    public void correctAuditorTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "1234");
-//        assertEquals(200, authCall.execute().code());
-//    }
-//
-//    @Test
-//    public void correctTenantTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("tenant@test.com", "1234");
-//        assertEquals(200, authCall.execute().code());
-//    }
-//
-//    @Test
-//    public void wrongEmailTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("xxxx@test.com", "1234");
-//        assertNotEquals(200, authCall.execute().code());
-//    }
-//
-//    @Test
-//    public void wrongPasswordTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "xxxx");
-//        assertNotEquals(200, authCall.execute().code());
-//    }
-//
-//    @Test
-//    public void emptyEmailTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("", "xxxx");
-//        assertNotEquals(200, authCall.execute().code());
-//    }
-//
-//    @Test
-//    public void emptyPasswordTest() throws IOException {
-//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "");
-//        assertNotEquals(200, authCall.execute().code());
-//    }
-
 }
