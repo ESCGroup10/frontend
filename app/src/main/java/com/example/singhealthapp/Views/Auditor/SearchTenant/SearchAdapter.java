@@ -46,8 +46,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
         holder.tenantCompany.setText(list.get(position).getCompany());
         holder.tenantInstitution.setText(list.get(position).getInstitution());
         holder.tenantType.setText(list.get(position).getType());
-        holder.cardView.setClickable(false);
-        holder.view.setOnClickListener(new View.OnClickListener() {
+        holder.cardView.setClickable(true);
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 underlyingFragment.navigate(position);

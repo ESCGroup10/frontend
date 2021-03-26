@@ -18,10 +18,13 @@ import org.junit.Test;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.swipeDown;
+import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.DrawerMatchers.isClosed;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.*;
 
 public class AuditorFragmentContainerTest {
@@ -87,12 +90,19 @@ public class AuditorFragmentContainerTest {
         onView(withId(R.id.safetyChecklistFragment)).check(matches(isDisplayed()));
 
         // we can click on a button to go to the audit checklist
+        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp());
+        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp());
+        sleep();
+        sleep();
         onView(withId(R.id.start_audit_button)).perform(click());
         sleep();
         onView(withId(R.id.auditChecklistFragment)).check(matches(isDisplayed()));
 
         // we can go to status confirmation page
+        scrollToBottom();
         onView(withId(R.id.submit_audit_button)).perform(click());
+        sleep();
+        onView(withText("Yes")).perform(click());
         sleep();
         onView(withId(R.id.statusConfirmationFragment)).check(matches(isDisplayed()));
 
@@ -100,6 +110,50 @@ public class AuditorFragmentContainerTest {
         onView(withId(R.id.button_return)).perform(click());
         sleep();
         onView(withId(R.id.auditor_fragment_container)).check(matches(isDisplayed()));
+    }
+
+
+
+
+    public void scrollToBottom() {
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        sleep();
+        sleep();
+        sleep();
+        sleep();
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        sleep();
+        sleep();
+        sleep();
+        sleep();
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        sleep();
+        sleep();
+        sleep();
+        sleep();
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        sleep();
+        sleep();
+        sleep();
+        sleep();
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        sleep();
+        sleep();
+        sleep();
+        sleep();
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        sleep();
+        sleep();
+        sleep();onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
+        sleep();
+        sleep();
     }
 
 
