@@ -70,16 +70,16 @@ public class AuditChecklistFragment extends Fragment {
     private int reportID = -2;
 
     //scores
-    private float staff_hygiene_score = 0;
-    private float housekeeping_score = 0;
-    private float safety_score = 0;
-    private float healthierchoice_score = 0;
-    private float foodhygiene_score = 0;
-    private float original_staff_hygiene_score = 0;
-    private float original_housekeeping_score = 0;
-    private float original_safety_score = 0;
-    private float original_healthierchoice_score = 0;
-    private float original_foodhygiene_score = 0;
+    private double staff_hygiene_score = 0;
+    private double housekeeping_score = 0;
+    private double safety_score = 0;
+    private double healthierchoice_score = 0;
+    private double foodhygiene_score = 0;
+    private double original_staff_hygiene_score = 0;
+    private double original_housekeeping_score = 0;
+    private double original_safety_score = 0;
+    private double original_healthierchoice_score = 0;
+    private double original_foodhygiene_score = 0;
 
     private int staff_hygiene_percent_weightage = 0;
     private int housekeeping_percent_weightage = 0;
@@ -193,7 +193,7 @@ public class AuditChecklistFragment extends Fragment {
                 .create(DatabaseApiCaller.class);
     }
 
-    private float round(float num, int dec) {
+    private float round(double num, int dec) {
         return Math.round(num * (Math.pow(10.0, dec)) / (Math.pow(10.0, dec)));
     }
 

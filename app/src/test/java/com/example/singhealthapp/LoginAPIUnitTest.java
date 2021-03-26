@@ -1,8 +1,11 @@
 package com.example.singhealthapp;
 
+import android.widget.Toast;
+
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Token;
 import com.example.singhealthapp.Models.User;
+import com.example.singhealthapp.Views.Login.LoginActivity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +22,8 @@ import java.util.List;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -114,6 +119,24 @@ public class LoginAPIUnitTest {
 //        assert(authCall.isExecuted()).onLoadFailed(IOException.class);
 //    }
 
+//    // testing REST API with live Integration Tests (with JSON payload)
+//    @Test
+//    public void correctTenantTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("tenant@test.com", "1234");
+//        assertEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void wrongEmailTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("xxxx@test.com", "1234");
+//        assertNotEquals(200, authCall.execute().code());
+//    }
+//
+//    @Test
+//    public void wrongPasswordTest() throws IOException {
+//        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "xxxx");
+//        assertNotEquals(200, authCall.execute().code());
+//    }
 
     //    DatabaseApiCaller apiCaller = new Retrofit.Builder()
 //            .baseUrl("https://esc10-303807.et.r.appspot.com/")
