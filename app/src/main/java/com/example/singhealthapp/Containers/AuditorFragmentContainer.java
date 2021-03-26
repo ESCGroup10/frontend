@@ -11,31 +11,28 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
-import com.example.singhealthapp.Models.Case;
-import com.example.singhealthapp.Models.DatabaseApiCaller;
-import com.example.singhealthapp.R;
-import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
-import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
-import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
-import com.example.singhealthapp.Views.Login.LoginActivity;
-import com.example.singhealthapp.Views.TestFragment;
-import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
-import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
-import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
-import com.google.android.material.navigation.NavigationView;
-import com.google.gson.Gson;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.Models.Case;
+import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
+import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
+import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
+import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
+import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
+import com.example.singhealthapp.Views.Login.LoginActivity;
+import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
+import com.example.singhealthapp.Views.TestFragment;
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,8 +44,6 @@ import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         TakePhotoInterface, AuditChecklistFragment.HandlePhotoListener {
@@ -140,10 +135,15 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         }
         catch (Exception ignored){ }
         try {
-            if (getSupportFragmentManager().findFragmentByTag("viewTenant").isVisible()) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(getSupportFragmentManager().findFragmentByTag("viewTenant").getId()
-                                , new SearchTenantFragment(), "getTenant").commit();
+            if (getSupportFragmentManager().findFragmentByTag("tenantsFragment").isVisible()) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("safetyFragment").isVisible()) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
                 return;
             }
         }

@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Tenants.TenantsFragment;
 
 import java.util.ArrayList;
@@ -115,7 +114,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
     public void navigate(int position) {
         SearchTenantFragment.this.getParentFragmentManager()
                 .beginTransaction()
-                .replace(R.id.auditor_fragment_container, new TenantsFragment(tenants.get(position)))
+                .replace(R.id.auditor_fragment_container, new TenantsFragment(tenants.get(position)),"tenantsFragment")
                 .addToBackStack(null)
                 .commit();
     }
