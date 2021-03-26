@@ -180,11 +180,11 @@ public class AddTenantFragment extends Fragment {
         fields.put("type", user.getType());
         fields.put("institution", user.getInstitution());
 
-        Call<User> call = apiCaller.postUser("Token " + token, fields);
+        Call<Void> call = apiCaller.postUser("Token " + token, fields);
 
-        call.enqueue(new Callback<User>() {
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 if (!response.isSuccessful()) {
                     // Toast
                     return ;
@@ -193,7 +193,7 @@ public class AddTenantFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 // Toast
                 return ;
             }

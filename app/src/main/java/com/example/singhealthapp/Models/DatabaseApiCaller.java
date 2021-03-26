@@ -54,7 +54,7 @@ public interface DatabaseApiCaller {
     // post details of new user i.e. add a new tenant/auditor to the database
     @FormUrlEncoded
     @POST("/api/users/")
-    Call<User> postUser (
+    Call<Void> postUser (
             @Header("authorization") String token,
             @FieldMap Map<String, String> fields
     );
