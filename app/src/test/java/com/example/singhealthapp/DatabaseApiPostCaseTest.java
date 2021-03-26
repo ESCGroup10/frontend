@@ -62,7 +62,7 @@ public class DatabaseApiPostCaseTest {
     @Test
     public void postCaseTest() throws IOException {
         Call<ResponseBody> call = apiCaller.postCase(token, report_id,  question, is_resolved, non_compliance_type,
-                unresolved_photo, unresolved_comments, unresolved_date, resolved_photo, resolved_comments, resolved_date);
+                unresolved_photo, unresolved_comments, resolved_photo, resolved_comments, resolved_date);
         if (expected) {
             assertEquals(response_code, call.execute().code());
         } else {

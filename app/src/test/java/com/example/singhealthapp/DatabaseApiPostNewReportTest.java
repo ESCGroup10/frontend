@@ -1,6 +1,7 @@
 package com.example.singhealthapp;
 
 import com.example.singhealthapp.Models.DatabaseApiCaller;
+import com.example.singhealthapp.Models.Report;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,8 +78,8 @@ public class DatabaseApiPostNewReportTest {
 
     @Test
     public void postNewReportTest() throws IOException {
-        Call<ResponseBody> call = apiCaller.postNewReport(token, auditor_id, tenant_id, company, location, outlet_type, status, report_notes,
-                report_date, resolution_date, staff_hygiene_score, housekeeping_score, safety_score, healthierchoice_score, foodhygiene_score);
+        Call<Report> call = apiCaller.postNewReport(token, auditor_id, tenant_id, company, location, outlet_type, status, report_notes,
+                resolution_date, staff_hygiene_score, housekeeping_score, safety_score, healthierchoice_score, foodhygiene_score);
         if (expected) {
             assertEquals(response_code, call.execute().code());
         } else {

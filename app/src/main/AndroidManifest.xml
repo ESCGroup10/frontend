@@ -20,8 +20,6 @@
             android:parentActivityName=".Views.Login.LoginActivity" />
         <activity android:name=".Containers.TenantFragmentContainer"
             android:parentActivityName=".Views.Login.LoginActivity" />
-        <activity android:name=".Views.Login.ResetPasswordActivity"
-            android:parentActivityName=".Views.Login.LoginActivity" />
         <activity android:name=".Views.Login.LoginActivity">
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
