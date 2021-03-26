@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 @RunWith(Parameterized.class)
-public class LoginUserInputUnitTest {
+public class LoginInputUnitTest {
     public String email, password;
     public int response_code;
     public boolean expected;
@@ -30,7 +30,7 @@ public class LoginUserInputUnitTest {
             .create(DatabaseApiCaller.class);
 
     // classic constructor
-    public LoginUserInputUnitTest (int response_code, String email, String password, boolean expected) {
+    public LoginInputUnitTest(int response_code, String email, String password, boolean expected) {
         this.email = email;
         this.password = password;
         this.response_code = response_code;
@@ -41,12 +41,13 @@ public class LoginUserInputUnitTest {
     public static Collection<Object[]> parameters() {
         // map result to constructor parameters (each inner list corresponds to the inputs to the constructor)
         return Arrays.asList (new Object [][] {
-                {200, "auditor@test.com", "1234", true},
-                {200, "tenant@test.com", "1234", true},
-                {200, "xxxx@test.com", "1234", false},
-                {200, "auditor@test.com", "xxxx", false},
-                {200, "", "xxxx", false},
-                {200, "auditor@test.com", "", false}
+                {200, "auditor@test.com", "1234", true}, // correct auditor
+                {200, "tenant@test.com", "1234", true}, // correct tenant
+                {200, "xxxx@test.com", "1234", false}, // wrong email
+                {200, "auditor@test.com", "xxxx", false}, // wrong password
+                {200, "", "1234", false}, // empty email
+                {200, "auditor@test.com", "", false}, // empty password
+                {200, "", "", false} // both empty
         });
     }
 

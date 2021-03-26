@@ -1,17 +1,15 @@
 package com.example.singhealthapp;
 
-import android.util.Log;
 
-import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
 import com.example.singhealthapp.Views.Login.LoginActivity;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.hamcrest.CoreMatchers.not;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.pressBack;
@@ -20,6 +18,7 @@ import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 @RunWith(AndroidJUnit4ClassRunner.class)
@@ -32,6 +31,20 @@ public class LoginInstrumentedTest {
     @Test
     public void isActivityInView() {
         onView(withId(R.id.login_page)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void disableLogin() throws InterruptedException {
+        onView(withId(R.id.login_email)).perform(typeText("xxxx@test.com")).perform(closeSoftKeyboard());
+        onView(withId(R.id.login_password)).perform(typeText("1234")).perform(closeSoftKeyboard());
+
+        onView(withId(R.id.loginButton)).perform(click()).perform(click()); Thread.sleep(1000);
+        onView(withId(R.id.loginButton)).perform(click()).perform(click()); Thread.sleep(1000);
+        onView(withId(R.id.loginButton)).perform(click()).perform(click()); Thread.sleep(1000);
+        onView(withId(R.id.loginButton)).perform(click()).perform(click()); Thread.sleep(1000);
+        onView(withId(R.id.loginButton)).perform(click()).perform(click()); Thread.sleep(1000);
+
+        onView(withId(R.id.loginButton)).check(matches(not(isEnabled())));
     }
 
     @Test

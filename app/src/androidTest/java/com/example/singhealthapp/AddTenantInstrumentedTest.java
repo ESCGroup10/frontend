@@ -6,7 +6,7 @@ import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
-import com.example.singhealthapp.Container.AuditorFragmentContainer;
+import com.example.singhealthapp.Containers.AuditorFragmentContainer;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import androidx.test.espresso.contrib.DrawerActions;
