@@ -3,6 +3,7 @@ package com.example.singhealthapp.Views;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
@@ -49,7 +50,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TestFragment extends Fragment {
 
     TextView queryTextView, postTextView, imagesTextView, uploadedImageTextView;
-    Button postButton, testButton, listImagesButton, uploadImgButton;
+    Button postButton, testButton, listImagesButton, uploadImgButton, retrieveImgButton;
     ImageView uploadedImage;
     Drawable testImage;
 
@@ -75,6 +76,7 @@ public class TestFragment extends Fragment {
         postButton = getView().findViewById(R.id.post_button);
         listImagesButton = getView().findViewById(R.id.listimage_button);
         uploadImgButton = getView().findViewById((R.id.uploadImg_button));
+        retrieveImgButton = getView().findViewById(R.id.retrieveImg_button);
 
         testImage = getResources().getDrawable(R.drawable.testupload);
 
@@ -83,10 +85,8 @@ public class TestFragment extends Fragment {
         testButton.setOnClickListener(v -> queryUsers());
         postButton.setOnClickListener(v -> addNewUser());
         listImagesButton.setOnClickListener(v -> retrieveImageList());
-        uploadImgButton.setOnClickListener(v -> {
-            uploadImage();
-//                displayImage();
-        });
+        uploadImgButton.setOnClickListener(v -> uploadImage());
+        retrieveImgButton.setOnClickListener(v -> retrieveImage());
 
         loadToken();
     }
@@ -187,7 +187,6 @@ public class TestFragment extends Fragment {
     public void uploadImage() {
 
         int caseId = 3;
-
         new Thread(() -> {
             try {
                 Storage storage = StorageOptions.getDefaultInstance().getService();
@@ -201,11 +200,28 @@ public class TestFragment extends Fragment {
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
                 storage.create(blobInfo, bitmapdata);
 
-            } catch (Exception e) {
-                System.out.println("Upload Failed" + e);
-            }
-            getActivity().runOnUiThread(() -> uploadedImageTextView.setText("case-" + caseId));
+                getActivity().runOnUiThread(() -> uploadedImageTextView.setText("Image Uploaded!"));
 
+            } catch (Exception e) {
+                getActivity().runOnUiThread(() -> uploadedImageTextView.setText(""+ e));
+            }
+
+        }).start();
+    }
+
+    public void retrieveImage() {
+        new Thread(() -> {
+            try {
+                Storage storage = StorageOptions.getDefaultInstance().getService();
+
+                byte[] bitmapdata = storage.get("case-images").get("testimage.png").getContent();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+
+                getActivity().runOnUiThread(() -> uploadedImage.setImageBitmap(bitmap));;
+
+            } catch (Exception e) {
+                System.out.println("Retrieval Failed! " + e);
+            }
         }).start();
     }
 
