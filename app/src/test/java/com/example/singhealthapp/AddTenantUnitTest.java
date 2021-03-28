@@ -117,8 +117,4 @@ public class AddTenantUnitTest {
         }
         return fields;
     }
-
-    static class Code {
-        static final int successCode = 401;
-    }
 }

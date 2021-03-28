@@ -8,7 +8,7 @@ import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
-import com.example.singhealthapp.Container.AuditorFragmentContainer;
+import com.example.singhealthapp.Containers.AuditorFragmentContainer;
 
 import org.junit.Before;
 import org.junit.Rule;

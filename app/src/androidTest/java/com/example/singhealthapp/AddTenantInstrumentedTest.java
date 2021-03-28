@@ -44,6 +44,7 @@ public class AddTenantInstrumentedTest {
                 .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
                 .perform(DrawerActions.open());
         onView(withId(R.id.nav_Add_Tenant)).perform(click());
+        Thread.sleep(100);
     }
 
     @Test
