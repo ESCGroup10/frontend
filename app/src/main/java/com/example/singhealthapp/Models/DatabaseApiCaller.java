@@ -38,13 +38,6 @@ public interface DatabaseApiCaller {
             @Field("type") String type
     );
 
-    // get a single user based on user email
-    @GET("/api/singleUser/")
-    Call<List<User>> getSingleUser(
-            @Header("authorization") String token,
-            @Query("email") String email
-    );
-
     // login post request
     @FormUrlEncoded
     @POST("/login/")
@@ -52,6 +45,14 @@ public interface DatabaseApiCaller {
             @Field("username") String email,
             @Field("password") String password
     );
+
+    // get a single user based on user email
+    @GET("/api/singleUser/")
+    Call<List<User>> getSingleUser(
+            @Header("authorization") String token,
+            @Query("email") String email
+    );
+
 
     // post details of new user i.e. add a new tenant/auditor to the database
     @FormUrlEncoded
@@ -113,10 +114,10 @@ public interface DatabaseApiCaller {
             @Field("status") boolean status,
             @Field("report_notes") String report_notes,
             @Field("resolution_date") String resolution_date,
-            @Field("staff_hygiene_score") float staff_hygiene_score,
-            @Field("housekeeping_score") float housekeeping_score,
-            @Field("safety_score") float safety_score,
-            @Field("healthierchoice_score") float healthierchoice_score,
-            @Field("foodhygiene_score") float foodhygiene_score
+            @Field("staff_hygiene_score") double staff_hygiene_score,
+            @Field("housekeeping_score") double housekeeping_score,
+            @Field("safety_score") double safety_score,
+            @Field("healthierchoice_score") double healthierchoice_score,
+            @Field("foodhygiene_score") double foodhygiene_score
     );
 }

@@ -18,8 +18,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+
+// Parameterized testing for various user inputs and check response code of api calls
+
 @RunWith(Parameterized.class)
 public class LoginInputUnitTest {
+
+
+
     public String email, password;
     public int response_code;
     public boolean expected;
