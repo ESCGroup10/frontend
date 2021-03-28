@@ -1,20 +1,27 @@
 package com.example.singhealthapp.Views.Auditor.Tenants;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
 
 public class TenantsFragment extends Fragment {
+    private static final String TAG = "TenantsFragment";
     Tenant tenant;
     View view;
     TextView company, institution, type, location, name;
+    Button button;
+
+    private static final String TENANT_TYPE_KEY = "tenant_type_key";
 
     public TenantsFragment(Tenant tenant) {
         this.tenant = tenant;
@@ -22,11 +29,9 @@ public class TenantsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getActivity().setTitle("Report " + tenant.getId());
-        view = inflater.inflate(R.layout.fragment_tenant_expanded, container, false);
+        getActivity().setTitle(tenant.getCompany());
 
-        company = view.findViewById(R.id.tenantCompany);
-        company.setText("COMPANY: " + tenant.getCompany());
+        view = inflater.inflate(R.layout.fragment_tenant_expanded, container, false);
 
         location = view.findViewById(R.id.tenantLocation);
         location.setText("LOCATION: " + tenant.getLocation());
@@ -40,6 +45,21 @@ public class TenantsFragment extends Fragment {
         name = view.findViewById(R.id.tenantName);
         name.setText("OWNER NAME: " + tenant.getName());
 
+        button = view.findViewById(R.id.startSafetyChecklistButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: called");
+                Bundle bundle = new Bundle();
+                bundle.putString(TENANT_TYPE_KEY, tenant.getType());
+                SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
+                safetyChecklistFragment.setArguments(bundle);
+                TenantsFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyFragment").commit();
+            }
+        });
+
         return view;
     }
+
+
 }

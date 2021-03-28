@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".Container.TenantFragmentContainer">
+    tools:context=".Containers.TenantFragmentContainer">
 
     <TextView
         android:id="@+id/query_textview"

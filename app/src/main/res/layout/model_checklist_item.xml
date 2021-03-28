@@ -102,16 +102,33 @@
 
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/remarks"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="left"
             android:layout_below="@id/checkbox_level"
-            android:layout_margin="10dp"
-            android:hint="Remarks"
-            android:inputType="textShortMessage|textAutoCorrect"
-            android:imeOptions="actionDone"
-            android:textSize="18dp"/>
+            android:weightSum="100">
+
+            <EditText
+                android:id="@+id/remarks"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="95"
+                android:layout_margin="10dp"
+                android:hint="Remarks"
+                android:inputType="textShortMessage|textAutoCorrect"
+                android:imeOptions="actionDone"
+                android:textSize="18sp"/>
+
+            <ImageButton
+                android:id="@+id/camera_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/camera"/>
+
+        </LinearLayout>
 
 
     </RelativeLayout>

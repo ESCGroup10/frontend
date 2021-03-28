@@ -4,9 +4,11 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:id="@+id/auditChecklistFragment">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"
@@ -180,9 +182,10 @@
             android:layout_height="wrap_content"/>
 
         <EditText
+            android:id="@+id/overallReportNotes"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Findings/Remarks"
+            android:layout_height="70dp"
+            android:hint="Overall findings/remarks"
             android:layout_marginVertical="10dp"/>
 
         <Button

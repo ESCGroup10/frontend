@@ -18,7 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.Tenants.TenantsFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -27,8 +29,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SearchTenantFragment extends Fragment {
+public class SearchTenantFragment extends Fragment implements SearchAdapter.NavFromTenantSelection {
     SearchAdapter adapter;
+    private ArrayList<SearchMain> tenantPreviews, getTenantPreviews;
+    private List<Tenant> tenants, displayTenants;
+
+
 
     @Nullable
     @Override
@@ -76,7 +82,8 @@ public class SearchTenantFragment extends Fragment {
                     return ;
                 }
                 System.out.println(response.body().get(0).getId());
-                adapter = new SearchAdapter(tenantSearch, response.body(), getActivity());
+                adapter = new SearchAdapter(tenantSearch, response.body(), getActivity(), loadToken(), SearchTenantFragment.this);
+                tenants = response.body();
                 try {
                     RecyclerView view = (RecyclerView) getView().findViewById(R.id.tenantRecycler);
                     view.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -94,11 +101,21 @@ public class SearchTenantFragment extends Fragment {
         });
     }
 
+
     private String loadToken() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         String token = sharedPreferences.getString("TOKEN_KEY", null);
         int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
         System.out.println("User ID " + userId);
         return token;
+    }
+
+    @Override
+    public void navigate(int position) {
+        SearchTenantFragment.this.getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.auditor_fragment_container, new TenantsFragment(tenants.get(position)),"tenantsFragment")
+                .addToBackStack(null)
+                .commit();
     }
 }
