@@ -45,11 +45,30 @@
             android:id="@+id/image_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="List all images in bucket"/>
+            android:text="List all image names in bucket"/>
 
         <Button
             android:layout_margin="20dp"
             android:id="@+id/listimage_button"
+            android:text="List images name"
+            android:background="#a4bf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/uploadedImg_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/uploadedImg_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Uploaded Image"/>
+
+        <Button
+            android:layout_margin="20dp"
+            android:id="@+id/uploadImg_button"
             android:text="List Images"
             android:background="#a4bf"
             android:layout_width="wrap_content"

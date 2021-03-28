@@ -2,11 +2,16 @@ package com.example.singhealthapp.Views;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,12 +24,19 @@ import com.example.singhealthapp.Models.User;
 import com.example.singhealthapp.R;
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -36,8 +48,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TestFragment extends Fragment {
 
-    TextView queryTextView, postTextView, imagesTextView;
-    Button postButton, testButton, listImagesButton;
+    TextView queryTextView, postTextView, imagesTextView, uploadedImageTextView;
+    Button postButton, testButton, listImagesButton, uploadImgButton;
+    ImageView uploadedImage;
+    Drawable testImage;
 
     private String token;
 
@@ -51,18 +65,28 @@ public class TestFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
         queryTextView = getView().findViewById(R.id.query_textview);
         postTextView = getView().findViewById(R.id.post_textview);
         imagesTextView = getView().findViewById(R.id.image_list);
+        uploadedImageTextView = getView().findViewById(R.id.uploadedImg_textview);
 
         testButton = getView().findViewById(R.id.test_button);
         postButton = getView().findViewById(R.id.post_button);
         listImagesButton = getView().findViewById(R.id.listimage_button);
+        uploadImgButton = getView().findViewById((R.id.uploadImg_button));
+
+        testImage = getResources().getDrawable(R.drawable.testupload);
+
+        uploadedImage = getView().findViewById(R.id.uploadedImg_image);
 
         testButton.setOnClickListener(v -> queryUsers());
         postButton.setOnClickListener(v -> addNewUser());
-
-        authImplicit();
+        listImagesButton.setOnClickListener(v -> retrieveImageList());
+        uploadImgButton.setOnClickListener(v -> {
+            uploadImage();
+//                displayImage();
+        });
 
         loadToken();
     }
@@ -143,17 +167,46 @@ public class TestFragment extends Fragment {
         System.out.println("User ID " + userId);
     }
 
-    static void authImplicit() {
+    public void retrieveImageList() {
         // If you don't specify credentials when constructing the client, the client library will
         // look for credentials via the environment variable GOOGLE_APPLICATION_CREDENTIALS.
-
         new Thread(() -> {
+            Storage storage = StorageOptions.getDefaultInstance().getService();
 
-        Storage storage;
-        storage = StorageOptions.getDefaultInstance().getService();
+            Bucket bucket = storage.get("case-images");
 
-        Bucket b = storage.get("case-images");
-        System.out.println(b.toString());
+            ArrayList<String> imageNames = new ArrayList<>();
+            Iterable<Blob> list = storage.list("case-images").getValues();
+            for (Blob blob : list) {
+                imageNames.add(blob.getName());
+            }
+            getActivity().runOnUiThread(() -> imagesTextView.setText("Bucket Name: " + bucket + "\n" +imageNames.toString()));
         }).start();
     }
+
+    public void uploadImage() {
+
+        int caseId = 3;
+
+        new Thread(() -> {
+            try {
+                Storage storage = StorageOptions.getDefaultInstance().getService();
+
+                Bitmap bitmap = ((BitmapDrawable) testImage).getBitmap();
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] bitmapdata = stream.toByteArray();
+
+                BlobId blobId = BlobId.of("case-images", "case-"+caseId);
+                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
+                storage.create(blobInfo, bitmapdata);
+
+            } catch (Exception e) {
+                System.out.println("Upload Failed" + e);
+            }
+            getActivity().runOnUiThread(() -> uploadedImageTextView.setText("case-" + caseId));
+
+        }).start();
+    }
+
 }
