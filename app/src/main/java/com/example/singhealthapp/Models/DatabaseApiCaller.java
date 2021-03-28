@@ -38,13 +38,6 @@ public interface DatabaseApiCaller {
             @Field("type") String type
     );
 
-    // get a single user based on user email
-    @GET("/api/singleUser/")
-    Call<List<User>> getSingleUser(
-            @Header("authorization") String token,
-            @Query("email") String email
-    );
-
     // login post request
     @FormUrlEncoded
     @POST("/login/")
@@ -53,10 +46,18 @@ public interface DatabaseApiCaller {
             @Field("password") String password
     );
 
+    // get a single user based on user email
+    @GET("/api/singleUser/")
+    Call<List<User>> getSingleUser(
+            @Header("authorization") String token,
+            @Query("email") String email
+    );
+
+
     // post details of new user i.e. add a new tenant/auditor to the database
     @FormUrlEncoded
     @POST("/api/users/")
-    Call<User> postUser (
+    Call<Void> postUser (
             @Header("authorization") String token,
             @FieldMap Map<String, String> fields
     );

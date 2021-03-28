@@ -38,7 +38,7 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
             holder.is_resolved.setText("Unresolved");
             holder.cardView.setCardBackgroundColor(Color.rgb(239, 117, 119));
         }
-        holder.type.setText(cases.get(position).getQuestion());
+        holder.type.setText(cases.get(position).getNon_compliance_type());
         holder.id.setText("Case " + cases.get(position).getId());
 
     }
