@@ -72,7 +72,10 @@ public class AuditorFragmentContainerTest {
                 .check(matches(isClosed(Gravity.LEFT)))
                 .perform(DrawerActions.open());
         sleep();
+        sleep();
         onView(withId(R.id.nav_Tenants)).perform(click());
+        sleep();
+        sleep();
         sleep();
         onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
         onView(withId(R.id.tenantRecycler)).check(matches(isDisplayed()));
