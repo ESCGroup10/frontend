@@ -17,7 +17,14 @@ import androidx.fragment.app.Fragment;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.User;
 import com.example.singhealthapp.R;
+import com.google.api.gax.paging.Page;
+import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -29,11 +36,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TestFragment extends Fragment {
 
-    TextView queryTextView;
-    Button testButton;
-
-    TextView postTextView;
-    Button postButton;
+    TextView queryTextView, postTextView, imagesTextView;
+    Button postButton, testButton, listImagesButton;
 
     private String token;
 
@@ -48,13 +52,17 @@ public class TestFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         queryTextView = getView().findViewById(R.id.query_textview);
-        testButton = getView().findViewById(R.id.test_button);
-
         postTextView = getView().findViewById(R.id.post_textview);
+        imagesTextView = getView().findViewById(R.id.image_list);
+
+        testButton = getView().findViewById(R.id.test_button);
         postButton = getView().findViewById(R.id.post_button);
+        listImagesButton = getView().findViewById(R.id.listimage_button);
 
         testButton.setOnClickListener(v -> queryUsers());
         postButton.setOnClickListener(v -> addNewUser());
+
+        authImplicit();
 
         loadToken();
     }
@@ -133,5 +141,19 @@ public class TestFragment extends Fragment {
 
         int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
         System.out.println("User ID " + userId);
+    }
+
+    static void authImplicit() {
+        // If you don't specify credentials when constructing the client, the client library will
+        // look for credentials via the environment variable GOOGLE_APPLICATION_CREDENTIALS.
+
+        new Thread(() -> {
+
+        Storage storage;
+        storage = StorageOptions.getDefaultInstance().getService();
+
+        Bucket b = storage.get("case-images");
+        System.out.println(b.toString());
+        }).start();
     }
 }

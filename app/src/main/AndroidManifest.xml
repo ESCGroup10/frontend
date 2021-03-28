@@ -21,7 +21,6 @@
         <activity android:name=".Containers.TenantFragmentContainer"
             android:parentActivityName=".Views.Login.LoginActivity" />
         <activity android:name=".Views.Login.LoginActivity">
-            android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -34,7 +33,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths"/>
         </provider>
     </application>
 

@@ -1,39 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     tools:context=".Containers.TenantFragmentContainer">
 
-    <TextView
-        android:id="@+id/query_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Example Query"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_gravity="center">
 
-    <Button
-        android:layout_margin="20dp"
-        android:id="@+id/test_button"
-        android:text="Get All Users"
-        android:background="#a4bf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/query_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Example Query"/>
 
-    <TextView
-        android:id="@+id/post_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Example Post"/>
+        <Button
+            android:layout_margin="20dp"
+            android:id="@+id/test_button"
+            android:text="Get All Users"
+            android:background="#a4bf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
-    <Button
-        android:layout_margin="20dp"
-        android:id="@+id/post_button"
-        android:text="Add New User"
-        android:background="#a4bf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/post_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Example Post"/>
 
-</LinearLayout>
+        <Button
+            android:layout_margin="20dp"
+            android:id="@+id/post_button"
+            android:text="Add New User"
+            android:background="#a4bf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/image_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="List all images in bucket"/>
+
+        <Button
+            android:layout_margin="20dp"
+            android:id="@+id/listimage_button"
+            android:text="List Images"
+            android:background="#a4bf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</ScrollView>
