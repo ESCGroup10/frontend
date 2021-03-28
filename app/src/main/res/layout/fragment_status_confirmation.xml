@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/statusConfirmationFragment">
+    android:id="@+id/statusConfirmationFragment"
+    android:layout_weight="100">
 
     <View
         android:id="@+id/top"
@@ -46,5 +47,10 @@
         android:layout_gravity="center_vertical"
         android:layout_below="@id/middle"
         android:layout_centerHorizontal="true"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>
