@@ -54,26 +54,6 @@ public class DatabaseApiPostCaseTest {
         this.expected = expected;
     }
 
-
-    public void getToken() {
-        Call<Token> authCall = apiCaller.postLogin("auditor@test.com", "1234");
-        authCall.enqueue(new Callback<Token>() {
-            @Override
-            public void onResponse(Call<Token> call, Response<Token> response) {
-                if (response.code() == 200) { // response code is valid
-                    token = response.body().getToken();
-                } else {
-                    System.out.println("response code: "+response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Token> call, Throwable t) {
-                System.out.println(t);
-            }
-        });
-    }
-
     @Parameterized.Parameters
     public static Collection<Object[]> parameters() {
         // map result to constructor parameters (each inner list corresponds to the inputs to the constructor)
