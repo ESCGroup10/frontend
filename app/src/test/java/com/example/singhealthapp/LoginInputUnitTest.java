@@ -24,8 +24,6 @@ import static org.junit.Assert.assertNotEquals;
 @RunWith(Parameterized.class)
 public class LoginInputUnitTest {
 
-
-
     public String email, password;
     public int response_code;
     public boolean expected;

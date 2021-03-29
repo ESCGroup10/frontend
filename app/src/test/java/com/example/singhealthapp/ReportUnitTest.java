@@ -53,8 +53,6 @@ public class ReportUnitTest {
                 .baseUrl(server.url("").toString())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(DatabaseApiCaller.class);
-        Call<Void> call = caller.postUser("Token " + mockToken, generateField(true));
-        assertEquals(201, call.execute().code());
-        server.shutdown();
+
     }
 }

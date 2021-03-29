@@ -6,7 +6,7 @@ import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
-import com.example.singhealthapp.Container.AuditorFragmentContainer;
+import com.example.singhealthapp.Containers.AuditorFragmentContainer;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.DrawerMatchers.isClosed;
