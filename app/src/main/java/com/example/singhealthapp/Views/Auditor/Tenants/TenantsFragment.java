@@ -2,7 +2,6 @@ package com.example.singhealthapp.Views.Auditor.Tenants;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,8 +18,6 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
-
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
