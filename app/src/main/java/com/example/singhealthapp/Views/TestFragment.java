@@ -170,16 +170,25 @@ public class TestFragment extends Fragment {
     public void retrieveImageList() {
         // If you don't specify credentials when constructing the client, the client library will
         // look for credentials via the environment variable GOOGLE_APPLICATION_CREDENTIALS.
+
+        // API call needs to be done async or on another thread
         new Thread(() -> {
             Storage storage = StorageOptions.getDefaultInstance().getService();
 
             Bucket bucket = storage.get("case-images");
 
+            // ArrayList to store all the image file names
             ArrayList<String> imageNames = new ArrayList<>();
+
+            // get list (Iterable) of all the blobs in Cloud Storage
             Iterable<Blob> list = storage.list("case-images").getValues();
+
+            // loop through the Iterable to get all the file names
             for (Blob blob : list) {
-                imageNames.add(blob.getName());
+                imageNames.add(blob.getName()); // add every file name into an ArrayList
             }
+
+            // display the ArrayList of all file names in TextView on another thread
             getActivity().runOnUiThread(() -> imagesTextView.setText("Bucket Name: " + bucket + "\n" +imageNames.toString()));
         }).start();
     }
@@ -187,22 +196,32 @@ public class TestFragment extends Fragment {
     public void uploadImage() {
 
         int caseId = 3;
+
+        // API call needs to be done async or on another thread
         new Thread(() -> {
             try {
-                Storage storage = StorageOptions.getDefaultInstance().getService();
+                Storage storage = StorageOptions.getDefaultInstance().getService(); // get the Cloud Storage space
 
+                // convert the bitmap into byte array
                 Bitmap bitmap = ((BitmapDrawable) testImage).getBitmap();
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] bitmapdata = stream.toByteArray();
 
+
+                // Create a blob (item) to upload onto Cloud Storage
                 BlobId blobId = BlobId.of("case-images", "case-"+caseId);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
+
+                // upload the blob
                 storage.create(blobInfo, bitmapdata);
 
+                // update UI TextView in another thread
                 getActivity().runOnUiThread(() -> uploadedImageTextView.setText("Image Uploaded!"));
 
             } catch (Exception e) {
+
+                // update UI TextView in another thread
                 getActivity().runOnUiThread(() -> uploadedImageTextView.setText(""+ e));
             }
 
@@ -210,13 +229,19 @@ public class TestFragment extends Fragment {
     }
 
     public void retrieveImage() {
+
+        // API call needs to be done async or on another thread
         new Thread(() -> {
             try {
-                Storage storage = StorageOptions.getDefaultInstance().getService();
+                Storage storage = StorageOptions.getDefaultInstance().getService(); // get the Cloud Storage space
 
+                // retrieve image in the form of byte array from Cloud Storage
                 byte[] bitmapdata = storage.get("case-images").get("testimage.png").getContent();
+
+                //convert the byte array into a bitmap
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
+                // display bitmap image on ImageView in another thread
                 getActivity().runOnUiThread(() -> uploadedImage.setImageBitmap(bitmap));;
 
             } catch (Exception e) {
