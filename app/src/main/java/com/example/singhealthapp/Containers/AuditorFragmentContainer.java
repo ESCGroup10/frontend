@@ -3,7 +3,10 @@ package com.example.singhealthapp.Containers;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -39,6 +42,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,13 +57,14 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     ChecklistAdapter mChecklistAdapter;
     int mAdapterPosition;
-    String mCurrentPhotoPath;
-    String mCurrentQuestion;
+    String mCurrentPhotoName;
+    int mPhotoNameCounter = 0;
+    Bitmap mCurrentPhotoBitmap;
 
     private static Call<List<Case>> getCaseCall;
     private static Call<ResponseBody> delCaseCall;
     private static String token;
-    HashMap<String, String> photoPathHashMap = new HashMap<>();
+    ArrayList<Bitmap> photoBitmapArrayList = new ArrayList<>();
 
     //keys
     private final String USER_TYPE_KEY = "USER_TYPE_KEY";
@@ -220,7 +225,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     }
 
     public void takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition, String question) {
-        /*
+        /**
         * Params
         * - checklistAdapter: The ChecklistAdapter that called this method
         * - adapterPosition: The position of the item in the adapter that called this method
@@ -232,7 +237,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = createTempPhotoFile();
             } catch (IOException ex) {
                 Log.d(TAG, "takePhoto: error in creating file for image to go into");
             }
@@ -244,7 +249,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 mChecklistAdapter = checklistAdapter;
                 mAdapterPosition = adapterPosition;
-                mCurrentQuestion = question;
+                mCurrentPhotoName = question;
             } else {
                 Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
                 CentralisedToast.makeText(this, "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
@@ -256,14 +261,30 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        /*
+        /**
         * Gets photo taken and updates recyclerview with a thumbnail
         * */
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            //Bundle extras = data.getExtras();
-            //Bitmap imageBitmap = (Bitmap)extras.get("data");
-            updatePhotoPathHashMap();
+            Uri imageUri = data.getData();
+            if(Build.VERSION.SDK_INT < 28) {
+                try {
+                    mCurrentPhotoBitmap = MediaStore.Images.Media.getBitmap(
+                            this.getContentResolver(),
+                            imageUri
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), imageUri);
+                try {
+                    mCurrentPhotoBitmap = ImageDecoder.decodeBitmap(source);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            updatePhotoHashMap();
         }
     }
 
@@ -272,7 +293,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         token = sharedPreferences.getString("TOKEN_KEY", null);
     }
 
-    public File createImageFile() throws IOException {
+    public File createTempPhotoFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -282,30 +303,24 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
-    private void updatePhotoPathHashMap() {
-        photoPathHashMap.put(mCurrentQuestion, mCurrentPhotoPath);
-        clearCurrentPhotoData();
-    }
-
-    private void clearCurrentPhotoData() {
-        mCurrentPhotoPath = null;
-        mCurrentQuestion = null;
+    private void updatePhotoHashMap() {
+        photoBitmapArrayList.add(mCurrentPhotoBitmap);
+        clearCurrentReportPhotoData();
     }
 
     @Override
-    public HashMap getPhotoPathHashMap() {
-        return photoPathHashMap;
+    public ArrayList<Bitmap> getPhotoBitmaps() {
+        return photoBitmapArrayList;
     }
 
     @Override
-    public void clearPhotoPathHashMap() {
-        photoPathHashMap.clear();
+    public void clearCurrentReportPhotoData() {
+        photoBitmapArrayList.clear();
+        mCurrentPhotoName = null;
+        mCurrentPhotoBitmap = null;
     }
 
 }
