@@ -64,7 +64,7 @@
         <Button
             android:layout_margin="20dp"
             android:id="@+id/uploadImg_button"
-            android:text="List Images"
+            android:text="Upload Image"
             android:background="#a4bf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
