@@ -30,8 +30,10 @@ public class SafetyChecklistFragment extends Fragment {
     private ChecklistAdapter checklistAdapter1;
     private ChecklistAdapter checklistAdapter2;
 
-    private static final String TENANT_TYPE_KEY = "tenant_type_key";
     String tenantType;
+    private int tenantID;
+    private String tenantCompany;
+    private String tenantLocation;
 
     Button start_audit_button;
 
@@ -43,8 +45,10 @@ public class SafetyChecklistFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_safety_checklist, container, false);
 
         Bundle bundle = getArguments();
-        tenantType = bundle.getString(TENANT_TYPE_KEY);
-        Log.d(TAG, "tenantType receiving: "+tenantType);
+        tenantType = bundle.getString("TENANT_TYPE_KEY");
+        tenantID = bundle.getInt("ID_KEY");
+        tenantCompany = bundle.getString("COMPANY_KEY");
+        tenantLocation = bundle.getString("LOCATION_KEY");
 
         checklist_items_array_part1 = new ArrayList<>();
         checklist_items_array_part2 = new ArrayList<>();
@@ -64,7 +68,10 @@ public class SafetyChecklistFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 // if selected tenant type is F&B, then put F&B, if Non F&B, put Non F&B
-                bundle.putString(TENANT_TYPE_KEY, tenantType);
+                bundle.putString("TENANT_TYPE_KEY", tenantType);
+                bundle.putInt("ID_KEY", tenantID);
+                bundle.putString("COMPANY_KEY", tenantCompany);
+                bundle.putString("LOCATION_KEY", tenantLocation);
                 Log.d(TAG, "tenantType sending: "+tenantType);
                 AuditChecklistFragment auditChecklistFragment = new AuditChecklistFragment();
                 auditChecklistFragment.setArguments(bundle);

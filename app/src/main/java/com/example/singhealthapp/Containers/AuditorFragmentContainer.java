@@ -57,14 +57,14 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     ChecklistAdapter mChecklistAdapter;
     int mAdapterPosition;
-    String mCurrentPhotoName;
-    int mPhotoNameCounter = 0;
+    String mCurrentQuestion;
     Bitmap mCurrentPhotoBitmap;
+    Uri mCurrentPhotoURI;
 
     private static Call<List<Case>> getCaseCall;
     private static Call<ResponseBody> delCaseCall;
     private static String token;
-    ArrayList<Bitmap> photoBitmapArrayList = new ArrayList<>();
+    HashMap<String, Bitmap> photoBitmapHashMap = new HashMap<>();
 
     //keys
     private final String USER_TYPE_KEY = "USER_TYPE_KEY";
@@ -242,14 +242,14 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 Log.d(TAG, "takePhoto: error in creating file for image to go into");
             }
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
+                mCurrentPhotoURI = FileProvider.getUriForFile(this,
                         "com.example.android.fileprovider",
                         photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentPhotoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 mChecklistAdapter = checklistAdapter;
                 mAdapterPosition = adapterPosition;
-                mCurrentPhotoName = question;
+                mCurrentQuestion = question;
             } else {
                 Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
                 CentralisedToast.makeText(this, "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
@@ -266,18 +266,18 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         * */
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Uri imageUri = data.getData();
+//            Uri imageUri = data.getData();
             if(Build.VERSION.SDK_INT < 28) {
                 try {
                     mCurrentPhotoBitmap = MediaStore.Images.Media.getBitmap(
                             this.getContentResolver(),
-                            imageUri
+                            mCurrentPhotoURI
                     );
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else {
-                ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), imageUri);
+                ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), mCurrentPhotoURI);
                 try {
                     mCurrentPhotoBitmap = ImageDecoder.decodeBitmap(source);
                 } catch (IOException e) {
@@ -307,19 +307,21 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     }
 
     private void updatePhotoHashMap() {
-        photoBitmapArrayList.add(mCurrentPhotoBitmap);
-        clearCurrentReportPhotoData();
+        if (mCurrentPhotoBitmap == null) {
+            Log.e(TAG, "createCases: mCurrentPhotoBitmap is null, question: "+mCurrentQuestion);
+        }
+        photoBitmapHashMap.put(mCurrentQuestion, mCurrentPhotoBitmap);
     }
 
     @Override
-    public ArrayList<Bitmap> getPhotoBitmaps() {
-        return photoBitmapArrayList;
+    public HashMap<String, Bitmap> getPhotoBitmaps() {
+        return photoBitmapHashMap;
     }
 
     @Override
     public void clearCurrentReportPhotoData() {
-        photoBitmapArrayList.clear();
-        mCurrentPhotoName = null;
+        photoBitmapHashMap.clear();
+        mCurrentQuestion = null;
         mCurrentPhotoBitmap = null;
     }
 

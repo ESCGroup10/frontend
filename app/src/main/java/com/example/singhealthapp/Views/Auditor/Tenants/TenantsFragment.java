@@ -63,14 +63,10 @@ public class TenantsFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, "onClick: called");
                 Bundle bundle = new Bundle();
-                bundle.putString("TENANT_TYPE_KEY", tenant.getType());
-                bundle.putInt("ID_KEY", tenant.getId());
-                bundle.putString("COMPANY_KEY", tenant.getCompany());
-                bundle.putString("LOCATION_KEY", tenant.getLocation());
-                Log.d(TAG, "tenantType sending: "+tenant.getType());
-                Log.d(TAG, "id sending: "+tenant.getId());
-                Log.d(TAG, "company sending: "+tenant.getCompany());
-                Log.d(TAG, "location sending: "+tenant.getLocation());
+                    bundle.putString("TENANT_TYPE_KEY", tenant.getType());
+                    bundle.putInt("ID_KEY", tenant.getId());
+                    bundle.putString("COMPANY_KEY", tenant.getCompany());
+                    bundle.putString("LOCATION_KEY", tenant.getLocation());
                 SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
                 safetyChecklistFragment.setArguments(bundle);
                 TenantsFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyFragment").commit();

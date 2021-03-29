@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.DatabasePhotoOperations;
 import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
 import com.example.singhealthapp.Models.ChecklistItem;
@@ -31,6 +32,7 @@ import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirma
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -82,7 +84,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     Call<ResponseBody> caseCall;
 
     HandlePhotoListener mActivityCallback;
-    ArrayList<Bitmap> photoBitmapArrayList;
+    HashMap<String, Bitmap> photoBitmapHashMap;
     int photoNameCounter = 0;
 
     @Nullable
@@ -207,7 +209,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     public interface HandlePhotoListener {
-        ArrayList<Bitmap> getPhotoBitmaps();
+        HashMap<String, Bitmap> getPhotoBitmaps();
         void clearCurrentReportPhotoData();
     }
 
@@ -281,29 +283,29 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     private void createCases() {
         Log.d(TAG, "createCases: called");
-        photoBitmapArrayList = getAllPhotos();
+        photoBitmapHashMap = getAllPhotos();
         for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String non_compliance_type = recyclerViewNameArrayList.get(i);
             ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases();
             for (int j=0; j<caseList.size(); j+=2) {
                 String question = caseList.get(j);
                 String comments = caseList.get(j+1);
+                Bitmap photoBitmap = photoBitmapHashMap.get(question); // get bitmap using question
+                if (photoBitmap == null) {
+                    Log.e(TAG, "createCases: photobitmap is null, questions: "+question);
+                }
                 String photoName = getUniquePhotoName();
                 if (photoName.equals("")) {
                     Log.d(TAG, "createCases: error creating unique photo name");
                     return;
                 }
-                Log.d(TAG, "createCases: \nreportID: "+reportID+
-                        " \nquestion: "+question+
-                        " \nnon_compliance_type: "+non_compliance_type+
-                        " \nunresolved photo: "+photoName+
-                        " \ncomments: "+comments);
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
                         photoName, comments);
                 caseCall.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        Log.d(TAG, "createCases onResponse: "+response);
+                        Log.d(TAG, "createCases response code: "+response.code());
+                        DatabasePhotoOperations.uploadImage(photoBitmap, photoName);
                     }
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
@@ -572,7 +574,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         }
     }
 
-    private ArrayList<Bitmap> getAllPhotos() {
+    private HashMap<String, Bitmap> getAllPhotos() {
         Log.d(TAG, "getAllPhotos: called");
         return mActivityCallback.getPhotoBitmaps();
     }
