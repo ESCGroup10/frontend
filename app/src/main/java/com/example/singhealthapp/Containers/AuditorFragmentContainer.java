@@ -224,7 +224,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         editor.commit();
     }
 
-    public void takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition, String question) {
+    public boolean takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition, String question) {
         /**
         * Params
         * - checklistAdapter: The ChecklistAdapter that called this method
@@ -250,6 +250,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 mChecklistAdapter = checklistAdapter;
                 mAdapterPosition = adapterPosition;
                 mCurrentQuestion = question;
+                return true;
             } else {
                 Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
                 CentralisedToast.makeText(this, "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
@@ -257,6 +258,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         } else {
             CentralisedToast.makeText(this, "Camera does not exist", CentralisedToast.LENGTH_SHORT);
         }
+        return false;
     }
 
     @Override

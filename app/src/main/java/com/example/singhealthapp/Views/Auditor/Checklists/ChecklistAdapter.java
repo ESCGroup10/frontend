@@ -57,12 +57,12 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
         checklist_items_array.get(position).setRemarks(holder.editTextRemarks.getText().toString());
     }
 
-    public void callTakePhoto(int position) {
+    public boolean callTakePhoto(int position) {
         /*
         * Usage: allows adapter to ask underlying activity to take photo.
         * */
         String question = checklist_items_array.get(position).getStatement();
-        TakePhotoActivity.takePhoto(ChecklistAdapter.this, position, question);
+        return TakePhotoActivity.takePhoto(ChecklistAdapter.this, position, question);
     }
 
     @Override
@@ -133,7 +133,10 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             cameraButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callTakePhoto(getAdapterPosition());
+                    boolean result = callTakePhoto(getAdapterPosition());
+                    if (result) {
+                        cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+                    }
                 }
             });
 
