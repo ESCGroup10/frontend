@@ -58,7 +58,7 @@ public class StatusConfirmationFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // if auditor
-                StatusConfirmationFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsFragment()).commit();
+                StatusConfirmationFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport").commit();
                 // TODO: if tenant
             }
         });
