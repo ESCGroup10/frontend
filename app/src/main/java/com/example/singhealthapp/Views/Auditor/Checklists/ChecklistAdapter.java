@@ -2,6 +2,8 @@ package com.example.singhealthapp.Views.Auditor.Checklists;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.TextChangedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +40,6 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     public ChecklistAdapter(TakePhotoInterface takePhotoActivity, ArrayList<ChecklistItem> checklist_items_array) {
         this.checklist_items_array = checklist_items_array;
         this.TakePhotoActivity = takePhotoActivity;
-    }
-
-    public ChecklistAdapter(ArrayList<ChecklistItem> checklist_items_array) {
-        this.checklist_items_array = checklist_items_array;
     }
 
     // instantiate ViewHolder
@@ -73,7 +72,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
 
     @Override
     public ArrayList<String> sendCases() {
-        /*
+        /**
         * Usage:
         * - sends a list of pairs of statements(questions) and remarks(comments)
         * */
@@ -81,6 +80,8 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
 
         for (ChecklistItem item : checklist_items_array) {
             if (item.isCase()) {
+                Log.d(TAG, "sendCases: "+item.getStatement());
+                Log.d(TAG, "sendCases: "+item.getRemarks());
                 cases.add(item.getStatement());
                 cases.add(item.getRemarks());
             }
@@ -105,6 +106,19 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             colourStatusIndicator = itemView.findViewById(R.id.color_status_indicator);
             cameraButton = itemView.findViewById(R.id.camera_button);
 
+            editTextRemarks.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    checklist_items_array.get(getAdapterPosition()).setRemarks(s.toString());
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+
             cameraButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -119,6 +133,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                         colourStatusIndicator.setBackgroundColor(black);
                     } else { // view has not been clicked before
                         colourStatusIndicator.setBackgroundColor(green);
+                        checklist_items_array.get(getAdapterPosition()).setCase(false);
                     }
                 }
             });
@@ -129,7 +144,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                     if (colourStatusIndicator.getBackground().equals(red)) { // view has been clicked before
                         colourStatusIndicator.setBackgroundColor(black);
                     } else { // view has not been clicked before
+                        Log.d(TAG, "onClick: set false");
                         colourStatusIndicator.setBackgroundColor(red);
+                        checklist_items_array.get(getAdapterPosition()).setCase(true);
                     }
                 }
             });
@@ -141,6 +158,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                         colourStatusIndicator.setBackgroundColor(black);
                     } else { // view has not been clicked before
                         colourStatusIndicator.setBackgroundColor(grey);
+                        checklist_items_array.get(getAdapterPosition()).setCase(false);
                     }
                 }
             });

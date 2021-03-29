@@ -19,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
@@ -27,6 +28,7 @@ import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
+import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
@@ -40,7 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -58,7 +59,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     private static Call<List<Case>> getCaseCall;
     private static Call<ResponseBody> delCaseCall;
     private static String token;
-    Map<String, String> photoPathHashMap = new HashMap<>();
+    HashMap<String, String> photoPathHashMap = new HashMap<>();
 
     //keys
     private final String USER_TYPE_KEY = "USER_TYPE_KEY";
@@ -110,72 +111,74 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: ");
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
+        if (!(fragment instanceof IOnBackPressed)) {
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            }
+            catch (Exception ignored){ }
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            }
+            catch (Exception ignored){ }
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId()
+                                    , new ReportsFragment(), "getReport").commit();
+                    return;
+                }
+            }
+            catch (Exception ignored){ }
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("tenantsFragment").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            }
+            catch (Exception ignored){ }
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("safetyFragment").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            }
+            catch (Exception ignored){ }
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
+                                    , new ReportsFragment(), "getReport").commit();
+                    return;
+                }
+            }
+            catch (Exception ignored){ }
 
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId()
-                                , new ReportsFragment(), "getReport").commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("tenantsFragment").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("safetyFragment").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                , new ReportsFragment(), "getReport").commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
+            if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
+                auditor_drawer.closeDrawer(GravityCompat.START);
+            } else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
-            auditor_drawer.closeDrawer(GravityCompat.START);
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-            builder.setMessage("Do you want to log out? ");
-            builder.setPositiveButton("OK", (dialog, id) -> {
-                //AuditorFragmentContainer.super.onBackPressed();
-                dialog.dismiss();
-                clearData(); // clear user type (to avoid auto login) and token (for safety)
-                Intent intent = new Intent(AuditorFragmentContainer.this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            });
-            builder.setNegativeButton("Cancel", (dialog, id) -> {
-                dialog.dismiss();
-            });
-            builder.show();
+                builder.setMessage("Do you want to log out? ");
+                builder.setPositiveButton("OK", (dialog, id) -> {
+                    //AuditorFragmentContainer.super.onBackPressed();
+                    dialog.dismiss();
+                    clearData(); // clear user type (to avoid auto login) and token (for safety)
+                    Intent intent = new Intent(AuditorFragmentContainer.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                });
+                builder.setNegativeButton("Cancel", (dialog, id) -> {
+                    dialog.dismiss();
+                });
+                builder.show();
+            }
         }
     }
 
@@ -296,7 +299,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     }
 
     @Override
-    public Map getPhotoPathHashMap() {
+    public HashMap getPhotoPathHashMap() {
         return photoPathHashMap;
     }
 
@@ -304,4 +307,5 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     public void clearPhotoPathHashMap() {
         photoPathHashMap.clear();
     }
+
 }

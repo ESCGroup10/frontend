@@ -66,6 +66,7 @@ public class TenantsFragment extends Fragment {
                 Log.d(TAG, "onClick: called");
                 Bundle bundle = new Bundle();
                 bundle.putString(TENANT_TYPE_KEY, tenant.getType());
+                Log.d(TAG, "tenantType sending: "+tenant.getType());
                 SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
                 safetyChecklistFragment.setArguments(bundle);
                 TenantsFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyFragment").commit();

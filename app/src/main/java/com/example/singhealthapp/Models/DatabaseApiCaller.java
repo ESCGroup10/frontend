@@ -89,7 +89,7 @@ public interface DatabaseApiCaller {
             @Query("is_resolved") int is_resolved
     );
 
-    @POST("/api/filterCases/")
+    @POST("/api/case/")
     Call<ResponseBody> postCase (
             @Header("authorization") String token,
             @Query("report_id") int report_id,
@@ -127,4 +127,6 @@ public interface DatabaseApiCaller {
             @Header("authorization") String token,
             @Path("id") int id
     );
+    @DELETE("/api/report/{id}/")
+    Call<Void> deleteReport(@Path("id") int reportID);
 }
