@@ -89,6 +89,17 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
         return cases;
     }
 
+    @Override
+    public int getNumCases() {
+        int result = 0;
+        for (ChecklistItem item : checklist_items_array) {
+            if (item.isCase()) {
+                result++;
+            }
+        }
+        return result;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView textViewQuestion, textViewTrue, textViewFalse, textViewNA;

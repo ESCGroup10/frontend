@@ -81,11 +81,11 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private double original_healthierchoice_score = 0;
     private double original_foodhygiene_score = 0;
 
-    private int staff_hygiene_percent_weightage = 0;
-    private int housekeeping_percent_weightage = 0;
-    private int safety_percent_weightage = 0;
-    private int healthierchoice_percent_weightage = 0;
-    private int foodhygiene_percent_weightage = 0;
+    private double staff_hygiene_weightage = 0;
+    private double housekeeping_weightage = 0;
+    private double safety_weightage = 0;
+    private double healthierchoice_weightage = 0;
+    private double foodhygiene_weightage = 0;
 
     Call<Report> reportCall;
     Call<ResponseBody> caseCall;
@@ -118,6 +118,11 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     Log.d(TAG, "calculateScores IllegalArgumentException: "+ex);
                 }
                 createCases();
+                Log.d(TAG, "foodhygiene_score "+foodhygiene_score+"\n"+
+                        "healthierchoice_score "+healthierchoice_score+"\n"+
+                        "housekeeping_score "+housekeeping_score+"\n"+
+                        "safety_score "+safety_score+"\n"+
+                        "staff_hygiene_score "+staff_hygiene_score);
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                 builder.setTitle("Confirm Submission?")
                         .setMessage("Total non compliance cases: "+numCases+"\nResult: "+passFail)
@@ -194,15 +199,11 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 .commit();
     }
 
-    private boolean isChecklistComplete() {
-        return true;
-    }
-
     @Override
     public void onBackPressed() {
-        if (reportID > 0 && !isChecklistComplete()) {
+        if (reportID > 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-            builder.setTitle("Are you sure you want to leave?\nReport will be deleted!")
+            builder.setTitle("Are you sure you want to leave?\nOngoing report will be deleted!")
                     .setCancelable(false)
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
                         @Override
@@ -229,6 +230,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     public interface OnAuditSubmitListener {
         ArrayList<String> sendCases();
+        int getNumCases();
     }
 
     private String getOverallNotes() {
@@ -289,13 +291,15 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         Log.d(TAG, "createCases: called");
         numCases = 0;
         questionAndPhotoPathHashMap = getAllPhotos();
-        for (int i=0; i<checklistAdapterArrayList.size(); i+=2) {
+        Log.d(TAG, "createCases: "+recyclerViewNameArrayList.toString());
+        Log.d(TAG, "createCases: "+checklistAdapterArrayList.toString());
+        for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String non_compliance_type = recyclerViewNameArrayList.get(i);
             ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases();
             for (int j=0; j<caseList.size(); j+=2) {
                 numCases++;
-                String question = caseList.remove(j);
-                String comments = caseList.remove(j);
+                String question = caseList.get(j);
+                String comments = caseList.get(j+1);
                 Log.d(TAG, "createCases: \nreportID: "+reportID+
                         " \nquestion: "+question+
                         " \nnon_compliance_type: "+non_compliance_type+
@@ -319,42 +323,61 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         }
     }
 
+    private void reInitScores() {
+        staff_hygiene_score=original_staff_hygiene_score;
+        housekeeping_score=original_housekeeping_score;
+        foodhygiene_score=original_foodhygiene_score;
+        healthierchoice_score=original_healthierchoice_score;
+        safety_score=original_safety_score;
+    }
+
     private void calculateScores() throws IllegalArgumentException {
         Log.d(TAG, "calculateScores: called");
+        reInitScores();
         if (checklistAdapterArrayList.size() != recyclerViewNameArrayList.size()) {
             Log.d(TAG, "calculateScores: something went wrong when creating recyclerviews");
             return;
         }
-        for (int i=0; i<checklistAdapterArrayList.size(); i+=2) {
+        for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String name = recyclerViewNameArrayList.get(i);
-            ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases();
+            int currentChecklistNumCases = checklistAdapterArrayList.get(i).getNumCases();
 
             switch (name) {
                 case "Professional & Staff Hygiene":
-                    staff_hygiene_score-=(caseList.size()/2);
+                    staff_hygiene_score-=currentChecklistNumCases;
                     break;
                 case "Housekeeping & General Cleanliness":
-                    housekeeping_score-=(caseList.size()/2);
+                    housekeeping_score-=currentChecklistNumCases;
                     break;
                 case "Healthier Choice":
-                    foodhygiene_score-=(caseList.size()/2);
+                    foodhygiene_score-=currentChecklistNumCases;
                     break;
                 case "Food Hygiene":
-                    healthierchoice_score-=(caseList.size()/2);
+                    healthierchoice_score-=currentChecklistNumCases;
                     break;
                 case "Workplace Safety & Health":
-                    safety_score-=(caseList.size()/2);
+                    safety_score-=currentChecklistNumCases;
                     break;
                 default:
                     throw new IllegalArgumentException();
             }
         }
-        staff_hygiene_score = staff_hygiene_score*staff_hygiene_percent_weightage/original_staff_hygiene_score;
-        housekeeping_score = housekeeping_score*housekeeping_percent_weightage/original_housekeeping_score;
-        safety_score = safety_score*safety_percent_weightage/original_safety_score;
-        healthierchoice_score = healthierchoice_percent_weightage*healthierchoice_percent_weightage/original_healthierchoice_score;
-        foodhygiene_score = foodhygiene_score*foodhygiene_percent_weightage/original_foodhygiene_score;
-        if (staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 95) {
+        Log.d(TAG, "calculateScores: before: \n"+"staff_hygiene_score: "+staff_hygiene_score+"\n"+
+                "housekeeping_score: "+housekeeping_score+"\n"+
+                "safety_score: "+safety_score+"\n"+
+                "healthierchoice_score: "+healthierchoice_score+"\n"+
+                "foodhygiene_score: "+foodhygiene_score);
+        staff_hygiene_score = staff_hygiene_score* staff_hygiene_weightage /original_staff_hygiene_score;
+        housekeeping_score = housekeeping_score* housekeeping_weightage /original_housekeeping_score;
+        safety_score = safety_score* safety_weightage /original_safety_score;
+        healthierchoice_score = healthierchoice_score * healthierchoice_weightage /original_healthierchoice_score;
+        foodhygiene_score = foodhygiene_score* foodhygiene_weightage /original_foodhygiene_score;
+        Log.d(TAG, "calculateScores: after: \n"+"staff_hygiene_score: "+staff_hygiene_score+"\n"+
+                "housekeeping_score: "+housekeeping_score+"\n"+
+                "safety_score: "+safety_score+"\n"+
+                "healthierchoice_score: "+healthierchoice_score+"\n"+
+                "foodhygiene_score: "+foodhygiene_score);
+        if (staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 0.95) {
             passFail = "Fail";
         } else {
             passFail = "Pass";
@@ -507,7 +530,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     private void initScoresAndPercentages(String tenantType) {
         Log.d(TAG, "initScoresAndPercentages: called");
-        if (tenantType.toLowerCase().equals("F&B")) {
+        if (tenantType.equals("F&B")) {
             staff_hygiene_score = 13;
             housekeeping_score = 17;
             safety_score = 18;
@@ -518,21 +541,25 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             original_safety_score = 18;
             original_healthierchoice_score = 11;
             original_foodhygiene_score = 37;
-            staff_hygiene_percent_weightage = 10;
-            housekeeping_percent_weightage = 20;
-            safety_percent_weightage = 20;
-            healthierchoice_percent_weightage = 15;
-            foodhygiene_percent_weightage = 35;
-        } else if (tenantType.toLowerCase().equals("Non F&B")) {
+            staff_hygiene_weightage = 0.10;
+            housekeeping_weightage = 0.20;
+            safety_weightage = 0.20;
+            healthierchoice_weightage = 0.15;
+            foodhygiene_weightage = 0.35;
+            Log.d(TAG, "initScoresAndPercentages: scores set for F&B");
+        } else if (tenantType.equals("Non F&B")) {
             staff_hygiene_score = 6;
             housekeeping_score = 12;
             safety_score = 16;
             original_staff_hygiene_score = 6;
             original_housekeeping_score = 12;
             original_safety_score = 16;
-            staff_hygiene_percent_weightage = 20;
-            housekeeping_percent_weightage = 40;
-            safety_percent_weightage = 40;
+            staff_hygiene_weightage = 0.20;
+            housekeeping_weightage = 0.40;
+            safety_weightage = 0.40;
+            Log.d(TAG, "initScoresAndPercentages: scores set for Non F&B");
+        } else {
+            Log.d(TAG, "initScoresAndPercentages: not set, check tenant type");
         }
     }
 
