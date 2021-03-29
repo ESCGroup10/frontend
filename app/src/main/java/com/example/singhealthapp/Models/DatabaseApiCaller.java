@@ -14,6 +14,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface DatabaseApiCaller {
@@ -119,5 +120,11 @@ public interface DatabaseApiCaller {
             @Field("safety_score") double safety_score,
             @Field("healthierchoice_score") double healthierchoice_score,
             @Field("foodhygiene_score") double foodhygiene_score
+    );
+
+    @DELETE("/api/users/{id}/")
+    Call<Void> deleteUser(
+            @Header("authorization") String token,
+            @Path("id") int id
     );
 }
