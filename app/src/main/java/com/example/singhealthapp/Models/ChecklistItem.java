@@ -7,6 +7,7 @@ public class ChecklistItem {
     private String statement;
     private String remarks;
     private Bitmap imageBitmap;
+    private boolean photoTaken;
 
     private boolean isCase = false;
 
@@ -14,6 +15,15 @@ public class ChecklistItem {
         this.statement = statement;
         this.remarks = remarks;
         this.imageBitmap = null;
+        this.photoTaken = false;
+    }
+
+    public boolean isPhotoTaken() {
+        return photoTaken;
+    }
+
+    public void setPhotoTaken(boolean photoTaken) {
+        this.photoTaken = photoTaken;
     }
 
     public boolean isCase() {

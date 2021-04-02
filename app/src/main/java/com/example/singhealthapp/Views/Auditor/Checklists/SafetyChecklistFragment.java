@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.R;
 
@@ -85,7 +85,7 @@ public class SafetyChecklistFragment extends Fragment {
     private void init_recyclerView(RecyclerView recyclerView, ArrayList<ChecklistItem> list, ChecklistAdapter checklistAdapter) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        checklistAdapter = new ChecklistAdapter((TakePhotoInterface)getActivity(), list);
+        checklistAdapter = new ChecklistAdapter((HandlePhotoInterface)getActivity(), list);
         recyclerView.setAdapter(checklistAdapter);
     }
 

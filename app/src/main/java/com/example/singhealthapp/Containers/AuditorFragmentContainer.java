@@ -25,7 +25,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
-import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
@@ -42,7 +42,6 @@ import com.google.android.material.navigation.NavigationView;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        TakePhotoInterface, AuditChecklistFragment.HandlePhotoListener {
+        HandlePhotoInterface, AuditChecklistFragment.HandlePhotoListener {
 
     private static final String TAG = "AuditorFragmentContain";
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -268,7 +267,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         * */
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            Uri imageUri = data.getData();
+            mChecklistAdapter.photoTaken(mAdapterPosition);
             if(Build.VERSION.SDK_INT < 28) {
                 try {
                     mCurrentPhotoBitmap = MediaStore.Images.Media.getBitmap(
@@ -325,6 +324,10 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         photoBitmapHashMap.clear();
         mCurrentQuestion = null;
         mCurrentPhotoBitmap = null;
+    }
+
+    public interface OnPhotoTakenListener {
+        void photoTaken(int position);
     }
 
 }

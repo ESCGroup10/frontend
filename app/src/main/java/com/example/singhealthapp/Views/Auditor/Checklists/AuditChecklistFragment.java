@@ -3,24 +3,29 @@ package com.example.singhealthapp.Views.Auditor.Checklists;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.DatabasePhotoOperations;
-import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
@@ -28,6 +33,7 @@ import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,12 +52,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     Button submit_audit_button;
     EditText overall_notes_editText;
+    FloatingActionButton fab;
 
     private String[] header_files;
     private ArrayList<ChecklistAdapter> checklistAdapterArrayList = new ArrayList<>();
     private ArrayList<String> recyclerViewNameArrayList = new ArrayList<>();
     int numCases;
     String passFail;
+    private boolean endOfView = false;
 
     private static DatabaseApiCaller apiCaller;
     private String token;
@@ -87,6 +95,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     HashMap<String, Bitmap> photoBitmapHashMap;
     int photoNameCounter = 0;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -102,6 +111,20 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         initScoresAndPercentages(tenantType);
 
         initRecyclerViews(view);
+
+        /**
+         * If scrolled to the bottom, set endOfView to true
+         * */
+        view.findViewById(R.id.nested_scroll_view).setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (!v.canScrollVertically(1)) {
+                    // bottom of nested scroll view
+                    endOfView = true;
+                    makeFabScrollToTop();
+                }
+            }
+        });
 
         submit_audit_button = view.findViewById(R.id.submit_audit_button);
         submit_audit_button.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +167,19 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         createReport(); // do this first so the reportID can be obtained first
 
         return view;
+    }
+
+    private void focusOnView(View v, TextView tv) {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                v.scrollTo(0, tv.getBottom());
+            }
+        });
+    }
+
+    private void makeFabScrollToTop() {
+
     }
 
     private void deleteReport() {
@@ -357,11 +393,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     throw new IllegalArgumentException();
             }
         }
-//        Log.d(TAG, "calculateScores: before: \n"+"staff_hygiene_score: "+staff_hygiene_score+"\n"+
-//                "housekeeping_score: "+housekeeping_score+"\n"+
-//                "safety_score: "+safety_score+"\n"+
-//                "healthierchoice_score: "+healthierchoice_score+"\n"+
-//                "foodhygiene_score: "+foodhygiene_score);
         staff_hygiene_score = staff_hygiene_score* staff_hygiene_weightage /original_staff_hygiene_score;
         housekeeping_score = housekeeping_score* housekeeping_weightage /original_housekeeping_score;
         safety_score = safety_score* safety_weightage /original_safety_score;
@@ -369,11 +400,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             healthierchoice_score = healthierchoice_score * healthierchoice_weightage / original_healthierchoice_score;
             foodhygiene_score = foodhygiene_score * foodhygiene_weightage / original_foodhygiene_score;
         }
-//        Log.d(TAG, "calculateScores: after: \n"+"staff_hygiene_score: "+staff_hygiene_score+"\n"+
-//                "housekeeping_score: "+housekeeping_score+"\n"+
-//                "safety_score: "+safety_score+"\n"+
-//                "healthierchoice_score: "+healthierchoice_score+"\n"+
-//                "foodhygiene_score: "+foodhygiene_score);
         if (staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 0.95) {
             passFail = "Fail";
         } else {
@@ -386,7 +412,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         ChecklistAdapter checklistAdapter;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        checklistAdapter = new ChecklistAdapter((TakePhotoInterface)getActivity(), list);
+        checklistAdapter = new ChecklistAdapter((HandlePhotoInterface)getActivity(), list);
         recyclerView.setAdapter(checklistAdapter);
         checklistAdapterArrayList.add(checklistAdapter);
         recyclerViewNameArrayList.add(recyclerViewName);
@@ -412,7 +438,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void initChecklistSection(View view, String pathName) {
-        /*
+        /**
          * 1. Gets an ArrayList of questions for each sub-header in a section specified by the pathName
          * 2. Matches each ArrayList to a recyclerView
          * 3. Initialises the recyclerView
@@ -451,7 +477,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private RecyclerView getCorrespondingRecyclerView(View view, String subHeader) throws IllegalArgumentException {
-        /*
+        /**
         * Returns recyclerView corresponding to the subHeader given
         * */
         Log.d(TAG, "getCorrespondingRecyclerView: called");

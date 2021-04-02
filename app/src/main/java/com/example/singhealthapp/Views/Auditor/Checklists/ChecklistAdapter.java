@@ -1,6 +1,5 @@
 package com.example.singhealthapp.Views.Auditor.Checklists;
 
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,16 +14,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.Containers.AuditorFragmentContainer;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
-import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.TextChangedListener;
+import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.ViewHolder>
-        implements AuditChecklistFragment.OnAuditSubmitListener {
+        implements AuditChecklistFragment.OnAuditSubmitListener, AuditorFragmentContainer.OnPhotoTakenListener {
 
     private static final String TAG = "ChecklistAdapter";
 
@@ -35,9 +33,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
 
     private ArrayList<ChecklistItem> checklist_items_array = new ArrayList<>();
 
-    private TakePhotoInterface TakePhotoActivity;
+    private HandlePhotoInterface TakePhotoActivity;
 
-    public ChecklistAdapter(TakePhotoInterface takePhotoActivity, ArrayList<ChecklistItem> checklist_items_array) {
+    public ChecklistAdapter(HandlePhotoInterface takePhotoActivity, ArrayList<ChecklistItem> checklist_items_array) {
         this.checklist_items_array = checklist_items_array;
         this.TakePhotoActivity = takePhotoActivity;
     }
@@ -55,6 +53,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.textViewQuestion.setText(checklist_items_array.get(position).getStatement());
         checklist_items_array.get(position).setRemarks(holder.editTextRemarks.getText().toString());
+        if (checklist_items_array.get(position).isPhotoTaken()) {
+            holder.cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+        }
     }
 
     public boolean callTakePhoto(int position) {
@@ -100,6 +101,12 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
         return result;
     }
 
+    @Override
+    public void photoTaken(int position) {
+        checklist_items_array.get(position).setPhotoTaken(true);
+        notifyItemChanged(position);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView textViewQuestion, textViewTrue, textViewFalse, textViewNA;
@@ -135,7 +142,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 public void onClick(View v) {
                     boolean result = callTakePhoto(getAdapterPosition());
                     if (result) {
-                        cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+//                        cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
                     }
                 }
             });
@@ -149,6 +156,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                         colourStatusIndicator.setBackgroundColor(green);
                         checklist_items_array.get(getAdapterPosition()).setCase(false);
                     }
+                    cameraButton.setBackgroundResource(R.drawable.camera);
                 }
             });
 
@@ -162,6 +170,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                         colourStatusIndicator.setBackgroundColor(red);
                         checklist_items_array.get(getAdapterPosition()).setCase(true);
                     }
+                    if (checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
+                        cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+                    }
                 }
             });
 
@@ -174,6 +185,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                         colourStatusIndicator.setBackgroundColor(grey);
                         checklist_items_array.get(getAdapterPosition()).setCase(false);
                     }
+                    cameraButton.setBackgroundResource(R.drawable.camera);
                 }
             });
         }
