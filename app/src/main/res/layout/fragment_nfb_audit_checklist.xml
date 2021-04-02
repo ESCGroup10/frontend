@@ -21,6 +21,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/ProfessionalismAndStaffHygieneTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Professionalism &amp; Staff Hygiene (20%)"
@@ -76,6 +77,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
+                android:id="@+id/HousekeepingAndGeneralCleanlinessTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Housekeeping &amp; General Cleanliness (40%)"
@@ -109,6 +111,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
+                android:id="@+id/WorkplaceSafetyAndHealthTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Workplace Safety &amp; Health (40%)"

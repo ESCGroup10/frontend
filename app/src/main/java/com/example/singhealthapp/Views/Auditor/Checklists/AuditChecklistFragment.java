@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,7 +34,8 @@ import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -52,7 +54,17 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     Button submit_audit_button;
     EditText overall_notes_editText;
-    FloatingActionButton fab;
+    FloatingActionButton ProfessionalismAndStaffHygieneFAB;
+    FloatingActionButton HousekeepingAndGeneralCleanlinessFAB;
+    FloatingActionButton FoodHygieneFAB;
+    FloatingActionButton HealthierChoiceFAB;
+    FloatingActionButton WorkplaceSafetyAndHealthFAB;
+    TextView ProfessionalismAndStaffHygieneTextView;
+    TextView HousekeepingAndGeneralCleanlinessTextView;
+    TextView FoodHygieneTextView;
+    TextView HealthierChoiceTextView;
+    TextView WorkplaceSafetyAndHealthTextView;
+    NestedScrollView nestedScrollView;
 
     private String[] header_files;
     private ArrayList<ChecklistAdapter> checklistAdapterArrayList = new ArrayList<>();
@@ -112,21 +124,68 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
         initRecyclerViews(view);
 
-        /**
-         * If scrolled to the bottom, set endOfView to true
-         * */
-        view.findViewById(R.id.nested_scroll_view).setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (!v.canScrollVertically(1)) {
-                    // bottom of nested scroll view
-                    endOfView = true;
-                    makeFabScrollToTop();
-                }
-            }
-        });
+        nestedScrollView = view.findViewById(R.id.nested_scroll_view);
+
+        ProfessionalismAndStaffHygieneTextView = view.findViewById(R.id.ProfessionalismAndStaffHygieneTextView);
+        HousekeepingAndGeneralCleanlinessTextView = view.findViewById(R.id.HousekeepingAndGeneralCleanlinessTextView);
+        WorkplaceSafetyAndHealthTextView = view.findViewById(R.id.WorkplaceSafetyAndHealthTextView);
+
+        ProfessionalismAndStaffHygieneFAB = view.findViewById(R.id.ProfessionalismAndStaffHygieneFAB);
+        HousekeepingAndGeneralCleanlinessFAB = view.findViewById(R.id.HousekeepingAndGeneralCleanlinessFAB);
+        WorkplaceSafetyAndHealthFAB = view.findViewById(R.id.WorkplaceSafetyAndHealthFAB);
 
         submit_audit_button = view.findViewById(R.id.submit_audit_button);
+        overall_notes_editText = view.findViewById(R.id.overallReportNotes);
+
+        if (tenantType.equals("F&B")) {
+            FoodHygieneFAB = view.findViewById(R.id.FoodHygieneFAB);
+            HealthierChoiceFAB = view.findViewById(R.id.HealthierChoiceFAB);
+            FoodHygieneTextView = view.findViewById(R.id.FoodHygieneTextView);
+            HealthierChoiceTextView = view.findViewById(R.id.HealthierChoiceTextView);
+        }
+
+        setAllListeners();
+        initApiCaller();
+        loadToken();
+        loadUserID();
+        createReport(); // do this first so the reportID can be obtained first
+
+        return view;
+    }
+
+    private void setAllListeners() {
+        ProfessionalismAndStaffHygieneFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                focusOnView(ProfessionalismAndStaffHygieneTextView);
+            }
+        });
+        HousekeepingAndGeneralCleanlinessFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                focusOnView(HousekeepingAndGeneralCleanlinessTextView);
+            }
+        });
+        if (tenantType.equals("F&B")) {
+            FoodHygieneFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    focusOnView(FoodHygieneTextView);
+                }
+            });
+            HealthierChoiceFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    focusOnView(HealthierChoiceTextView);
+                }
+            });
+        }
+        WorkplaceSafetyAndHealthFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                focusOnView(WorkplaceSafetyAndHealthTextView);
+            }
+        });
         submit_audit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,28 +217,15 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         .show();
             }
         });
-
-        overall_notes_editText = view.findViewById(R.id.overallReportNotes);
-
-        initApiCaller();
-        loadToken();
-        loadUserID();
-        createReport(); // do this first so the reportID can be obtained first
-
-        return view;
     }
 
-    private void focusOnView(View v, TextView tv) {
-        new Handler().post(new Runnable() {
+    private final void focusOnView(TextView tv){
+        nestedScrollView.post(new Runnable() {
             @Override
             public void run() {
-                v.scrollTo(0, tv.getBottom());
+                nestedScrollView.scrollTo(0, tv.getBottom()-200);
             }
         });
-    }
-
-    private void makeFabScrollToTop() {
-
     }
 
     private void deleteReport() {

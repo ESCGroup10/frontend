@@ -32,7 +32,6 @@
                 android:focusable="true"/>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/ProfessionalismCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
@@ -84,6 +83,7 @@
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:id="@+id/HousekeepingAndGeneralCleanlinessTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
@@ -158,7 +158,6 @@
                 android:textStyle="bold" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/StorageAndPreparationOfFoodCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
@@ -208,12 +207,13 @@
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:id="@+id/HealthierChoiceTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="15dp"
-                android:text="Healthier Choice in line with HPB’s Healthy Eating’s Initiative (15%)"
+                android:text="Healthier Choice (15%)"
                 android:textColor="@color/black"
                 android:textSize="30sp"
                 android:textStyle="bold" />
@@ -268,6 +268,7 @@
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:id="@+id/WorkplaceSafetyAndHealthTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
