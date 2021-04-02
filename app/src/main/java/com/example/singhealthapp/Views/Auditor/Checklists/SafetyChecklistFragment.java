@@ -41,6 +41,7 @@ public class SafetyChecklistFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //TODO: implement shared pref (if have time)
         getActivity().setTitle("COVID safe measures checklist");
         View view = inflater.inflate(R.layout.fragment_safety_checklist, container, false);
 
@@ -75,7 +76,9 @@ public class SafetyChecklistFragment extends Fragment {
                 Log.d(TAG, "tenantType sending: "+tenantType);
                 AuditChecklistFragment auditChecklistFragment = new AuditChecklistFragment();
                 auditChecklistFragment.setArguments(bundle);
-                SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, auditChecklistFragment).commit();
+                SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction()
+                        .replace(R.id.auditor_fragment_container, auditChecklistFragment, "auditChecklist")
+                        .commit();
             }
         });
 
