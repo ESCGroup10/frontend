@@ -1,5 +1,5 @@
 package com.example.singhealthapp.HelperClasses;
 
 public interface Ping {
-    public void setIdlingResourcePing();
+    public void decrementCountingIdlingResource();
 }

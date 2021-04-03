@@ -12,9 +12,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,15 +31,11 @@ import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.HelperClasses.Ping;
-import com.example.singhealthapp.HelperClasses.SetIdlingResource;
-import com.example.singhealthapp.HelperClasses.SimpleIdlingResource;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
-import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
-import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
@@ -61,11 +55,6 @@ import retrofit2.Call;
 
 public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         HandlePhotoInterface, AuditChecklistFragment.HandlePhotoListener, Ping {
-
-    // for espresso tests using idling resource, will be null during execution
-    @Nullable
-    private SimpleIdlingResource mIdlingResource;
-    private SetIdlingResource setIdlingResource = new SetIdlingResource(mIdlingResource);
 
     private static final String TAG = "AuditorFragmentContain";
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -131,7 +120,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: ");
-//        setIdlingResource.toFalse();
         EspressoCountingIdlingResource.increment();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
         try {
@@ -218,7 +206,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//        setIdlingResource.toFalse();
         EspressoCountingIdlingResource.increment();
         switch (item.getItemId()) {
             case R.id.nav_Auditor_Statistics:
@@ -276,7 +263,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentPhotoURI);
-//                setIdlingResource.toFalse(); // to be set true in onActivityResult
                 EspressoCountingIdlingResource.increment();
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 mChecklistAdapter = checklistAdapter;
@@ -320,7 +306,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             }
             updatePhotoHashMap();
         }
-//        setIdlingResource.toTrue(); //it was set false in takePhoto method
         EspressoCountingIdlingResource.decrement();
     }
 
@@ -361,25 +346,18 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         mCurrentPhotoBitmap = null;
     }
 
-    /**
-     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
-     */
-    @VisibleForTesting
-    @NonNull
-    public IdlingResource getIdlingResource() {
-        if (mIdlingResource == null) {
-            mIdlingResource = new SimpleIdlingResource();
-        }
-        return mIdlingResource;
-    }
-
-    @Override
-    public void setIdlingResourcePing() {
-//        setIdlingResource.toTrue();
-        EspressoCountingIdlingResource.decrement();
-    }
-
     public interface OnPhotoTakenListener {
         void photoTaken(int position);
     }
+
+    @Override
+    public void decrementCountingIdlingResource() {
+        EspressoCountingIdlingResource.decrement();
+    }
+
+    @VisibleForTesting
+    public IdlingResource getEspressoIdlingResource() {
+        return EspressoCountingIdlingResource.getIdlingResource();
+    }
+
 }

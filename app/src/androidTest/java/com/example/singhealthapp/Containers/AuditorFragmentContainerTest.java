@@ -78,14 +78,26 @@ public class AuditorFragmentContainerTest {
     public void setUp() {
         // register idling resources here
         ActivityScenario activityScenario = ActivityScenario.launch(AuditorFragmentContainer.class);
-//        activityScenario.onActivity(new ActivityScenario.ActivityAction<AuditorFragmentContainer>() {
-//            @Override
-//            public void perform(AuditorFragmentContainer activity) {
-//                mIdlingResource = activity.getIdlingResource();
-//                IdlingRegistry.getInstance().register(mIdlingResource);
-//            }
-//        });
+        activityScenario.onActivity(new ActivityScenario.ActivityAction<AuditorFragmentContainer>() {
+                      @Override
+                      public void perform(AuditorFragmentContainer activity) {
+                          mIdlingResource = activity.getEspressoIdlingResource();
+                          IdlingRegistry.getInstance().register(mIdlingResource);
+                      }
+                  });
         IdlingRegistry.getInstance().register(EspressoCountingIdlingResource.getIdlingResource());
+        /**
+         * Example for calling method in an Activity:
+         *
+         * METHOD MUST HAVE @VisibleForTesting TAG
+         * activityScenario.onActivity(new ActivityScenario.ActivityAction<AuditorFragmentContainer>() {
+         *             @Override
+         *             public void perform(AuditorFragmentContainer activity) {
+         *                 mIdlingResource = activity.getIdlingResource();
+         *                 IdlingRegistry.getInstance().register(mIdlingResource);
+         *             }
+         *         });
+         * */
     }
 
     @After

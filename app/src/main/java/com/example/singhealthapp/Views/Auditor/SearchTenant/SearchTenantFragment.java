@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.Ping;
-import com.example.singhealthapp.HelperClasses.SetIdlingResource;
-import com.example.singhealthapp.HelperClasses.SimpleIdlingResource;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
@@ -91,7 +89,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
                     view.setLayoutManager(new LinearLayoutManager(getActivity()));
                     view.setItemAnimator(new DefaultItemAnimator());
                     view.setAdapter(adapter);
-                    ((Ping)requireActivity()).setIdlingResourcePing();
+                    ((Ping)requireActivity()).decrementCountingIdlingResource();
                 }
                 catch (Exception e) {
                     System.out.println("recycleView not set");
