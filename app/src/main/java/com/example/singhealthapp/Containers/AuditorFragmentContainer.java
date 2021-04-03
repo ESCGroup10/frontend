@@ -12,9 +12,13 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,9 +27,14 @@ import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.test.espresso.IdlingResource;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
+import com.example.singhealthapp.HelperClasses.Ping;
+import com.example.singhealthapp.HelperClasses.SetIdlingResource;
+import com.example.singhealthapp.HelperClasses.SimpleIdlingResource;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
@@ -51,7 +60,12 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        HandlePhotoInterface, AuditChecklistFragment.HandlePhotoListener {
+        HandlePhotoInterface, AuditChecklistFragment.HandlePhotoListener, Ping {
+
+    // for espresso tests using idling resource, will be null during execution
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+    private SetIdlingResource setIdlingResource = new SetIdlingResource(mIdlingResource);
 
     private static final String TAG = "AuditorFragmentContain";
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -97,6 +111,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         toggle.syncState();
 
         if (savedInstanceState == null) {
+            EspressoCountingIdlingResource.increment();
             getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment(), "getTenant").commit();
         }
 
@@ -116,6 +131,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: ");
+//        setIdlingResource.toFalse();
+        EspressoCountingIdlingResource.increment();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
         try {
             if (getSupportFragmentManager().findFragmentByTag("safetyChecklist").isVisible()) {
@@ -201,6 +218,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//        setIdlingResource.toFalse();
+        EspressoCountingIdlingResource.increment();
         switch (item.getItemId()) {
             case R.id.nav_Auditor_Statistics:
                 getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new StatisticsFragment()).commit();
@@ -223,7 +242,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TestFragment()).commit();
                 break;
         }
-
         auditor_drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -258,6 +276,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentPhotoURI);
+//                setIdlingResource.toFalse(); // to be set true in onActivityResult
+                EspressoCountingIdlingResource.increment();
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 mChecklistAdapter = checklistAdapter;
                 mAdapterPosition = adapterPosition;
@@ -300,6 +320,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             }
             updatePhotoHashMap();
         }
+//        setIdlingResource.toTrue(); //it was set false in takePhoto method
+        EspressoCountingIdlingResource.decrement();
     }
 
     private void loadToken() {
@@ -339,8 +361,25 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         mCurrentPhotoBitmap = null;
     }
 
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
+
+    @Override
+    public void setIdlingResourcePing() {
+//        setIdlingResource.toTrue();
+        EspressoCountingIdlingResource.decrement();
+    }
+
     public interface OnPhotoTakenListener {
         void photoTaken(int position);
     }
-
 }

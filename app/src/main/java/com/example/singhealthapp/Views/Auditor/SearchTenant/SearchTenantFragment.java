@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.Ping;
+import com.example.singhealthapp.HelperClasses.SetIdlingResource;
+import com.example.singhealthapp.HelperClasses.SimpleIdlingResource;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
@@ -30,11 +33,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SearchTenantFragment extends Fragment implements SearchAdapter.NavFromTenantSelection {
+
     SearchAdapter adapter;
     private ArrayList<SearchMain> tenantPreviews, getTenantPreviews;
     private List<Tenant> tenants, displayTenants;
-
-
 
     @Nullable
     @Override
@@ -89,6 +91,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
                     view.setLayoutManager(new LinearLayoutManager(getActivity()));
                     view.setItemAnimator(new DefaultItemAnimator());
                     view.setAdapter(adapter);
+                    ((Ping)requireActivity()).setIdlingResourcePing();
                 }
                 catch (Exception e) {
                     System.out.println("recycleView not set");
