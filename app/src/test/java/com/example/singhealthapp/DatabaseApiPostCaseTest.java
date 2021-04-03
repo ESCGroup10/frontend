@@ -40,6 +40,7 @@ public class DatabaseApiPostCaseTest {
         this.unresolved_photo = unresolved_photo;
         this.unresolved_comments = unresolved_comments;
         this.expected_response_code = expected_response_code;
+        this.token = "fakeToken";
     }
 
     @Parameterized.Parameters
@@ -82,6 +83,8 @@ public class DatabaseApiPostCaseTest {
         System.out.println("Actual response code: "+actual_response_code);
         assertEquals(expected_response_code, actual_response_code);
         RecordedRequest request = server.takeRequest();
+        System.out.println("Actual header response: "+request.getHeader("authorization"));
+        assertEquals("Token fakeToken", request.getHeader("authorization"));
         System.out.println("Request line: "+request.getRequestLine());
         assertEquals("POST /api/case/ HTTP/1.1", request.getRequestLine());
 
