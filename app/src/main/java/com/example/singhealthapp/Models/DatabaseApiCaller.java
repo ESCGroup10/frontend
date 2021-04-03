@@ -99,9 +99,6 @@ public interface DatabaseApiCaller {
             @Field("non_compliance_type") String non_compliance_type,
             @Field("unresolved_photo") String unresolved_photo,
             @Field("unresolved_comments") String unresolved_comments
-//            @Field("resolved_photo") String resolved_photo,
-//            @Field("resolved_comments") String resolved_comments,
-//            @Query("resolved_date") String resolved_date
     );
 
     @FormUrlEncoded
