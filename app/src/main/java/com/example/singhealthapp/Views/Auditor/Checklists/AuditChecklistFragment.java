@@ -461,7 +461,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         ChecklistAdapter checklistAdapter;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        checklistAdapter = new ChecklistAdapter((HandlePhotoInterface)getActivity(), list);
+        checklistAdapter = new ChecklistAdapter((HandlePhotoInterface)getActivity(), list, true);
         recyclerView.setAdapter(checklistAdapter);
         checklistAdapterArrayList.add(checklistAdapter);
         recyclerViewNameArrayList.add(recyclerViewName);

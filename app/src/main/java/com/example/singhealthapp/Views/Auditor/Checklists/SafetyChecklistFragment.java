@@ -92,7 +92,7 @@ public class SafetyChecklistFragment extends Fragment {
     private void init_recyclerView(RecyclerView recyclerView, ArrayList<ChecklistItem> list, ChecklistAdapter checklistAdapter) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        checklistAdapter = new ChecklistAdapter((HandlePhotoInterface)getActivity(), list);
+        checklistAdapter = new ChecklistAdapter((HandlePhotoInterface)getActivity(), list, false);
         recyclerView.setAdapter(checklistAdapter);
     }
 

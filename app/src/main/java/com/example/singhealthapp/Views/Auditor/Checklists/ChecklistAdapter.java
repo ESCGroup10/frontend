@@ -32,10 +32,12 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     private final int black = Color.parseColor("#FF000000");
 
     private ArrayList<ChecklistItem> checklist_items_array = new ArrayList<>();
+    private boolean isAudit;
 
     private HandlePhotoInterface TakePhotoActivity;
 
-    public ChecklistAdapter(HandlePhotoInterface takePhotoActivity, ArrayList<ChecklistItem> checklist_items_array) {
+    public ChecklistAdapter(HandlePhotoInterface takePhotoActivity, ArrayList<ChecklistItem> checklist_items_array, boolean isAudit) {
+        this.isAudit = isAudit;
         this.checklist_items_array = checklist_items_array;
         this.TakePhotoActivity = takePhotoActivity;
     }
@@ -52,9 +54,11 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.textViewQuestion.setText(checklist_items_array.get(position).getStatement());
-        checklist_items_array.get(position).setRemarks(holder.editTextRemarks.getText().toString());
-        if (checklist_items_array.get(position).isPhotoTaken()) {
-            holder.cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+        if (isAudit) {
+            checklist_items_array.get(position).setRemarks(holder.editTextRemarks.getText().toString());
+            if (checklist_items_array.get(position).isPhotoTaken()) {
+                holder.cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+            }
         }
     }
 
@@ -113,6 +117,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
         private EditText editTextRemarks;
         private View colourStatusIndicator;
         private ImageButton cameraButton;
+        private View extraLayer;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -123,29 +128,32 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             editTextRemarks = itemView.findViewById(R.id.remarks);
             colourStatusIndicator = itemView.findViewById(R.id.color_status_indicator);
             cameraButton = itemView.findViewById(R.id.camera_button);
+            extraLayer = itemView.findViewById(R.id.extra_layer);
 
-            editTextRemarks.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    checklist_items_array.get(getAdapterPosition()).setRemarks(s.toString());
-                }
-                @Override
-                public void afterTextChanged(Editable s) {
-                }
-            });
-
-            cameraButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    boolean result = callTakePhoto(getAdapterPosition());
-                    if (result) {
-//                        cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+            if (isAudit) {
+                editTextRemarks.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     }
-                }
-            });
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        checklist_items_array.get(getAdapterPosition()).setRemarks(s.toString());
+                    }
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                    }
+                });
+                cameraButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        callTakePhoto(getAdapterPosition());
+                    }
+                });
+            } else {
+                cameraButton.setVisibility(View.GONE);
+                editTextRemarks.setVisibility(View.GONE);
+                extraLayer.setVisibility(View.VISIBLE);
+            }
 
             textViewTrue.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -156,7 +164,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                         colourStatusIndicator.setBackgroundColor(green);
                         checklist_items_array.get(getAdapterPosition()).setCase(false);
                     }
-                    cameraButton.setBackgroundResource(R.drawable.camera);
+                    if (isAudit) {
+                        cameraButton.setBackgroundResource(R.drawable.camera);
+                    }
                 }
             });
 
@@ -171,7 +181,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                         checklist_items_array.get(getAdapterPosition()).setCase(true);
                     }
                     if (checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
-                        cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+                        if (isAudit) {
+                            cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+                        }
                     }
                 }
             });
@@ -185,7 +197,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                         colourStatusIndicator.setBackgroundColor(grey);
                         checklist_items_array.get(getAdapterPosition()).setCase(false);
                     }
-                    cameraButton.setBackgroundResource(R.drawable.camera);
+                    if (isAudit) {
+                        cameraButton.setBackgroundResource(R.drawable.camera);
+                    }
                 }
             });
         }
