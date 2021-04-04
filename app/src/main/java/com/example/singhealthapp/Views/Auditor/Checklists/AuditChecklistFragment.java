@@ -34,6 +34,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
+import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -286,7 +287,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             deleteReport();
-                            getActivity().getSupportFragmentManager().popBackStack();
+                            getActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.auditor_fragment_container, new SearchTenantFragment())
+                                    .commit();
                             dialog.dismiss();
                         }
                     })

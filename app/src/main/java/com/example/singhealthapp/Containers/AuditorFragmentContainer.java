@@ -36,6 +36,7 @@ import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
+import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
@@ -132,7 +133,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         try {
             if (getSupportFragmentManager().findFragmentByTag("auditChecklist").isVisible()) {
                 // TODO: can go to safety fragment if it implements shared pref
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                ((IOnBackPressed)getSupportFragmentManager().findFragmentByTag("auditChecklist")).onBackPressed();
+//                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
                 return;
             }
         }
@@ -190,7 +192,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
             builder.setMessage("Do you want to log out? ");
             builder.setPositiveButton("OK", (dialog, id) -> {
-                //AuditorFragmentContainer.super.onBackPressed();
                 dialog.dismiss();
                 clearData(); // clear user type (to avoid auto login) and token (for safety)
                 Intent intent = new Intent(AuditorFragmentContainer.this, LoginActivity.class);
@@ -214,7 +215,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
             case R.id.nav_Tenants:
                 getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SafetyChecklistFragment()).commit();
                 break;
 
             case R.id.nav_Reports:
