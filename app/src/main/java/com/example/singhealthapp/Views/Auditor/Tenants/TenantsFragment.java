@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
@@ -69,7 +70,11 @@ public class TenantsFragment extends Fragment {
                     bundle.putString("LOCATION_KEY", tenant.getLocation());
                 SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
                 safetyChecklistFragment.setArguments(bundle);
-                TenantsFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyChecklist").commit();
+
+                ((Ping)requireActivity()).incrementCountingIdlingResource(1);
+                TenantsFragment.this.getParentFragmentManager().beginTransaction()
+                        .replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyChecklist")
+                        .commit();
             }
         });
 
@@ -82,7 +87,7 @@ public class TenantsFragment extends Fragment {
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteTenant(tenant.getId()))
                     .create().show();
         });
-
+        ((Ping)requireActivity()).decrementCountingIdlingResource();
         return view;
     }
 

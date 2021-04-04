@@ -1,12 +1,15 @@
 package com.example.singhealthapp.HelperClasses;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class EspressoCountingIdlingResource {
     private static final String RESOURCE = "GLOBAL";
-
-    private static CountingIdlingResource mCountingIdlingResource = new CountingIdlingResource(RESOURCE);;
+    private static AtomicBoolean testing = new AtomicBoolean(false);
+    private static CountingIdlingResource mCountingIdlingResource = new CountingIdlingResource(RESOURCE);
 
     public static void increment() {
         if (mCountingIdlingResource != null) {

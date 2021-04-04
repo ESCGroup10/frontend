@@ -112,6 +112,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
 
     @Override
     public void navigate(int position) {
+        ((Ping)requireActivity()).incrementCountingIdlingResource(1);
         SearchTenantFragment.this.getParentFragmentManager()
                 .beginTransaction()
                 .replace(R.id.auditor_fragment_container, new TenantsFragment(tenants.get(position)),"tenantsFragment")

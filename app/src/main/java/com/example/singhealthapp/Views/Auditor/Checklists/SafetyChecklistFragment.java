@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.R;
 
@@ -76,12 +77,15 @@ public class SafetyChecklistFragment extends Fragment {
                 Log.d(TAG, "tenantType sending: "+tenantType);
                 AuditChecklistFragment auditChecklistFragment = new AuditChecklistFragment();
                 auditChecklistFragment.setArguments(bundle);
+
+                ((Ping)requireActivity()).incrementCountingIdlingResource(12); //12 = number of recyclerViews created + 1 report created
                 SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction()
                         .replace(R.id.auditor_fragment_container, auditChecklistFragment, "auditChecklist")
                         .commit();
             }
         });
 
+        ((Ping)requireActivity()).decrementCountingIdlingResource();
         return view;
     }
 

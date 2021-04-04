@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.DatabasePhotoOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
@@ -142,6 +143,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             HealthierChoiceFAB = view.findViewById(R.id.HealthierChoiceFAB);
             FoodHygieneTextView = view.findViewById(R.id.FoodHygieneTextView);
             HealthierChoiceTextView = view.findViewById(R.id.HealthierChoiceTextView);
+        } else {
+            ((Ping)requireActivity()).decrementCountingIdlingResource();
+            ((Ping)requireActivity()).decrementCountingIdlingResource();
         }
 
         setAllListeners();
@@ -341,9 +345,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         reportCall.enqueue(new Callback<Report>() {
             @Override
             public void onResponse(Call<Report> call, Response<Report> response) {
-//                Log.d(TAG, "createReport onResponse: "+response);
                 reportID = response.body().getId();
-//                Log.d(TAG, "onResponse: reportID: "+reportID);
+                ((Ping)requireActivity()).decrementCountingIdlingResource();
             }
 
             @Override
@@ -462,6 +465,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         recyclerView.setAdapter(checklistAdapter);
         checklistAdapterArrayList.add(checklistAdapter);
         recyclerViewNameArrayList.add(recyclerViewName);
+        ((Ping)requireActivity()).decrementCountingIdlingResource();
     }
 
     private String getRecyclerViewName(String subHeader) {
@@ -470,7 +474,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 return "Professional & Staff Hygiene";
             case "General Environment Cleanliness":case "Hand Hygiene Facilities":
                 return "Housekeeping & General Cleanliness";
-            case ("Storage & Preparation of Food"):case "Storage of Food in Refrigerator/ Warmer":
+            case "Storage & Preparation of Food":case "Storage of Food in Refrigerator/ Warmer":
                 return "Healthier Choice";
             case "Food":case "Beverage":
                 return "Food Hygiene";

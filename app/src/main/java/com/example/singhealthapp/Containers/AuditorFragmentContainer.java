@@ -356,8 +356,10 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     }
 
     @Override
-    public void incrementCountingIdlingResource() {
-        EspressoCountingIdlingResource.increment();
+    public void incrementCountingIdlingResource(int numResources) {
+        for (int i = 0; i < numResources; i++) {
+            EspressoCountingIdlingResource.increment();
+        }
     }
 
 }
