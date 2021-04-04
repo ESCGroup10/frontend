@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
@@ -204,6 +205,7 @@ public class ReportsFragment extends Fragment {
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
             view.setItemAnimator(new DefaultItemAnimator());
             view.setAdapter(adapterCompleted);
+            ((Ping)requireActivity()).decrementCountingIdlingResource();
         } catch (Exception e) {
             System.out.println("Completed recycleView not set");
         }

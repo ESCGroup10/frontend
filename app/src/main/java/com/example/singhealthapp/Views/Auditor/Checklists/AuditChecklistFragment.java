@@ -3,34 +3,46 @@ package com.example.singhealthapp.Views.Auditor.Checklists;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.singhealthapp.Containers.AuditorFragmentContainer;
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
-import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.HelperClasses.DatabasePhotoOperations;
+import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
+import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
-import java.text.DecimalFormat;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -39,33 +51,36 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AuditChecklistFragment extends Fragment {
+public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     public static final String TAG = "AuditChecklistFragment";
 
     Button submit_audit_button;
     EditText overall_notes_editText;
+    FloatingActionButton ProfessionalismAndStaffHygieneFAB;
+    FloatingActionButton HousekeepingAndGeneralCleanlinessFAB;
+    FloatingActionButton FoodHygieneFAB;
+    FloatingActionButton HealthierChoiceFAB;
+    FloatingActionButton WorkplaceSafetyAndHealthFAB;
+    TextView ProfessionalismAndStaffHygieneTextView;
+    TextView HousekeepingAndGeneralCleanlinessTextView;
+    TextView FoodHygieneTextView;
+    TextView HealthierChoiceTextView;
+    TextView WorkplaceSafetyAndHealthTextView;
+    NestedScrollView nestedScrollView;
 
-    private static final String TENANT_TYPE_KEY = "tenant_type_key";
     private String[] header_files;
     private ArrayList<ChecklistAdapter> checklistAdapterArrayList = new ArrayList<>();
     private ArrayList<String> recyclerViewNameArrayList = new ArrayList<>();
     int numCases;
     String passFail;
-    private String company;
-    private String location;
-    private String outletType;
-
-    //keys
-    private final String TITLE_KEY = "title_key";
-    private final String MSG_KEY = "message_key";
-    private final String BUTTON_TXT_KEY = "button_text_key";
-    private final String USER_ID_KEY = "USER_ID_KEY";
-    private final String TOKEN_KEY = "TOKEN_KEY";
+    private boolean endOfView = false;
 
     private static DatabaseApiCaller apiCaller;
     private String token;
     private int userID;
     private int tenantID;
+    private String tenantCompany;
+    private String tenantLocation;
     String tenantType;
     private int reportID = -2;
 
@@ -81,40 +96,109 @@ public class AuditChecklistFragment extends Fragment {
     private double original_healthierchoice_score = 0;
     private double original_foodhygiene_score = 0;
 
-    private int staff_hygiene_percent_weightage = 0;
-    private int housekeeping_percent_weightage = 0;
-    private int safety_percent_weightage = 0;
-    private int healthierchoice_percent_weightage = 0;
-    private int foodhygiene_percent_weightage = 0;
+    private double staff_hygiene_weightage = 0;
+    private double housekeeping_weightage = 0;
+    private double safety_weightage = 0;
+    private double healthierchoice_weightage = 0;
+    private double foodhygiene_weightage = 0;
 
     Call<Report> reportCall;
     Call<ResponseBody> caseCall;
 
-    private DecimalFormat df = new DecimalFormat("0.00");
-
     HandlePhotoListener mActivityCallback;
-    Map questionAndPhotoPathHashMap;
+    HashMap<String, Bitmap> photoBitmapHashMap;
+    int photoNameCounter = 0;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Audit checklist");
-        fakeData();
 
         Bundle bundle = getArguments();
-        tenantType = bundle.getString(TENANT_TYPE_KEY);
+        tenantType = bundle.getString("TENANT_TYPE_KEY");
+        tenantID = bundle.getInt("ID_KEY");
+        tenantCompany = bundle.getString("COMPANY_KEY");
+        tenantLocation = bundle.getString("LOCATION_KEY");
         View view = inflateFragmentLayout(tenantType, container, inflater);
         initScoresAndPercentages(tenantType);
 
         initRecyclerViews(view);
 
+        nestedScrollView = view.findViewById(R.id.nested_scroll_view);
+
+        ProfessionalismAndStaffHygieneTextView = view.findViewById(R.id.ProfessionalismAndStaffHygieneTextView);
+        HousekeepingAndGeneralCleanlinessTextView = view.findViewById(R.id.HousekeepingAndGeneralCleanlinessTextView);
+        WorkplaceSafetyAndHealthTextView = view.findViewById(R.id.WorkplaceSafetyAndHealthTextView);
+
+        ProfessionalismAndStaffHygieneFAB = view.findViewById(R.id.ProfessionalismAndStaffHygieneFAB);
+        HousekeepingAndGeneralCleanlinessFAB = view.findViewById(R.id.HousekeepingAndGeneralCleanlinessFAB);
+        WorkplaceSafetyAndHealthFAB = view.findViewById(R.id.WorkplaceSafetyAndHealthFAB);
+
         submit_audit_button = view.findViewById(R.id.submit_audit_button);
+        overall_notes_editText = view.findViewById(R.id.overallReportNotes);
+
+        if (tenantType.equals("F&B")) {
+            FoodHygieneFAB = view.findViewById(R.id.FoodHygieneFAB);
+            HealthierChoiceFAB = view.findViewById(R.id.HealthierChoiceFAB);
+            FoodHygieneTextView = view.findViewById(R.id.FoodHygieneTextView);
+            HealthierChoiceTextView = view.findViewById(R.id.HealthierChoiceTextView);
+        } else {
+            ((Ping)requireActivity()).decrementCountingIdlingResource();
+            ((Ping)requireActivity()).decrementCountingIdlingResource();
+        }
+
+        setAllListeners();
+        initApiCaller();
+        loadToken();
+        loadUserID();
+        createReport(); // do this first so the reportID can be obtained first
+
+        return view;
+    }
+
+    private void setAllListeners() {
+        ProfessionalismAndStaffHygieneFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                focusOnView(ProfessionalismAndStaffHygieneTextView);
+            }
+        });
+        HousekeepingAndGeneralCleanlinessFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                focusOnView(HousekeepingAndGeneralCleanlinessTextView);
+            }
+        });
+        if (tenantType.equals("F&B")) {
+            FoodHygieneFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    focusOnView(FoodHygieneTextView);
+                }
+            });
+            HealthierChoiceFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    focusOnView(HealthierChoiceTextView);
+                }
+            });
+        }
+        WorkplaceSafetyAndHealthFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                focusOnView(WorkplaceSafetyAndHealthTextView);
+            }
+        });
         submit_audit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createReport();
-                createCases(reportID);
+                try {
+                    calculateScores();
+                } catch (IllegalArgumentException ex) {
+                    Log.d(TAG, "calculateScores IllegalArgumentException: "+ex);
+                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                 builder.setTitle("Confirm Submission?")
                         .setMessage("Total non compliance cases: "+numCases+"\nResult: "+passFail)
@@ -122,6 +206,8 @@ public class AuditChecklistFragment extends Fragment {
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                photoNameCounter = 0;
+                                deleteReport();
                                 dialog.dismiss();
                             }
                         })
@@ -136,31 +222,48 @@ public class AuditChecklistFragment extends Fragment {
                         .show();
             }
         });
-
-        overall_notes_editText = view.findViewById(R.id.overallReportNotes);
-
-        return view;
     }
 
-    private void fakeData() {
-        Log.d(TAG, "fakeData: called");
-        tenantID = 1234567890;
-        company = "company";
-        location = "location";
-        outletType = "outletType";
+    private final void focusOnView(TextView tv){
+        nestedScrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                nestedScrollView.scrollTo(0, tv.getBottom()-200);
+            }
+        });
+    }
+
+    private void deleteReport() {
+        if (reportID > 0) {
+            Call<Void> deleteRequest = apiCaller.deleteReport("Token "+token, reportID);
+            deleteRequest.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                    Log.d(TAG, "deleteReport onResponse: "+response);
+                    Log.d(TAG, "deleteReport onResponse: code: "+response.code());
+                }
+
+                @Override
+                public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                    Log.d(TAG, "deleteReport onFailure: "+t);
+                }
+            });
+        }
     }
 
     private void submit() {
         Log.d(TAG, "submit: called");
+        createCases();
         Bundle bundle = new Bundle();
+        //keys
+        String TITLE_KEY = "title_key";
         bundle.putString(TITLE_KEY, "Audit Submitted");
+        String MSG_KEY = "message_key";
         bundle.putString(MSG_KEY, "Audit Complete!");
+        String BUTTON_TXT_KEY = "button_text_key";
         bundle.putString(BUTTON_TXT_KEY, "Return");
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
-        Log.d(TAG, "title: "+bundle.getString(TITLE_KEY));
-        Log.d(TAG, "msg: "+bundle.getString(MSG_KEY));
-        Log.d(TAG, "button text: "+bundle.getString(BUTTON_TXT_KEY));
         AuditChecklistFragment.this.getParentFragmentManager()
                 .beginTransaction()
                 .replace(R.id.auditor_fragment_container, statusConfirmationFragment)
@@ -168,13 +271,40 @@ public class AuditChecklistFragment extends Fragment {
                 .commit();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (reportID > 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+            builder.setTitle("Are you sure you want to leave?\nOngoing report will be deleted!")
+                    .setCancelable(false)
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteReport();
+                            getActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.auditor_fragment_container, new SearchTenantFragment())
+                                    .commit();
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+        }
+    }
+
     public interface HandlePhotoListener {
-        Map getPhotoPathHashMap();
-        void clearPhotoPathHashMap();
+        HashMap<String, Bitmap> getPhotoBitmaps();
+        void clearCurrentReportPhotoData();
     }
 
     public interface OnAuditSubmitListener {
         ArrayList<String> sendCases();
+        int getNumCases();
     }
 
     private String getOverallNotes() {
@@ -197,132 +327,132 @@ public class AuditChecklistFragment extends Fragment {
         return Math.round(num * (Math.pow(10.0, dec)) / (Math.pow(10.0, dec)));
     }
 
-    public int createReport() {
-        /*
+    public void createReport() {
+        /**
         * Usage:
         * - Creates a report in the db
         * Returns:
         * - db generated report ID
         * */
         Log.d(TAG, "createReport: called");
-        initApiCaller();
-        loadToken();
-        loadUserID();
-        try {
-            calculateScores();
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "calculateScores IllegalArgumentException: "+ex);
-            return -1;
-        }
-
         if (tenantType.equals("F&B")) {
-            reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, company, location, tenantType,
+            reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
                     false, getOverallNotes(), null, round(staff_hygiene_score, 2),
                     round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
                     round(foodhygiene_score, 2));
         } else {
-            reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, company, location, tenantType,
+            reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
                     false, getOverallNotes(), null, round(staff_hygiene_score, 2),
                     round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
         }
-
-        getReportID();
-        return reportID;
-    }
-
-    private void getReportID() {
-        Log.d(TAG, "getReportID: called");
         reportCall.enqueue(new Callback<Report>() {
             @Override
             public void onResponse(Call<Report> call, Response<Report> response) {
-                Log.d(TAG, "onResponse: code: " + response.code());
                 reportID = response.body().getId();
+                ((Ping)requireActivity()).decrementCountingIdlingResource();
             }
 
             @Override
             public void onFailure(Call<Report> call, Throwable t) {
-                Log.d(TAG, "onFailure: " + t.toString());
-                reportID = -2;
+                Log.d(TAG, "createReport onFailure: "+t);
+                reportID = -1;
             }
         });
-        if (reportID == -1) {
-            Log.d(TAG, "onClick: error in calculating scores");
-        } else if (reportID == -2) {
-            Log.d(TAG, "onClick: error in getting response from database");
+    }
+
+    private String getUniquePhotoName() {
+        if (reportID > 0) {
+            photoNameCounter++;
+            return ""+reportID+"_"+photoNameCounter;
+        } else {
+            return "";
         }
     }
 
-    private void createCases(int reportID) {
+    private void createCases() {
         Log.d(TAG, "createCases: called");
-        questionAndPhotoPathHashMap = getAllPhotos();
-        for (int i=0; i<checklistAdapterArrayList.size(); i+=2) {
+        photoBitmapHashMap = getAllPhotos();
+        for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String non_compliance_type = recyclerViewNameArrayList.get(i);
             ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases();
             for (int j=0; j<caseList.size(); j+=2) {
-                numCases++;
-                String question = caseList.remove(j);
-                String comments = caseList.remove(j);
+                String question = caseList.get(j);
+                String comments = caseList.get(j+1);
+                Bitmap photoBitmap = photoBitmapHashMap.get(question); // get bitmap using question
+                if (photoBitmap == null) {
+                    Log.e(TAG, "createCases: photobitmap is null, questions: "+question);
+                }
+                String photoName = getUniquePhotoName();
+                if (photoName.equals("")) {
+                    Log.d(TAG, "createCases: error creating unique photo name");
+                    return;
+                }
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
-                        (String)questionAndPhotoPathHashMap.get(question), comments, null,
-                        null, null);
+                        photoName, comments);
+                caseCall.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Log.d(TAG, "createCases response code: "+response.code());
+                        DatabasePhotoOperations.uploadImage(photoBitmap, photoName);
+                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.d(TAG, "createCases onFailure: "+t);
+                    }
+                });
             }
         }
+    }
+
+    private void reInitScores() {
+        staff_hygiene_score=original_staff_hygiene_score;
+        housekeeping_score=original_housekeeping_score;
+        foodhygiene_score=original_foodhygiene_score;
+        healthierchoice_score=original_healthierchoice_score;
+        safety_score=original_safety_score;
     }
 
     private void calculateScores() throws IllegalArgumentException {
         Log.d(TAG, "calculateScores: called");
+        numCases = 0;
+        reInitScores();
         if (checklistAdapterArrayList.size() != recyclerViewNameArrayList.size()) {
             Log.d(TAG, "calculateScores: something went wrong when creating recyclerviews");
             return;
         }
-        for (int i=0; i<checklistAdapterArrayList.size(); i+=2) {
+        for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String name = recyclerViewNameArrayList.get(i);
-            ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases();
+            int currentChecklistNumCases = checklistAdapterArrayList.get(i).getNumCases();
+            numCases += currentChecklistNumCases;
 
             switch (name) {
-                case "Professionalism":
-                    staff_hygiene_score-=(caseList.size()/2);
+                case "Professional & Staff Hygiene":
+                    staff_hygiene_score-=currentChecklistNumCases;
                     break;
-                case "Staff Hygiene":
-                    staff_hygiene_score-=(caseList.size()/2);
+                case "Housekeeping & General Cleanliness":
+                    housekeeping_score-=currentChecklistNumCases;
                     break;
-                case "General Environment Cleanliness":
-                    housekeeping_score-=(caseList.size()/2);
+                case "Healthier Choice":
+                    foodhygiene_score-=currentChecklistNumCases;
                     break;
-                case "Hand Hygiene Facilities":
-                    housekeeping_score-=(caseList.size()/2);
+                case "Food Hygiene":
+                    healthierchoice_score-=currentChecklistNumCases;
                     break;
-                case "Storage & Preparation of Food":
-                    foodhygiene_score-=(caseList.size()/2);
-                    break;
-                case "Storage of Food in Refrigerator/ Warmer":
-                    foodhygiene_score-=(caseList.size()/2);
-                    break;
-                case "Food":
-                    healthierchoice_score-=(caseList.size()/2);
-                    break;
-                case "Beverage":
-                    healthierchoice_score-=(caseList.size()/2);
-                    break;
-                case "General Safety":
-                    safety_score-=(caseList.size()/2);
-                    break;
-                case "Fire & Emergency Safety":
-                    safety_score-=(caseList.size()/2);
-                    break;
-                case "Electrical Safety":
-                    safety_score-=(caseList.size()/2);
+                case "Workplace Safety & Health":
+                    safety_score-=currentChecklistNumCases;
                     break;
                 default:
                     throw new IllegalArgumentException();
             }
         }
-        staff_hygiene_score = staff_hygiene_score*staff_hygiene_percent_weightage/original_staff_hygiene_score;
-        housekeeping_score = housekeeping_score*housekeeping_percent_weightage/original_housekeeping_score;
-        safety_score = safety_score*safety_percent_weightage/original_safety_score;
-        healthierchoice_score = healthierchoice_percent_weightage*healthierchoice_percent_weightage/original_healthierchoice_score;
-        foodhygiene_score = foodhygiene_score*foodhygiene_percent_weightage/original_foodhygiene_score;
-        if (staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 95) {
+        staff_hygiene_score = staff_hygiene_score* staff_hygiene_weightage /original_staff_hygiene_score;
+        housekeeping_score = housekeeping_score* housekeeping_weightage /original_housekeeping_score;
+        safety_score = safety_score* safety_weightage /original_safety_score;
+        if (tenantType.equals("F&B")) {
+            healthierchoice_score = healthierchoice_score * healthierchoice_weightage / original_healthierchoice_score;
+            foodhygiene_score = foodhygiene_score * foodhygiene_weightage / original_foodhygiene_score;
+        }
+        if (staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 0.95) {
             passFail = "Fail";
         } else {
             passFail = "Pass";
@@ -334,14 +464,34 @@ public class AuditChecklistFragment extends Fragment {
         ChecklistAdapter checklistAdapter;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        checklistAdapter = new ChecklistAdapter((TakePhotoInterface)getActivity(), list);
+        checklistAdapter = new ChecklistAdapter((HandlePhotoInterface)getActivity(), list, true);
         recyclerView.setAdapter(checklistAdapter);
         checklistAdapterArrayList.add(checklistAdapter);
         recyclerViewNameArrayList.add(recyclerViewName);
+        ((Ping)requireActivity()).decrementCountingIdlingResource();
+    }
+
+    private String getRecyclerViewName(String subHeader) {
+        switch (subHeader) {
+            case "Professionalism": case "Staff Hygiene":
+                return "Professional & Staff Hygiene";
+            case "General Environment Cleanliness":case "Hand Hygiene Facilities":
+                return "Housekeeping & General Cleanliness";
+            case "Storage & Preparation of Food":case "Storage of Food in Refrigerator/ Warmer":
+                return "Healthier Choice";
+            case "Food":case "Beverage":
+                return "Food Hygiene";
+            case "General Safety":case "Fire & Emergency Safety":case "Electrical Safety":
+                return "Workplace Safety & Health";
+            default:
+                Log.d(TAG, "getRecyclerViewName: error, check subHeaders");
+                throw new IllegalArgumentException();
+
+        }
     }
 
     private void initChecklistSection(View view, String pathName) {
-        /*
+        /**
          * 1. Gets an ArrayList of questions for each sub-header in a section specified by the pathName
          * 2. Matches each ArrayList to a recyclerView
          * 3. Initialises the recyclerView
@@ -362,7 +512,7 @@ public class AuditChecklistFragment extends Fragment {
                 }
                 try {
                     recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
-                    currentRecyclerViewName = line.substring(1);
+                    currentRecyclerViewName = getRecyclerViewName(line.substring(1));
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 }
@@ -380,7 +530,7 @@ public class AuditChecklistFragment extends Fragment {
     }
 
     private RecyclerView getCorrespondingRecyclerView(View view, String subHeader) throws IllegalArgumentException {
-        /*
+        /**
         * Returns recyclerView corresponding to the subHeader given
         * */
         Log.d(TAG, "getCorrespondingRecyclerView: called");
@@ -445,18 +595,20 @@ public class AuditChecklistFragment extends Fragment {
     private void loadToken() {
         Log.d(TAG, "loadToken: called");
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        String TOKEN_KEY = "TOKEN_KEY";
         token = sharedPreferences.getString(TOKEN_KEY, null);
     }
 
     private void loadUserID() {
         Log.d(TAG, "loadUserID: called");
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        String USER_ID_KEY = "USER_ID_KEY";
         userID = sharedPreferences.getInt(USER_ID_KEY, -1);
     }
 
     private void initScoresAndPercentages(String tenantType) {
         Log.d(TAG, "initScoresAndPercentages: called");
-        if (tenantType.toLowerCase().equals("F&B")) {
+        if (tenantType.equals("F&B")) {
             staff_hygiene_score = 13;
             housekeeping_score = 17;
             safety_score = 18;
@@ -467,21 +619,25 @@ public class AuditChecklistFragment extends Fragment {
             original_safety_score = 18;
             original_healthierchoice_score = 11;
             original_foodhygiene_score = 37;
-            staff_hygiene_percent_weightage = 10;
-            housekeeping_percent_weightage = 20;
-            safety_percent_weightage = 20;
-            healthierchoice_percent_weightage = 15;
-            foodhygiene_percent_weightage = 35;
-        } else if (tenantType.toLowerCase().equals("Non F&B")) {
+            staff_hygiene_weightage = 0.10;
+            housekeeping_weightage = 0.20;
+            safety_weightage = 0.20;
+            healthierchoice_weightage = 0.15;
+            foodhygiene_weightage = 0.35;
+            Log.d(TAG, "initScoresAndPercentages: scores set for F&B");
+        } else if (tenantType.equals("Non F&B")) {
             staff_hygiene_score = 6;
             housekeeping_score = 12;
             safety_score = 16;
             original_staff_hygiene_score = 6;
             original_housekeeping_score = 12;
             original_safety_score = 16;
-            staff_hygiene_percent_weightage = 20;
-            housekeeping_percent_weightage = 40;
-            safety_percent_weightage = 40;
+            staff_hygiene_weightage = 0.20;
+            housekeeping_weightage = 0.40;
+            safety_weightage = 0.40;
+            Log.d(TAG, "initScoresAndPercentages: scores set for Non F&B");
+        } else {
+            Log.d(TAG, "initScoresAndPercentages: not set, check tenant type");
         }
     }
 
@@ -493,17 +649,17 @@ public class AuditChecklistFragment extends Fragment {
             mActivityCallback = (HandlePhotoListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement HeadlineListener");
+                    + " must implement HandlePhotoListener");
         }
     }
 
-    private Map getAllPhotos() {
+    private HashMap<String, Bitmap> getAllPhotos() {
         Log.d(TAG, "getAllPhotos: called");
-        return mActivityCallback.getPhotoPathHashMap();
+        return mActivityCallback.getPhotoBitmaps();
     }
 
     private void clearAllPhotosFromContainerActivity() {
         Log.d(TAG, "clearAllPhotosFromContainerActivity: called");
-        mActivityCallback.clearPhotoPathHashMap();
+        mActivityCallback.clearCurrentReportPhotoData();
     }
 }
