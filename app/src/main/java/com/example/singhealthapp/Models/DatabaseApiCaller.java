@@ -91,7 +91,7 @@ public interface DatabaseApiCaller {
 
     @FormUrlEncoded
     @POST("/api/case/")
-    Call<ResponseBody> postCase (
+    Call<Case> postCase (
             @Header("authorization") String token,
             @Field("report_id") int report_id,
             @Field("question") String question,
@@ -128,4 +128,8 @@ public interface DatabaseApiCaller {
     @DELETE("/api/report/{id}/")
     Call<Void> deleteReport(@Header("authorization") String token,
                             @Path("id") int reportID);
+
+    @DELETE("/api/case/{id}/")
+    Call<Void> deleteCase(@Header("authorization") String token,
+                            @Path("id") int caseID);
 }

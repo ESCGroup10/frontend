@@ -16,7 +16,7 @@ import java.io.ByteArrayOutputStream;
 public class DatabasePhotoOperations {
     private static final String TAG = "DatabasePhotoOperations";
 
-    public static void uploadImage(Bitmap bitmap, String photoName) {
+    public static void uploadImage(Bitmap bitmap, String photoName) throws NullPointerException {
 
         new Thread(() -> {
             try {
@@ -33,6 +33,9 @@ public class DatabasePhotoOperations {
 
             } catch (StorageException e) {
                 Log.d(TAG, "uploadImage: failed to upload photo");
+            } catch (NullPointerException e) {
+                Log.d(TAG, "uploadImage: image does not exist");
+                throw new NullPointerException();
             }
 
         }).start();

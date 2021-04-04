@@ -25,10 +25,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.DatabasePhotoOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
+import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
@@ -74,6 +76,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     int numCases;
     String passFail;
     private boolean endOfView = false;
+    private ArrayList<Integer> submittedCaseIDs = new ArrayList<>();
+    boolean stopCreatingCases = false;
 
     private static DatabaseApiCaller apiCaller;
     private String token;
@@ -103,7 +107,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private double foodhygiene_weightage = 0;
 
     Call<Report> reportCall;
-    Call<ResponseBody> caseCall;
+    Call<Case> caseCall;
 
     HandlePhotoListener mActivityCallback;
     HashMap<String, Bitmap> photoBitmapHashMap;
@@ -214,6 +218,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                createCases();
                                 submit();
                                 clearAllPhotosFromContainerActivity();
                                 dialog.dismiss();
@@ -253,7 +258,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     private void submit() {
         Log.d(TAG, "submit: called");
-        createCases();
         Bundle bundle = new Bundle();
         //keys
         String TITLE_KEY = "title_key";
@@ -371,6 +375,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     private void createCases() {
         Log.d(TAG, "createCases: called");
+        stopCreatingCases = false;
         photoBitmapHashMap = getAllPhotos();
         for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String non_compliance_type = recyclerViewNameArrayList.get(i);
@@ -389,19 +394,74 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 }
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
                         photoName, comments);
-                caseCall.enqueue(new Callback<ResponseBody>() {
+                caseCall.enqueue(new Callback<Case>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    public void onResponse(Call<Case> call, Response<Case> response) {
                         Log.d(TAG, "createCases response code: "+response.code());
-                        DatabasePhotoOperations.uploadImage(photoBitmap, photoName);
+                        int caseID = response.body().getId();
+                        String question = response.body().getQuestion();
+                        submittedCaseIDs.add(caseID);
+                        try {
+                            DatabasePhotoOperations.uploadImage(photoBitmap, photoName);
+                        } catch (NullPointerException e) {
+                            alertDialogueNullPhoto(caseID, question);
+                            stopCreatingCases = true;
+                        }
                     }
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    public void onFailure(Call<Case> call, Throwable t) {
                         Log.d(TAG, "createCases onFailure: "+t);
                     }
                 });
+                if (stopCreatingCases) {
+                    return;
+                }
             }
         }
+    }
+
+    private void deleteCase(int caseID) {
+        Call<Void> deleteRequest = apiCaller.deleteCase("Token "+token, caseID);
+        deleteRequest.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                Log.d(TAG, "deleteCase onResponse: code: "+response.code());
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                Log.d(TAG, "deleteCase onFailure: "+t);
+            }
+        });
+    }
+
+    private void deleteRecentlySubmittedCases() {
+        for (int caseID : submittedCaseIDs) {
+            deleteCase(caseID);
+        }
+    }
+
+    private void alertDialogueNullPhoto(int caseID, String question) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setTitle("IMAGE NOT SET WARNING")
+                .setMessage("Please set an image for the non-compliance case:\n" +
+                        "'"+question+"'")
+                .setCancelable(false)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteRecentlySubmittedCases();
+                        ArrayList<View> outViews = new ArrayList<View>();
+                        getView().findViewsWithText(outViews, question, View.FIND_VIEWS_WITH_TEXT);
+                        if (outViews.size() > 1) {
+                            Log.d(TAG, "onClick: question may be contained in another question!");
+                        }
+                        View viewToFocusOn = outViews.get(0);
+                        focusOnView((TextView)viewToFocusOn);
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     private void reInitScores() {
