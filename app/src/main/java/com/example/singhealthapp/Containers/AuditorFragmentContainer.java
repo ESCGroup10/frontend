@@ -355,9 +355,9 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         EspressoCountingIdlingResource.decrement();
     }
 
-    @VisibleForTesting
-    public IdlingResource getEspressoIdlingResource() {
-        return EspressoCountingIdlingResource.getIdlingResource();
+    @Override
+    public void incrementCountingIdlingResource() {
+        EspressoCountingIdlingResource.increment();
     }
 
 }

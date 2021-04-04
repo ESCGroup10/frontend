@@ -18,6 +18,7 @@ public class StatisticsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("View Statistics");
+        ((Ping)requireActivity()).decrementCountingIdlingResource();
         return inflater.inflate(R.layout.fragment_statistics, container, false);
     }
 }

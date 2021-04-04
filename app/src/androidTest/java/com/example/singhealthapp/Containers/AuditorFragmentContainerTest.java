@@ -34,6 +34,7 @@ import static androidx.test.espresso.contrib.DrawerMatchers.isClosed;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
@@ -78,13 +79,6 @@ public class AuditorFragmentContainerTest {
     public void setUp() {
         // register idling resources here
         ActivityScenario activityScenario = ActivityScenario.launch(AuditorFragmentContainer.class);
-        activityScenario.onActivity(new ActivityScenario.ActivityAction<AuditorFragmentContainer>() {
-                      @Override
-                      public void perform(AuditorFragmentContainer activity) {
-                          mIdlingResource = activity.getEspressoIdlingResource();
-                          IdlingRegistry.getInstance().register(mIdlingResource);
-                      }
-                  });
         IdlingRegistry.getInstance().register(EspressoCountingIdlingResource.getIdlingResource());
         /**
          * Example for calling method in an Activity:
@@ -135,49 +129,77 @@ public class AuditorFragmentContainerTest {
     }
 
     @Test
-    public void NavToSafetyChecklist() {
-        // we can click on a recyclerView item to go to an expanded view of the Tenant
-        onView(withId(R.id.tenantRecycler)).perform(
-                RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.cardView)));
-        sleep();
-        onView(withId(R.id.expandedTenantFragment)).check(matches(isDisplayed()));
+    public void NavToReportsFragment() {
+        // tenant search fragment should be the first fragment displayed
+        // we can go to tenant search fragment by pressing the Tenants button in the drawer
+        onView(withId(R.id.auditor_drawer_layout))
+                .check(matches(isClosed(Gravity.LEFT)))
+                .perform(DrawerActions.open());
+        sleep(); // click operation is handled in external class so we use sleep instead of idling resource here
+        onView(withId(R.id.nav_Reports)).perform(click());
 
-        // we can click a button to start the safety checklist
-        onView(withId(R.id.startSafetyChecklistButton)).perform(click());
-        sleep();
-        onView(withId(R.id.safetyChecklistFragment)).check(matches(isDisplayed()));
+        onView(withId(R.id.reports)).check(matches(isDisplayed()));
+        onView(withId(R.id.reportPreviewRecyclerViewUnresolved)).check(matches(isDisplayed()));
+        onView(withId(R.id.reportPreviewRecyclerView)).check(matches(not(isDisplayed())));
     }
 
     @Test
-    public void NavToAuditChecklist() {
-        // we can click on a button to go to the audit checklist
-        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp());
-        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp());
-        sleep();
-        sleep();
-        onView(withId(R.id.start_audit_button)).perform(click());
-        sleep();
-        onView(withId(R.id.auditChecklistFragment)).check(matches(isDisplayed()));
+    public void NavToAddTenantFragment() {
+        // tenant search fragment should be the first fragment displayed
+        // we can go to tenant search fragment by pressing the Tenants button in the drawer
+        onView(withId(R.id.auditor_drawer_layout))
+                .check(matches(isClosed(Gravity.LEFT)))
+                .perform(DrawerActions.open());
+        sleep(); // click operation is handled in external class so we use sleep instead of idling resource here
+        onView(withId(R.id.nav_Add_Tenant)).perform(click());
+
+        onView(withId(16909135)).check(matches(isDisplayed())); //alert dialogue layout
     }
 
-    @Test
-    public void NavToStatusConfirmationChecklist() {
-        // we can go to status confirmation page
-        scrollToBottom();
-        onView(withId(R.id.submit_audit_button)).perform(click());
-        sleep();
-        onView(withText("Yes")).perform(click());
-        sleep();
-        onView(withId(R.id.statusConfirmationFragment)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void NavToReportFragment() {
-        // we can go to the report fragment
-        onView(withId(R.id.button_return)).perform(click());
-        sleep();
-        onView(withId(R.id.casePreviewScrollView)).check(matches(isDisplayed()));
-    }
+//    @Test
+//    public void NavToSafetyChecklist() {
+//        // we can click on a recyclerView item to go to an expanded view of the Tenant
+//        onView(withId(R.id.tenantRecycler)).perform(
+//                RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.cardView)));
+//        sleep();
+//        onView(withId(R.id.expandedTenantFragment)).check(matches(isDisplayed()));
+//
+//        // we can click a button to start the safety checklist
+//        onView(withId(R.id.startSafetyChecklistButton)).perform(click());
+//        sleep();
+//        onView(withId(R.id.safetyChecklistFragment)).check(matches(isDisplayed()));
+//    }
+//
+//    @Test
+//    public void NavToAuditChecklist() {
+//        // we can click on a button to go to the audit checklist
+//        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp());
+//        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp());
+//        sleep();
+//        sleep();
+//        onView(withId(R.id.start_audit_button)).perform(click());
+//        sleep();
+//        onView(withId(R.id.auditChecklistFragment)).check(matches(isDisplayed()));
+//    }
+//
+//    @Test
+//    public void NavToStatusConfirmationChecklist() {
+//        // we can go to status confirmation page
+//        scrollToBottom();
+//        onView(withId(R.id.submit_audit_button)).perform(click());
+//        sleep();
+//        onView(withText("Yes")).perform(click());
+//        sleep();
+//        onView(withId(R.id.statusConfirmationFragment)).check(matches(isDisplayed()));
+//    }
+//
+//    @Test
+//    public void NavToReportFragment() {
+//        // we can go to the report fragment
+//        onView(withId(R.id.button_return)).perform(click());
+//        sleep();
+//        onView(withId(R.id.casePreviewScrollView)).check(matches(isDisplayed()));
+//    }
 
 
 

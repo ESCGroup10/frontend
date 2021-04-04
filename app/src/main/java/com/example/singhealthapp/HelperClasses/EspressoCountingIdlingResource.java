@@ -1,14 +1,12 @@
 package com.example.singhealthapp.HelperClasses;
 
-import androidx.annotation.VisibleForTesting;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
-// TODO: make counting resource only apply during test
 public class EspressoCountingIdlingResource {
     private static final String RESOURCE = "GLOBAL";
 
-    private static CountingIdlingResource mCountingIdlingResource;
+    private static CountingIdlingResource mCountingIdlingResource = new CountingIdlingResource(RESOURCE);;
 
     public static void increment() {
         if (mCountingIdlingResource != null) {
@@ -25,7 +23,6 @@ public class EspressoCountingIdlingResource {
     }
 
     public static IdlingResource getIdlingResource() {
-        mCountingIdlingResource = new CountingIdlingResource(RESOURCE);
         return mCountingIdlingResource;
     }
 
