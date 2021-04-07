@@ -280,7 +280,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "onBackPressed: called");
         if (reportID > 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
             builder.setTitle("Are you sure you want to leave?\nOngoing report will be deleted!")
@@ -334,7 +333,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void createReport() {
-        Log.d(TAG, "createReport: called");
         if (tenantType.equals("F&B")) {
             reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
                     false, getOverallNotes(), null, round(staff_hygiene_score, 2),
@@ -456,8 +454,16 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         View viewToFocusOn = outViews.get(0);
         viewToFocusOn.getParent().requestChildFocus(viewToFocusOn,viewToFocusOn);
         ((CardView)viewToFocusOn.getParent().getParent()).setCardBackgroundColor(0x4Deb3434);
-        viewToFocusOn.clearFocus(); // otherwise the app will crash once it returns from a camera intent
-//        nestedScrollView.requestFocus();
+        // TODO: fix crash when user comes back from camera intent after clicking camera after handleNullPhoto is invoked
+//        viewToFocusOn.clearFocus(); // otherwise the app will crash once it returns from a camera intent
+//        Thread t = new Thread(() -> {
+//            int focusTryCount = 0;
+//            while (focusTryCount < 20 && !viewToFocusOn.requestFocus()) {
+//                focusTryCount++;
+//                System.out.println("failed to focus");
+//            }
+//            System.out.println("finished trying to focus");
+//        });
     }
 
     private void reInitScores() {
