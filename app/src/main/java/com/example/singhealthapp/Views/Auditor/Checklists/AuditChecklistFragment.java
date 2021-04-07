@@ -442,16 +442,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         CentralisedToast.makeText(getContext(), "Please take a photo for all non-compliance cases.", CentralisedToast.LENGTH_LONG);
         deleteRecentlySubmittedCases();
         ArrayList<View> outViews = new ArrayList<View>();
-        Log.d(TAG, "handleNullPhoto: question to find: "+question);
         getView().findViewsWithText(outViews, question, View.FIND_VIEWS_WITH_TEXT);
         if (outViews.size() > 1) {
             Log.d(TAG, "onClick: question may be contained in another question!");
-        } else {
-            Log.d(TAG, "handleNullPhoto: only 1 view with the question text");
         }
         Log.d(TAG, "handleNullPhoto: view qn found: "+((TextView)outViews.get(0)).getText());
         View viewToFocusOn = outViews.get(0);
         viewToFocusOn.getParent().requestChildFocus(viewToFocusOn,viewToFocusOn);
+        nestedScrollView.requestFocus();
     }
 
     private void reInitScores() {
