@@ -15,7 +15,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Views.Login.LoginActivity;
+import com.example.singhealthapp.Views.Tenant.ExpandedCase;
 import com.example.singhealthapp.Views.TestFragment;
 import com.example.singhealthapp.Views.Tenant.LatestReportFragment;
 import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
@@ -23,7 +26,7 @@ import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
 import com.google.android.material.navigation.NavigationView;
 
-public class TenantFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class TenantFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Ping {
 
     private static final String TAG = "TenantFragmentContainer";
 
@@ -94,9 +97,11 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        EspressoCountingIdlingResource.increment();
         switch (item.getItemId()) {
             case R.id.nav_MyReport:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment()).commit();
+//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ExpandedCase()).commit();
                 break;
 
             case R.id.nav_Tenant_Statistics:
@@ -120,6 +125,20 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         editor = sharedPreferences.edit();
         editor.putString("TOKEN_KEY", "");
         editor.putString("USER_TYPE_KEY", "");
+        editor.putString("OUTLET_KEY", "");
+        editor.putString("INSTITUTION_KEY", "");
         editor.commit();
+    }
+
+    @Override
+    public void decrementCountingIdlingResource() {
+        EspressoCountingIdlingResource.decrement();
+    }
+
+    @Override
+    public void incrementCountingIdlingResource(int numResources) {
+        for (int i = 0; i < numResources; i++) {
+            EspressoCountingIdlingResource.increment();
+        }
     }
 }

@@ -47,15 +47,17 @@ public class LoginActivity extends AppCompatActivity {
 
     private Token token;
     private String userType;
-    int userId;
+    private int userId;
+    private String company;
+    private String institution;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
-    //keys
-    private final String USER_TYPE_KEY = "USER_TYPE_KEY";
-    private final String USER_ID_KEY = "USER_ID_KEY";
-    private final String TOKEN_KEY = "TOKEN_KEY";
+    // How the 3 types are defined in the database
+    private final String auditorType = "Auditor";
+    private final String tenantTypeFB = "F&B";
+    private final String tenantTypeNFB = "Non F&B";
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -82,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (Objects.nonNull(userType)) { // if the userType can be loaded from SharedPreferences (which means user has logged in before)
             Intent intent;
-            if (userType.equals("Auditor")) { // check user type and log in
+            if (userType.equals(auditorType)) { // check user type and log in
                 intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
                 startActivity(intent);
             } else if (userType.equals("F&B") || userType.equals("Non F&B")) {
@@ -151,6 +153,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 userId = user.get(0).getId();
                 userType = user.get(0).getType();
+                if (!userType.equals(auditorType)) {
+                    company = user.get(0).getCompany();
+                    institution = user.get(0).getInstitution();
+                }
 
                 // use async task to save the token so that user can login faster
                 new Thread(() -> {
@@ -170,10 +176,10 @@ public class LoginActivity extends AppCompatActivity {
     // navigate to home page
     private void navigate(String userType) {
         Intent intent;
-        if (userType.equals("Auditor")) { // if user logged in is Auditor, move to Auditor page
+        if (userType.equals(auditorType)) { // if user logged in is Auditor, move to Auditor page
             intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
             startActivity(intent);
-        } else if (userType.equals("F&B") || userType.equals("Non F&B")) { // else if user logged in is F&B or Non F&B, move to Tennat page
+        } else if (userType.equals(tenantTypeFB) || userType.equals(tenantTypeNFB)) { // else if user logged in is F&B or Non F&B, move to Tennat page
             intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
             startActivity(intent);
         } else { // else this user is not a valid user type!
@@ -193,9 +199,13 @@ public class LoginActivity extends AppCompatActivity {
     private void saveData() {
         sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        editor.putString(TOKEN_KEY, token.getToken());
-        editor.putInt(USER_ID_KEY, userId);
-        editor.putString(USER_TYPE_KEY, userType);
+        editor.putString("TOKEN_KEY", token.getToken());
+        editor.putInt("USER_ID_KEY", userId);
+        editor.putString("USER_TYPE_KEY", userType);
+        if (!userType.equals(auditorType)) {
+            editor.putString("OUTLET_KEY", company);
+            editor.putInt("INSTITUTION_KEY", userId);
+        }
         editor.commit();
     }
 

@@ -132,4 +132,5 @@ public interface DatabaseApiCaller {
     @DELETE("/api/case/{id}/")
     Call<Void> deleteCase(@Header("authorization") String token,
                             @Path("id") int caseID);
+
 }

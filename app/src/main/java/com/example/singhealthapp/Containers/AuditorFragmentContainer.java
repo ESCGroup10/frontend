@@ -188,6 +188,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
             auditor_drawer.closeDrawer(GravityCompat.START);
         } else {
+            EspressoCountingIdlingResource.decrement();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder.setMessage("Do you want to log out? ");

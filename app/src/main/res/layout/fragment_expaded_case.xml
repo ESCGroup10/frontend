@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <TextView
+        android:id="@+id/companyTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Company: "
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:layout_gravity="left"/>
+
+    <TextView
+        android:id="@+id/institutionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Institution: "
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:layout_gravity="left"/>
+
+    <TextView
+        android:id="@+id/caseNumberTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Case "
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_gravity="left"/>
+
+    <TextView
+        android:id="@+id/nonComplianceTypeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Non-Compliance Type: "
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_gravity="left"/>
+
+    <TextView
+        android:id="@+id/resolvedStatusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status: "
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_gravity="left"/>
+
+    <ImageView
+        android:id="@+id/unresolvedImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/unresolvedImageInformationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Photo Taken: "
+        android:textSize="18dp"
+        android:textColor="@color/grey"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/unresolvedCommentsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"/>
+
+    <ImageView
+        android:id="@+id/resolvedImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/resolvedImageInformationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Photo Taken: "
+        android:textSize="18dp"
+        android:textColor="@color/grey"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/resolvedCommentsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"/>
+
+</LinearLayout>

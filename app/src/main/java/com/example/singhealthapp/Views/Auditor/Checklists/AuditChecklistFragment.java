@@ -86,6 +86,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private String tenantLocation;
     String tenantType;
     private int reportID = -2;
+    private boolean isCreatingCase = false;
 
     //scores
     private double staff_hygiene_score = 0;
@@ -213,8 +214,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                photoNameCounter = 0;
-                                new Thread(AuditChecklistFragment.this::deleteReport).start();
+                                resetPhotoNameCounter();
                                 dialog.dismiss();
                             }
                         })
@@ -294,6 +294,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             deleteReport();
+                            deleteRecentlySubmittedCases();
                             getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.auditor_fragment_container, new SearchTenantFragment())
                                     .commit();
@@ -375,24 +376,24 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private boolean createCases() {
         stopCreatingCases = false;
         photoBitmapHashMap = getAllPhotos();
-        for (int i=0; i<checklistAdapterArrayList.size(); i++) {
-            String non_compliance_type = recyclerViewNameArrayList.get(i);
-            ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases();
-            for (int j=0; j<caseList.size(); j+=2) {
+        Log.d(TAG, "createCases: len photos: "+photoBitmapHashMap.size());
+        for (int i=0; i<checklistAdapterArrayList.size(); i++) { //loop through all the recyclerView adapters
+            String non_compliance_type = recyclerViewNameArrayList.get(i); //get the non-compliance type associated with this adapter
+            ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases(); //get the cases from the recyclerView associated with this adapter
+            for (int j=0; j<caseList.size(); j+=2) { //extract the question and comments
                 String question = caseList.get(j);
                 String comments = caseList.get(j+1);
                 Bitmap photoBitmap = photoBitmapHashMap.get(question); // get bitmap using question
                 if (photoBitmap == null) {
                     Log.e(TAG, "createCases: photobitmap is null, questions: "+question);
-                    handleNullPhoto(question);
+                    handleNullPhoto(question); //delete submitted cases, reset photoNameCounter and prompt photo taking
                     stopCreatingCases = true;
+                    return false;
                 }
                 String photoName = getUniquePhotoName();
                 if (photoName.equals("")) {
                     Log.d(TAG, "createCases: error creating unique photo name");
-                    return false;
-                }
-                if (stopCreatingCases) {
+                    stopCreatingCases = true;
                     return false;
                 }
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
@@ -403,12 +404,10 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         Log.d(TAG, "createCases response code: "+response.code());
                         int caseID = response.body().getId();
                         String question = response.body().getQuestion();
-                        submittedCaseIDs.add(caseID);
-                        try {
-                            DatabasePhotoOperations.uploadImage(photoBitmap, photoName);
-                        } catch (NullPointerException e) {
-                            handleNullPhoto(question);
-                            stopCreatingCases = true;
+                        submittedCaseIDs.add(caseID); //keep track of the caseIDs that have been created
+                        DatabasePhotoOperations.uploadImage(photoBitmap, photoName); //upload non-null bitmap to database
+                        if (stopCreatingCases) {
+                            deleteCase(caseID);
                         }
                     }
                     @Override
@@ -422,6 +421,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void deleteCase(int caseID) {
+        Log.d(TAG, "deleteCase: called");
         Call<Void> deleteRequest = apiCaller.deleteCase("Token "+token, caseID);
         deleteRequest.enqueue(new Callback<Void>() {
             @Override
@@ -436,8 +436,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         });
     }
 
+    private void resetPhotoNameCounter() {
+        photoNameCounter = 0;
+    }
+
     private void deleteRecentlySubmittedCases() {
+        Log.d(TAG, "deleteRecentlySubmittedCases: called");
         for (int caseID : submittedCaseIDs) {
+            Log.d(TAG, "deleteRecentlySubmittedCases: id: "+caseID);
             deleteCase(caseID);
         }
     }
@@ -445,6 +451,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private void handleNullPhoto(String question) {
         CentralisedToast.makeText(getContext(), "Please take a photo for all non-compliance cases.", CentralisedToast.LENGTH_LONG);
         deleteRecentlySubmittedCases();
+        resetPhotoNameCounter();
         ArrayList<View> outViews = new ArrayList<View>();
         getView().findViewsWithText(outViews, question, View.FIND_VIEWS_WITH_TEXT);
         if (outViews.size() > 1) {
