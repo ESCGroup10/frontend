@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -347,8 +348,13 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         reportCall.enqueue(new Callback<Report>() {
             @Override
             public void onResponse(Call<Report> call, Response<Report> response) {
-                reportID = response.body().getId();
-                ((Ping)requireActivity()).decrementCountingIdlingResource();
+                // sometimes, response comes back as null the first time
+                try {
+                    reportID = response.body().getId();
+                    ((Ping)requireActivity()).decrementCountingIdlingResource();
+                } catch (Exception e) {
+                    createReport();
+                }
             }
 
             @Override
@@ -449,7 +455,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         Log.d(TAG, "handleNullPhoto: view qn found: "+((TextView)outViews.get(0)).getText());
         View viewToFocusOn = outViews.get(0);
         viewToFocusOn.getParent().requestChildFocus(viewToFocusOn,viewToFocusOn);
-        nestedScrollView.requestFocus();
+        ((CardView)viewToFocusOn.getParent().getParent()).setCardBackgroundColor(0x4Deb3434);
+        viewToFocusOn.clearFocus(); // otherwise the app will crash once it returns from a camera intent
+//        nestedScrollView.requestFocus();
     }
 
     private void reInitScores() {

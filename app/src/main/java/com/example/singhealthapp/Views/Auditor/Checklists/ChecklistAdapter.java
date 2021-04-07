@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.Containers.AuditorFragmentContainer;
@@ -58,6 +59,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             checklist_items_array.get(position).setRemarks(holder.editTextRemarks.getText().toString());
             if (checklist_items_array.get(position).isPhotoTaken()) {
                 holder.cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
+                holder.colourStatusIndicator.setBackgroundColor(red);
             }
         }
     }
@@ -118,6 +120,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
         private View colourStatusIndicator;
         private ImageButton cameraButton;
         private View extraLayer;
+        private CardView cardView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -129,6 +132,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             colourStatusIndicator = itemView.findViewById(R.id.color_status_indicator);
             cameraButton = itemView.findViewById(R.id.camera_button);
             extraLayer = itemView.findViewById(R.id.extra_layer);
+            cardView = itemView.findViewById(R.id.cardview);
 
             if (isAudit) {
                 editTextRemarks.addTextChangedListener(new TextWatcher() {
