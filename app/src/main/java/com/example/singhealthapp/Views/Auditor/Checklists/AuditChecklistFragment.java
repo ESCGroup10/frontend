@@ -3,11 +3,9 @@ package com.example.singhealthapp.Views.Auditor.Checklists;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +23,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.DatabasePhotoOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -39,14 +36,14 @@ import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnB
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.gson.internal.bind.util.ISO8601Utils;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -157,12 +154,16 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         initApiCaller();
         loadToken();
         loadUserID();
-        createReport(); // do this first so the reportID can be obtained first
+        CreateReportRunnable createReportRunnable = new CreateReportRunnable();
+        Thread createReportThread = new Thread(createReportRunnable);
+        createReportThread.start(); // do this first so the reportID can be obtained first
 
         return view;
     }
 
     private void setAllListeners() {
+        Date date = new Date();
+        long startTime = date.getTime();
         ProfessionalismAndStaffHygieneFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -227,6 +228,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         .show();
             }
         });
+        Date date2 = new Date();
+        long endTime = date2.getTime();
+        Log.d(TAG, "setAllListeners: time taken: "+(endTime-startTime));
     }
 
     private final void focusOnView(TextView tv){
@@ -257,7 +261,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void submit() {
-        Log.d(TAG, "submit: called");
         Bundle bundle = new Bundle();
         //keys
         String TITLE_KEY = "title_key";
@@ -312,56 +315,60 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private String getOverallNotes() {
-        Log.d(TAG, "getOverallNotes: called");
         String overallNotes = "";
         overallNotes = overall_notes_editText.getText().toString();
         return overallNotes;
     }
 
     private void initApiCaller() {
-        Log.d(TAG, "initApiCaller: called");
+        Date date = new Date();
+        long startTime = date.getTime();
         apiCaller = new Retrofit.Builder()
                 .baseUrl("https://esc10-303807.et.r.appspot.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(DatabaseApiCaller.class);
+        Date date2 = new Date();
+        long endTime = date2.getTime();
+        Log.d(TAG, "initApiCaller: time taken: "+(endTime-startTime));
     }
 
     private float round(double num, int dec) {
         return Math.round(num * (Math.pow(10.0, dec)) / (Math.pow(10.0, dec)));
     }
 
-    public void createReport() {
-        /**
-        * Usage:
-        * - Creates a report in the db
-        * Returns:
-        * - db generated report ID
-        * */
-        Log.d(TAG, "createReport: called");
-        if (tenantType.equals("F&B")) {
-            reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
-                    false, getOverallNotes(), null, round(staff_hygiene_score, 2),
-                    round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
-                    round(foodhygiene_score, 2));
-        } else {
-            reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
-                    false, getOverallNotes(), null, round(staff_hygiene_score, 2),
-                    round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
-        }
-        reportCall.enqueue(new Callback<Report>() {
-            @Override
-            public void onResponse(Call<Report> call, Response<Report> response) {
-                reportID = response.body().getId();
-                ((Ping)requireActivity()).decrementCountingIdlingResource();
+    private class CreateReportRunnable implements Runnable {
+        @Override
+        public void run() {
+            Date date = new Date();
+            long startTime = date.getTime();
+            if (tenantType.equals("F&B")) {
+                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
+                        false, getOverallNotes(), null, round(staff_hygiene_score, 2),
+                        round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
+                        round(foodhygiene_score, 2));
+            } else {
+                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
+                        false, getOverallNotes(), null, round(staff_hygiene_score, 2),
+                        round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
             }
+            reportCall.enqueue(new Callback<Report>() {
+                @Override
+                public void onResponse(Call<Report> call, Response<Report> response) {
+                    reportID = response.body().getId();
+                    ((Ping)requireActivity()).decrementCountingIdlingResource();
+                }
 
-            @Override
-            public void onFailure(Call<Report> call, Throwable t) {
-                Log.d(TAG, "createReport onFailure: "+t);
-                reportID = -1;
-            }
-        });
+                @Override
+                public void onFailure(Call<Report> call, Throwable t) {
+                    Log.d(TAG, "createReport onFailure: "+t);
+                    reportID = -1;
+                }
+            });
+            Date date2 = new Date();
+            long endTime = date2.getTime();
+            Log.d(TAG, "run: time taken: "+(endTime-startTime));
+        }
     }
 
     private String getUniquePhotoName() {
@@ -374,7 +381,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void createCases() {
-        Log.d(TAG, "createCases: called");
         stopCreatingCases = false;
         photoBitmapHashMap = getAllPhotos();
         for (int i=0; i<checklistAdapterArrayList.size(); i++) {
@@ -473,7 +479,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void calculateScores() throws IllegalArgumentException {
-        Log.d(TAG, "calculateScores: called");
         numCases = 0;
         reInitScores();
         if (checklistAdapterArrayList.size() != recyclerViewNameArrayList.size()) {
@@ -519,8 +524,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         }
     }
 
-    private void init_recyclerView(RecyclerView recyclerView, ArrayList<ChecklistItem> list, String recyclerViewName) {
-        Log.d(TAG, "init_recyclerView: called");
+    private synchronized void init_recyclerView(RecyclerView recyclerView, ArrayList<ChecklistItem> list, String recyclerViewName) {
+        Date date = new Date();
+        long startTime = date.getTime();
         ChecklistAdapter checklistAdapter;
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -529,6 +535,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         checklistAdapterArrayList.add(checklistAdapter);
         recyclerViewNameArrayList.add(recyclerViewName);
         ((Ping)requireActivity()).decrementCountingIdlingResource();
+        Date date2 = new Date();
+        long endTime = date.getTime();
+        Log.d(TAG, "init_recyclerView: time taken: "+(endTime-startTime));
     }
 
     private String getRecyclerViewName(String subHeader) {
@@ -550,50 +559,61 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         }
     }
 
-    private void initChecklistSection(View view, String pathName) {
-        /**
-         * 1. Gets an ArrayList of questions for each sub-header in a section specified by the pathName
-         * 2. Matches each ArrayList to a recyclerView
-         * 3. Initialises the recyclerView
-         * */
-        Log.d(TAG, "initChecklistSection: called");
-        boolean FIRST_SUB_HEADER = true;
+    private class CreateRecyclerViewThread implements Runnable {
+        private View view;
+        private String pathName;
+        private boolean FIRST_SUB_HEADER = true;
         RecyclerView recyclerView = null;
         String currentRecyclerViewName = null;
         ArrayList<String> lines;
         ArrayList<ChecklistItem> checklistArray = new ArrayList<>();
-        QuestionBank qb = new QuestionBank(getActivity());
-        lines = qb.getQuestions(pathName);
-        for (String line : lines) {
-            if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
-                if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
-                    init_recyclerView(recyclerView, checklistArray, currentRecyclerViewName);
-                    checklistArray = new ArrayList<>();
-                }
-                try {
-                    recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
-                    currentRecyclerViewName = getRecyclerViewName(line.substring(1));
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                }
-                FIRST_SUB_HEADER = false;
-            } else { // it is a question
-                if (Character.compare(line.charAt(0), '>') == 0) {
-                    ChecklistItem item = checklistArray.get(checklistArray.size() - 1);
-                    item.setStatement(item.getStatement()+"\n"+line);
-                } else {
-                    checklistArray.add(new ChecklistItem(line, ""));
+
+        public CreateRecyclerViewThread(View view, String pathName) {
+            this.view = view;
+            this.pathName = pathName;
+        }
+
+        @Override
+        public void run() {
+            Date date = new Date();
+            long startTime = date.getTime();
+            QuestionBank qb = new QuestionBank(getActivity());
+            synchronized(qb) {
+                lines = qb.getQuestions(pathName);
+            }
+            for (String line : lines) {
+                if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
+                    if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
+                        init_recyclerView(recyclerView, checklistArray, currentRecyclerViewName);
+                        checklistArray = new ArrayList<>();
+                    }
+                    try {
+                        recyclerView = getCorrespondingRecyclerView(view, line.substring(1));
+                        currentRecyclerViewName = getRecyclerViewName(line.substring(1));
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
+                    FIRST_SUB_HEADER = false;
+                } else { // it is a question
+                    if (Character.compare(line.charAt(0), '>') == 0) {
+                        ChecklistItem item = checklistArray.get(checklistArray.size() - 1);
+                        item.setStatement(item.getStatement()+"\n"+line);
+                    } else {
+                        checklistArray.add(new ChecklistItem(line, ""));
+                    }
                 }
             }
+            init_recyclerView(recyclerView, checklistArray, currentRecyclerViewName);
+            System.out.println("start time for "+pathName+": "+date.getTime());
+            Date date2 = new Date();
+            System.out.println("finished running "+pathName+" thread in: "+(date2.getTime()-startTime));
         }
-        init_recyclerView(recyclerView, checklistArray, currentRecyclerViewName);
     }
 
     private RecyclerView getCorrespondingRecyclerView(View view, String subHeader) throws IllegalArgumentException {
         /**
         * Returns recyclerView corresponding to the subHeader given
         * */
-        Log.d(TAG, "getCorrespondingRecyclerView: called");
         switch (subHeader) {
             case "Professionalism":
                 return view.findViewById(R.id.audit_checklist_recyclerview_professionalism);
@@ -623,7 +643,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private View inflateFragmentLayout(String tenantType, ViewGroup container, LayoutInflater inflater) {
-        Log.d(TAG, "inflateFragmentLayout: called");
         // decides which fragment to inflate
         View view;
         if (tenantType.equals("F&B")) {
@@ -644,30 +663,37 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void initRecyclerViews(View view) {
-        Log.d(TAG, "initRecyclerViews: called");
+        Date date = new Date();
+        long startTime = date.getTime();
+        ArrayList<Thread> threadArrayList = new ArrayList<>();
         // initialize and fill all recyclerViews using text files in assets directory
         for (String pathName : header_files) {
             Log.d(TAG, "onCreateView: init checklist section for: "+pathName);
-            initChecklistSection(view, pathName);
+            CreateRecyclerViewThread createRecyclerViewThread = new CreateRecyclerViewThread(view, pathName);
+            Thread thread = new Thread(createRecyclerViewThread);
+            threadArrayList.add(thread);
+            thread.start();
         }
+        Date date2 = new Date();
+        long endTime = date2.getTime();
+        Log.d(TAG, "initRecyclerViews: time taken: "+(endTime-startTime));
     }
 
     private void loadToken() {
-        Log.d(TAG, "loadToken: called");
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         String TOKEN_KEY = "TOKEN_KEY";
         token = sharedPreferences.getString(TOKEN_KEY, null);
     }
 
     private void loadUserID() {
-        Log.d(TAG, "loadUserID: called");
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         String USER_ID_KEY = "USER_ID_KEY";
         userID = sharedPreferences.getInt(USER_ID_KEY, -1);
     }
 
     private void initScoresAndPercentages(String tenantType) {
-        Log.d(TAG, "initScoresAndPercentages: called");
+        Date date = new Date();
+        long startTime = date.getTime();
         if (tenantType.equals("F&B")) {
             staff_hygiene_score = 13;
             housekeeping_score = 17;
@@ -699,11 +725,13 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         } else {
             Log.d(TAG, "initScoresAndPercentages: not set, check tenant type");
         }
+        Date date2 = new Date();
+        long endTime = date2.getTime();
+        Log.d(TAG, "initScoresAndPercentages: time taken: "+(endTime-startTime));
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
-        Log.d(TAG, "onAttach: called");
         super.onAttach(context);
         try {
             mActivityCallback = (HandlePhotoListener) context;
@@ -714,12 +742,10 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private HashMap<String, Bitmap> getAllPhotos() {
-        Log.d(TAG, "getAllPhotos: called");
         return mActivityCallback.getPhotoBitmaps();
     }
 
     private void clearAllPhotosFromContainerActivity() {
-        Log.d(TAG, "clearAllPhotosFromContainerActivity: called");
         mActivityCallback.clearCurrentReportPhotoData();
     }
 }

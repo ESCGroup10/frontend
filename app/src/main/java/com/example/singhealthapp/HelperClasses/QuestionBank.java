@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class QuestionBank {
 
@@ -19,6 +20,8 @@ public class QuestionBank {
     }
 
     public ArrayList<String> getQuestions(String fileName) {
+        Date date = new Date();
+        long startTime = date.getTime();
         groupedChecklistQuestions = new ArrayList<>();
 
         AssetManager assetManager = mContext.getAssets();
@@ -34,6 +37,8 @@ public class QuestionBank {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Date date2 = new Date();
+        System.out.println("time taken to get Qns: "+(date2.getTime()-startTime));
 
         return groupedChecklistQuestions;
     }
