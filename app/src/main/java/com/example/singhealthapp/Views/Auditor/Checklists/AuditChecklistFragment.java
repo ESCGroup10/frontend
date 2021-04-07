@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.DatabasePhotoOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -41,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -217,9 +220,10 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                createCases();
-                                submit();
-                                clearAllPhotosFromContainerActivity();
+                                if (createCases()) {
+                                    submit();
+                                    clearAllPhotosFromContainerActivity();
+                                }
                                 dialog.dismiss();
                             }
                         })
@@ -275,6 +279,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     @Override
     public void onBackPressed() {
+        Log.d(TAG, "onBackPressed: called");
         if (reportID > 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
             builder.setTitle("Are you sure you want to leave?\nOngoing report will be deleted!")
@@ -363,7 +368,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         }
     }
 
-    private void createCases() {
+    private boolean createCases() {
         stopCreatingCases = false;
         photoBitmapHashMap = getAllPhotos();
         for (int i=0; i<checklistAdapterArrayList.size(); i++) {
@@ -375,11 +380,16 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 Bitmap photoBitmap = photoBitmapHashMap.get(question); // get bitmap using question
                 if (photoBitmap == null) {
                     Log.e(TAG, "createCases: photobitmap is null, questions: "+question);
+                    handleNullPhoto(question);
+                    stopCreatingCases = true;
                 }
                 String photoName = getUniquePhotoName();
                 if (photoName.equals("")) {
                     Log.d(TAG, "createCases: error creating unique photo name");
-                    return;
+                    return false;
+                }
+                if (stopCreatingCases) {
+                    return false;
                 }
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
                         photoName, comments);
@@ -393,7 +403,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         try {
                             DatabasePhotoOperations.uploadImage(photoBitmap, photoName);
                         } catch (NullPointerException e) {
-                            alertDialogueNullPhoto(caseID, question);
+                            handleNullPhoto(question);
                             stopCreatingCases = true;
                         }
                     }
@@ -402,11 +412,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         Log.d(TAG, "createCases onFailure: "+t);
                     }
                 });
-                if (stopCreatingCases) {
-                    return;
-                }
             }
         }
+        return true;
     }
 
     private void deleteCase(int caseID) {
@@ -430,27 +438,20 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         }
     }
 
-    private void alertDialogueNullPhoto(int caseID, String question) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-        builder.setTitle("IMAGE NOT SET WARNING")
-                .setMessage("Please set an image for the non-compliance case:\n" +
-                        "'"+question+"'")
-                .setCancelable(false)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        deleteRecentlySubmittedCases();
-                        ArrayList<View> outViews = new ArrayList<View>();
-                        getView().findViewsWithText(outViews, question, View.FIND_VIEWS_WITH_TEXT);
-                        if (outViews.size() > 1) {
-                            Log.d(TAG, "onClick: question may be contained in another question!");
-                        }
-                        View viewToFocusOn = outViews.get(0);
-                        focusOnView((TextView)viewToFocusOn);
-                        dialog.dismiss();
-                    }
-                })
-                .show();
+    private void handleNullPhoto(String question) {
+        CentralisedToast.makeText(getContext(), "Please take a photo for all non-compliance cases.", CentralisedToast.LENGTH_LONG);
+        deleteRecentlySubmittedCases();
+        ArrayList<View> outViews = new ArrayList<View>();
+        Log.d(TAG, "handleNullPhoto: question to find: "+question);
+        getView().findViewsWithText(outViews, question, View.FIND_VIEWS_WITH_TEXT);
+        if (outViews.size() > 1) {
+            Log.d(TAG, "onClick: question may be contained in another question!");
+        } else {
+            Log.d(TAG, "handleNullPhoto: only 1 view with the question text");
+        }
+        Log.d(TAG, "handleNullPhoto: view qn found: "+((TextView)outViews.get(0)).getText());
+        View viewToFocusOn = outViews.get(0);
+        viewToFocusOn.getParent().requestChildFocus(viewToFocusOn,viewToFocusOn);
     }
 
     private void reInitScores() {
