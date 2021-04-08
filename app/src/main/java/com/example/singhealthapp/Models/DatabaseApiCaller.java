@@ -95,6 +95,16 @@ public interface DatabaseApiCaller {
         @Query("tenant_id") int tenant_id
     );
 
+    @GET("/api/reportCase/")
+    Call<List<ReportedCases>> getReportedCase (
+            @Header("authorization") String token
+    );
+
+    @GET("/api/resolvedCase/")
+    Call<List<ResolvedCases>> getResolvedCase (
+            @Header("authorization") String token
+    );
+
 
     @FormUrlEncoded
     @POST("/api/case/")

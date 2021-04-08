@@ -39,8 +39,6 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     ArrayList<Entry> houseKeeping = new ArrayList<>();
     float count = 0;
 
-
-
     public static TotalScoreStatsFragment getInstance() {
         return new TotalScoreStatsFragment();
     }
