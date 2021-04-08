@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -167,9 +168,8 @@ public class TestFragment extends Fragment {
         System.out.println("User ID " + userId);
     }
 
+    // retrieve image list from
     public void retrieveImageList() {
-        // If you don't specify credentials when constructing the client, the client library will
-        // look for credentials via the environment variable GOOGLE_APPLICATION_CREDENTIALS.
 
         // API call needs to be done async or on another thread
         new Thread(() -> {
@@ -185,7 +185,7 @@ public class TestFragment extends Fragment {
 
             // loop through the Iterable to get all the file names
             for (Blob blob : list) {
-                imageNames.add(blob.getName()); // add every file name into an ArrayList
+                imageNames.add(blob.getName());// add every file name into an ArrayList
             }
 
             // display the ArrayList of all file names in TextView on another thread
@@ -207,9 +207,8 @@ public class TestFragment extends Fragment {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] bitmapdata = stream.toByteArray();
-
-
-                // Create a blob (item) to upload onto Cloud Storage
+                
+                // create a blob (item) to upload onto Cloud Storage
                 BlobId blobId = BlobId.of("case-images", "case-"+caseId);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/png").build();
 
@@ -220,7 +219,6 @@ public class TestFragment extends Fragment {
                 getActivity().runOnUiThread(() -> uploadedImageTextView.setText("Image Uploaded!"));
 
             } catch (Exception e) {
-
                 // update UI TextView in another thread
                 getActivity().runOnUiThread(() -> uploadedImageTextView.setText(""+ e));
             }
@@ -228,6 +226,7 @@ public class TestFragment extends Fragment {
         }).start();
     }
 
+    // retrieve image from Google Cloud
     public void retrieveImage() {
 
         // API call needs to be done async or on another thread
@@ -238,11 +237,11 @@ public class TestFragment extends Fragment {
                 // retrieve image in the form of byte array from Cloud Storage
                 byte[] bitmapdata = storage.get("case-images").get("testimage.png").getContent();
 
-                //convert the byte array into a bitmap
+                // convert the byte array into a bitmap
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
                 // display bitmap image on ImageView in another thread
-                getActivity().runOnUiThread(() -> uploadedImage.setImageBitmap(bitmap));;
+                requireActivity().runOnUiThread(() -> uploadedImage.setImageBitmap(bitmap));
 
             } catch (Exception e) {
                 System.out.println("Retrieval Failed! " + e);

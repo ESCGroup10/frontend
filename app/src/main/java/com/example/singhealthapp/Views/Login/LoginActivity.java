@@ -1,5 +1,6 @@
 package com.example.singhealthapp.Views.Login;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -100,6 +101,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // make a call to post a new User to the database
         authCall.enqueue(new Callback<Token>() {
+            @SuppressLint("DefaultLocale")
             @Override
             public void onResponse(Call<Token> call, Response<Token> response) {
                 if (response.code() == 200) { // response code is valid
@@ -108,7 +110,10 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     if (resetCount != 4) {
                         resetCount++;
-                        Toast.makeText(LoginActivity.this, String.format("You have entered the wrong password %d times. You have %d tries left.", resetCount, 5-resetCount), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this,
+                                String.format("You have entered the wrong password %d times. You have %d tries left.", resetCount, 5-resetCount),
+                                Toast.LENGTH_SHORT)
+                                .show();
                     } else {
                         disableLogin();
                     }
@@ -121,6 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this,
                             "Login Error: Timeout after 10s \nPlease try again later", Toast.LENGTH_LONG).show();
                 } else {
+                    System.out.println("Error: " + t);
                     Toast.makeText(LoginActivity.this,
                             "Error: " + t, Toast.LENGTH_LONG).show();
                 }

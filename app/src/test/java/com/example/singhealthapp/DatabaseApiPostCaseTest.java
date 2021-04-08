@@ -1,5 +1,6 @@
 package com.example.singhealthapp;
 
+import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 
 import org.junit.Test;
@@ -76,7 +77,7 @@ public class DatabaseApiPostCaseTest {
                 .build()
                 .create(DatabaseApiCaller.class);
 
-        Call<ResponseBody> testCall = mockApiCaller.postCase("Token "+token, report_id,  question, is_resolved, non_compliance_type,
+        Call<Case> testCall = mockApiCaller.postCase("Token "+token, report_id,  question, is_resolved, non_compliance_type,
                 unresolved_photo, unresolved_comments);
 
         int actual_response_code = testCall.execute().code();
