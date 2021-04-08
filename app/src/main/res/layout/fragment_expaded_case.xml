@@ -99,7 +99,7 @@
             android:textSize="30sp" />
 
         <TextView
-            android:id="@+id/unresolvedImageInformationTextView"
+            android:id="@+id/unresolvedImageDateTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Photo Taken: "
@@ -144,7 +144,7 @@
             android:visibility="gone"/>
 
         <TextView
-            android:id="@+id/resolvedImageInformationTextView"
+            android:id="@+id/resolvedImageDateTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Photo Taken: "

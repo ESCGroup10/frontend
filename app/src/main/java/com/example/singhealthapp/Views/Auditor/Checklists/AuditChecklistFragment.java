@@ -400,7 +400,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     return false;
                 }
                 DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");
-                String datetime = dateFormat.format(new Date()).toString().toLowerCase();
+                String datetime = dateFormat.format(new Date()).toLowerCase();
                 Log.d(TAG, "createCases: datetime: "+datetime);
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
                         photoName, comments, datetime);

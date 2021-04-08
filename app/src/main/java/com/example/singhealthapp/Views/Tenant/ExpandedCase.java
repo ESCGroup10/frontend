@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
+import com.example.singhealthapp.HelperClasses.ParseDate;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
@@ -61,10 +62,10 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     TextView nonComplianceTypeTextView;
     TextView resolvedStatusTextView;
     ImageView unresolvedImageView;
-    TextView unresolvedImageInformationTextView;
+    TextView unresolvedImageDateTextView;
     TextView unresolvedCommentsTextView;
     ImageView resolvedImageView;
-    TextView resolvedImageInformationTextView;
+    TextView resolvedImageDateTextView;
     TextView resolvedCommentsTextView;
     View unresolvedResolvedSeparator;
     Button resolveButton;
@@ -92,8 +93,8 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     private String resolvedComments;
     private String unresolvedImageName;
     private String resolvedImageName;
-    private String unresolvedImageInformation;
-    private String resolvedImageInformation;
+    private String unresolvedImageDate;
+    private String resolvedImageDate;
 
     // Camera stuff
     Uri mImageURI;
@@ -155,11 +156,11 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         nonComplianceTypeTextView = view.findViewById(R.id.nonComplianceTypeTextView);
         resolvedStatusTextView = view.findViewById(R.id.resolvedStatusTextView);
         unresolvedImageView = view.findViewById(R.id.unresolvedImageView);
-        unresolvedImageInformationTextView = view.findViewById(R.id.unresolvedImageInformationTextView);
+        unresolvedImageDateTextView = view.findViewById(R.id.unresolvedImageDateTextView);
         unresolvedCommentsTextView = view.findViewById(R.id.unresolvedCommentsTextView);
         unresolvedResolvedSeparator = view.findViewById(R.id.unresolvedResolvedSeparator);
         resolvedImageView = view.findViewById(R.id.resolvedImageView);
-        resolvedImageInformationTextView = view.findViewById(R.id.resolvedImageInformationTextView);
+        resolvedImageDateTextView = view.findViewById(R.id.resolvedImageDateTextView);
         resolvedCommentsTextView = view.findViewById(R.id.resolvedCommentsTextView);
         resolveButton = view.findViewById(R.id.resolveButton);
         resolvingCaseSection = view.findViewById(R.id.resolvingCaseSection);
@@ -219,8 +220,16 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
             @Override
             public void onClick(View v) {
                 // TODO: patch the case
+                setResolvedDate();
+                while (resolvedImageDate == null) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 thisCase.setResolved_photo(resolvedImageName);
-                thisCase.setResolved_date(resolvedImageInformation);
+                thisCase.setResolved_date(resolvedImageDate);
                 thisCase.setResolved_comments(resolvedComments);
                 Call<Void> patchCall = apiCaller.patchCase("Token "+token, caseID, thisCase);
 
@@ -241,6 +250,11 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
                 HandleImageOperations.uploadImageToDatabase(mImageBitmap, resolvedImageName);
             }
         });
+    }
+
+    private synchronized void setResolvedDate() {
+        resolvedImageDate = ParseDate.getDate();
+        notifyAll();
     }
 
     private void submit() {
@@ -320,19 +334,19 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     private void setAllViewsFromDatabase() {
         Log.d(TAG, "setAllViewsFromDatabase: called");
         setHalfBoldTextViews(nonComplianceTypeTextView, nonComplianceType);
-        unresolvedImageInformationTextView.setText((String)(unresolvedImageInformationTextView.getText() + unresolvedImageInformation));
+        unresolvedImageDateTextView.setText((String)(unresolvedImageDateTextView.getText() + unresolvedImageDate));
         unresolvedCommentsTextView.setText((String)(unresolvedCommentsTextView.getText() + unresolvedComments));
         unresolvedImageView.setVisibility(View.VISIBLE);
 //        unresolvedImageViewPlaceholder.setVisibility(View.GONE);
         HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 300, 300);
         if (resolvedStatus) {
-            resolvedImageInformationTextView.setText((String)(resolvedImageInformationTextView.getText() + resolvedImageInformation));
+            resolvedImageDateTextView.setText((String)(resolvedImageDateTextView.getText() + resolvedImageDate));
             resolvedCommentsTextView.setText((String)(resolvedCommentsTextView.getText() + resolvedComments));
             resolvedImageView.setVisibility(View.VISIBLE);
 //            resolvedImageViewPlaceholder.setVisibility(View.GONE);
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 300, 300);
             unresolvedResolvedSeparator.setVisibility(VISIBLE);
-            resolvedImageInformationTextView.setVisibility(VISIBLE);
+            resolvedImageDateTextView.setVisibility(VISIBLE);
             resolvedCommentsTextView.setVisibility(VISIBLE);
         } else {
             resolveButton.setVisibility(VISIBLE);
@@ -381,7 +395,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
          * Usage: retrieves the following fields from the database:
          * - nonComplianceType
          * - unresolvedComments
-         * - unresolvedImageInformation
+         * - unresolvedImageDate
          * - unresolvedImageName
          * - resolvedImageName (null if case is not resolved)
          * - resolvedComments (null if case is not resolved)
@@ -413,13 +427,13 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
                 if (thisCase != null) {
                     nonComplianceType = thisCase.getNon_compliance_type();
                     unresolvedComments = thisCase.getUnresolved_comments();
-                    unresolvedImageInformation = thisCase.getUnresolved_date();
+                    unresolvedImageDate = thisCase.getUnresolved_date();
                     unresolvedImageName = thisCase.getUnresolved_photo();
 
                     // if the case is resolved, get the data, else leave relevant fields as null
                     if (resolvedStatus) {
                         resolvedImageName = thisCase.getResolved_photo();
-                        resolvedImageInformation = thisCase.getResolved_date();
+                        resolvedImageDate = thisCase.getResolved_date();
                         resolvedComments = thisCase.getResolved_comments();
                     } else {
                         resolvedImageName = unresolvedImageName + "_resolved";
@@ -448,10 +462,10 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
                 ", nonComplianceTypeTextView=" + nonComplianceTypeTextView +
                 ", resolvedStatusTextView=" + resolvedStatusTextView +
                 ", unresolvedImageView=" + unresolvedImageView +
-                ", unresolvedImageInformationTextView=" + unresolvedImageInformationTextView +
+                ", unresolvedImageDateTextView=" + unresolvedImageDateTextView +
                 ", unresolvedCommentsTextView=" + unresolvedCommentsTextView +
                 ", resolvedImageView=" + resolvedImageView +
-                ", resolvedImageInformationTextView=" + resolvedImageInformationTextView +
+                ", resolvedImageDateTextView=" + resolvedImageDateTextView +
                 ", resolvedCommentsTextView=" + resolvedCommentsTextView +
                 ", apiCaller=" + apiCaller +
                 ", token='" + token + '\'' +
@@ -466,8 +480,8 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
                 ", resolvedComments='" + resolvedComments + '\'' +
                 ", unresolvedImageName='" + unresolvedImageName + '\'' +
                 ", resolvedImageName='" + resolvedImageName + '\'' +
-                ", unresolvedImageInformation='" + unresolvedImageInformation + '\'' +
-                ", resolvedImageInformation='" + resolvedImageInformation + '\'' +
+                ", unresolvedImageDate='" + unresolvedImageDate + '\'' +
+                ", resolvedImageDate='" + resolvedImageDate + '\'' +
                 '}';
     }
 
