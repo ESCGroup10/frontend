@@ -16,6 +16,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
+import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
+import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
+import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -76,12 +80,38 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else {
+                try {
+                    if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) { // this is the main page so just log out?
+//                        getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new LatestReportFragment()).commit();
+//                        return;
+                    }
+                } catch (Exception ignored) {
+                }
+                try {
+                    if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new MyReportsFragment(), "getReport").commit();
+                        return;
+                    }
+                } catch (Exception ignored) {
+                }
+                try {
+                    if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
+                        CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
+                                        , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
+                        return;
+                    }
+                } catch (Exception ignored) {
+                }
+
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
                 builder.setMessage("Do you want to log out? ");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //AuditorFragmentContainer.super.onBackPressed();
                         dialog.dismiss();
                         clearData(); // clear user type (to avoid auto login) and token (for safety)
                         Intent intent = new Intent(TenantFragmentContainer.this, LoginActivity.class);
@@ -92,11 +122,11 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
-                        //finish();
                     }
                 });
                 builder.show();
             }
+
         }
     }
 
@@ -105,8 +135,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         EspressoCountingIdlingResource.increment();
         switch (item.getItemId()) {
             case R.id.nav_MyReport:
-//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ExpandedCase()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment(), "getReport").commit();
                 break;
 
             case R.id.nav_Tenant_Statistics:

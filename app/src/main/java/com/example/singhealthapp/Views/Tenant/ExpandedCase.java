@@ -35,6 +35,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
+import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -119,7 +120,6 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         loadCompanyAndInstitution();
 
         Bundle bundle = getArguments();
-        // TODO: make fragment before this send report number
         try {
             reportNumber = bundle.getInt("REPORT_NUMBER_KEY");
         } catch (Exception e) {
@@ -281,7 +281,6 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         /**
          * Usage: Get image bitmap
          * */
-//        super.onActivityResult(requestCode, resultCode, data);
         Bitmap oldBitmap = mImageBitmap;
         switch (requestCode) {
             case REQUEST_IMAGE_CAPTURE:
@@ -308,8 +307,6 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
             Log.d(TAG, "onActivityResult: image bitmap received");
         }
     }
-
-
 
     private void setAllViewsFromBundle() {
         Log.d(TAG, "setAllViews: called");
@@ -338,13 +335,11 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         unresolvedImageDateTextView.setText((String)(unresolvedImageDateTextView.getText() + unresolvedImageDate));
         unresolvedCommentsTextView.setText((String)(unresolvedCommentsTextView.getText() + unresolvedComments));
         unresolvedImageView.setVisibility(View.VISIBLE);
-//        unresolvedImageViewPlaceholder.setVisibility(View.GONE);
         HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 300, 300);
         if (resolvedStatus) {
             resolvedImageDateTextView.setText((String)(resolvedImageDateTextView.getText() + resolvedImageDate));
             resolvedCommentsTextView.setText((String)(resolvedCommentsTextView.getText() + resolvedComments));
             resolvedImageView.setVisibility(View.VISIBLE);
-//            resolvedImageViewPlaceholder.setVisibility(View.GONE);
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 300, 300);
             unresolvedResolvedSeparator.setVisibility(VISIBLE);
             resolvedImageDateTextView.setVisibility(VISIBLE);
@@ -393,14 +388,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     private synchronized void getCase() {
         /**
          * This method is synchronised to ensure that apiCaller is instantiated before we try to use it
-         * Usage: retrieves the following fields from the database:
-         * - nonComplianceType
-         * - unresolvedComments
-         * - unresolvedImageDate
-         * - unresolvedImageName
-         * - resolvedImageName (null if case is not resolved)
-         * - resolvedComments (null if case is not resolved)
-         * - resolvedImageName (null if case is not resolved)
+         * Usage: retrieves the required fields from specified case in database
          * */
         Log.d(TAG, "getCase: called");
         while (apiCaller == null) {
@@ -445,45 +433,11 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
                     Log.d(TAG, "onResponse: no cases match given caseID");
                 }
             }
-
             @Override
             public void onFailure(@NotNull Call<List<Case>> call, @NotNull Throwable t) {
-                System.out.println(t.toString());
+                t.printStackTrace();
             }
         });
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return "ExpandedCase{" +
-                "companyTextView=" + companyTextView +
-                ", institutionTextView=" + institutionTextView +
-                ", caseNumberTextView=" + caseNumberTextView +
-                ", nonComplianceTypeTextView=" + nonComplianceTypeTextView +
-                ", resolvedStatusTextView=" + resolvedStatusTextView +
-                ", unresolvedImageView=" + unresolvedImageView +
-                ", unresolvedImageDateTextView=" + unresolvedImageDateTextView +
-                ", unresolvedCommentsTextView=" + unresolvedCommentsTextView +
-                ", resolvedImageView=" + resolvedImageView +
-                ", resolvedImageDateTextView=" + resolvedImageDateTextView +
-                ", resolvedCommentsTextView=" + resolvedCommentsTextView +
-                ", apiCaller=" + apiCaller +
-                ", token='" + token + '\'' +
-                ", reportID=" + reportID +
-                ", reportNumber=" + reportNumber +
-                ", caseNumber=" + caseNumber +
-                ", company='" + company + '\'' +
-                ", institution='" + institution + '\'' +
-                ", nonComplianceType='" + nonComplianceType + '\'' +
-                ", resolvedStatus=" + resolvedStatus +
-                ", unresolvedComments='" + unresolvedComments + '\'' +
-                ", resolvedComments='" + resolvedComments + '\'' +
-                ", unresolvedImageName='" + unresolvedImageName + '\'' +
-                ", resolvedImageName='" + resolvedImageName + '\'' +
-                ", unresolvedImageDate='" + unresolvedImageDate + '\'' +
-                ", resolvedImageDate='" + resolvedImageDate + '\'' +
-                '}';
     }
 
     @Override
@@ -492,8 +446,8 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
             resolvingCaseSection.setVisibility(View.GONE);
             resolveButton.setVisibility(View.VISIBLE);
         } else {
-            // TODO: go back to previous fragment
-            CentralisedToast.makeText(getActivity(), "going to previous fragment", CentralisedToast.LENGTH_SHORT);
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new MyReportsFragment(), "getReport").commit();
         }
         return true;
     }

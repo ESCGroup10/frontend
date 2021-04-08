@@ -38,6 +38,8 @@ import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -88,7 +90,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private String tenantLocation;
     String tenantType;
     private int reportID = -2;
-    private boolean isCreatingCase = false;
 
     //scores
     private double staff_hygiene_score = 0;
@@ -115,12 +116,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     HashMap<String, Bitmap> photoBitmapHashMap;
     int photoNameCounter = 0;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Audit checklist");
+
+        new Thread(() -> {
+                Storage storage = StorageOptions.getDefaultInstance().getService();
+        }).start();
 
         Bundle bundle = getArguments();
         tenantType = bundle.getString("TENANT_TYPE_KEY");
@@ -404,7 +407,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 String datetime = dateFormat.format(new Date());
                 Log.d(TAG, "createCases: datetime: "+datetime);
-                caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
+                caseCall = apiCaller.postCase("Token "+token, reportID, tenantID, question, 0, non_compliance_type,
                         photoName, comments, datetime);
                 caseCall.enqueue(new Callback<Case>() {
                     @Override
@@ -412,7 +415,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         Log.d(TAG, "createCases response code: "+response.code());
                         int caseID = response.body().getId();
                         String question = response.body().getQuestion();
-                        submittedCaseIDs.add(caseID); //keep track of the caseIDs that have been created
+                        synchronized(submittedCaseIDs) { // make sure we don't have undesirable modifications
+                            submittedCaseIDs.add(caseID); //keep track of the caseIDs that have been created
+                        }
                         HandleImageOperations.uploadImageToDatabase(photoBitmap, photoName); //upload non-null bitmap to database
                         if (stopCreatingCases) {
                             deleteCase(caseID);

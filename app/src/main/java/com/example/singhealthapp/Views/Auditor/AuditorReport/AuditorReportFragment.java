@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AuditorReportFragment extends Fragment {
+    private static final String TAG = "AuditorReportFragment";
     Report report;
     View view;
     TextView company, location, resolved, unresolved;
@@ -60,7 +62,14 @@ public class AuditorReportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getActivity().setTitle("Report " + report.getId());
+        if (report.getTenant_display_id() == null){
+            getActivity().setTitle("Report " + report.getId());
+        }
+        else if ( report.isStatus() ){
+            getActivity().setTitle("Completed Report " + report.getTenant_display_id());
+        }
+        else getActivity().setTitle("Completed Report " + report.getTenant_display_id());
+
         view = inflater.inflate(R.layout.fragment_auditor_report, container, false);
 
         chart1 = view.findViewById(R.id.reportBarChart1);
@@ -85,7 +94,7 @@ public class AuditorReportFragment extends Fragment {
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-        Call<List<Case>> call = apiCaller.getCasesById("Token " + token, 12, 0);
+        Call<List<Case>> call = apiCaller.getCasesById("Token " + token, report.getId(), 1);
         call.enqueue(new Callback<List<Case>>() {
             @Override
             public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
@@ -95,6 +104,10 @@ public class AuditorReportFragment extends Fragment {
                 }
                 if (response.body().isEmpty()) resolved.setText("0");
                 else resolved.setText(String.valueOf(response.body().size()));
+                Log.d(TAG, "onResponse: "+"size of response body: "+response.body().size());
+                Log.d(TAG, "onResponse: "+"response body: "+response.body());
+                System.out.println("size of response body: "+response.body().size());
+                System.out.println("response body: "+response.body());
                 resolvedCases.addAll(response.body());
                 call = apiCaller.getCasesById("Token " + token, report.getId(), 0);
                 call.enqueue(new Callback<List<Case>>() {
@@ -104,16 +117,20 @@ public class AuditorReportFragment extends Fragment {
                             Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                             return ;
                         }
+                        Log.d(TAG, "onResponse: "+"size of response body: "+response.body().size());
+                        Log.d(TAG, "onResponse: "+"response body: "+response.body());
+                        System.out.println("size of response body: "+response.body().size());
+                        System.out.println("response body: "+response.body());
                         if (response.body().isEmpty()) unresolved.setText("0");
                         else unresolved.setText(String.valueOf(response.body().size()));
                         unresolvedCases.addAll(response.body());
-                        if ( ! resolved.getText().toString().equals("0") || ! resolved.getText().toString().equals("0")) {
+                        if ( ! resolved.getText().toString().equals("0") || ! unresolved.getText().toString().equals("0")) {
                             button.setEnabled(true);
                             button.setBackgroundColor(Color.rgb(115, 194, 239));
                             button.setOnClickListener(v -> getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(getActivity().getSupportFragmentManager().findFragmentByTag("viewReport").getId()
                                             , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation(), report, token),
-                                            "viewCase").commit());
+                                            "expandedCase").commit());
                         }
                     }
                     @Override

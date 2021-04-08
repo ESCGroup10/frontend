@@ -1,10 +1,14 @@
 package com.example.singhealthapp.Models;
 
 public class Case {
-    private int id, report_id;
+    private int id, report_id, tenant_id;
     private String question, unresolved_photo, unresolved_comments, resolved_photo,
             resolved_comments, non_compliance_type, unresolved_date, resolved_date;
     private boolean is_resolved;
+
+    public int getTenant_id() {
+        return tenant_id;
+    }
 
     public int getId() {
         return id;

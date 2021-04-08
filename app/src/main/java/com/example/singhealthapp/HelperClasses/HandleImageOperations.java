@@ -118,7 +118,9 @@ public class HandleImageOperations {
                 });
 
             } catch (Exception e) {
-                System.out.println("Retrieval Failed! " + e);
+                placeholder.setText("Image could not be loaded");
+                System.out.println("Retrieval Failed!");
+                e.printStackTrace();
             }
         }).start();
     }

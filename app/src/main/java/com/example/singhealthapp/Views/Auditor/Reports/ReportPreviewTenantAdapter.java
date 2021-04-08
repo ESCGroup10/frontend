@@ -20,13 +20,13 @@ import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragme
 
 import java.util.List;
 
-public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHolder>{
+public class ReportPreviewTenantAdapter extends RecyclerView.Adapter<ReportPreviewHolder>{
     List<ReportPreview> list;
     FragmentActivity parent;
     List<Report> reports;
     private String token;
 
-    public ReportPreviewAdapter(List<ReportPreview> list, List<Report> reports, FragmentActivity parent, String token) {
+    public ReportPreviewTenantAdapter(List<ReportPreview> list, List<Report> reports, FragmentActivity parent, String token) {
         this.list = list;
         this.reports = reports;
         this.parent = parent;
@@ -57,20 +57,20 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
 
     @Override
     public void onBindViewHolder(@NonNull ReportPreviewHolder holder, int position) {
-        holder.reportName.setText(list.get(position).getReportName());
-//        holder.reportDate.setText(list.get(position).getReportDate());
+        Report report;
+        report = reports.get(position);
+        report.setTenant_display_id(position + 1);
+        holder.reportName.setText("Report " + String.valueOf(position + 1));
         holder.reportDate.setText("Created at: ");
         setHalfBoldTextViews(holder.reportDate, list.get(position).getReportDate());
-        if (!list.get(position).getResolution_date().equals("NOT RESOLVED")) {
-            holder.resolution.setText("Resolved at: "+list.get(position).getResolution_date());
-        }
 //        holder.resolution.setText(list.get(position).getResolution_date());
-//        holder.id.setText("TENANT ID: " + list.get(position).getTenant_id());
+//        if (report.isStatus()) holder.id.setText("Completed");
+//        else holder.id.setText("Unresolved");
         holder.resolution.setText("");
         holder.id.setText("");
         holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
                 .replace(parent.getSupportFragmentManager().findFragmentByTag("getReport").getId()
-                        , new AuditorReportFragment(reports.get(position), token), "viewReport").commit());
+                        , new AuditorReportFragment(report, token), "viewReport").commit());
     }
 
     @Override

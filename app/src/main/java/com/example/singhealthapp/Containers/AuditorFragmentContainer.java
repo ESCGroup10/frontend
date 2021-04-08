@@ -31,6 +31,8 @@ import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
+import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
+import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
@@ -173,9 +175,10 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         catch (Exception ignored){ }
         try {
             if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
+                CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
                 getSupportFragmentManager().beginTransaction()
                         .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                , new ReportsFragment(), "getReport").commit();
+                                , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
                 return;
             }
         }

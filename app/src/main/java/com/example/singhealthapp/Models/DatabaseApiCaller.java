@@ -97,8 +97,9 @@ public interface DatabaseApiCaller {
     Call<Case> postCase (
             @Header("authorization") String token,
             @Field("report_id") int report_id,
+            @Field("tenant_id") int tenant_id,
             @Field("question") String question,
-            @Field("is_resolved") boolean is_resolved,
+            @Field("is_resolved") int is_resolved,
             @Field("non_compliance_type") String non_compliance_type,
             @Field("unresolved_photo") String unresolved_photo,
             @Field("unresolved_comments") String unresolved_comments,

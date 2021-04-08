@@ -212,9 +212,14 @@ public class ReportsFragment extends Fragment {
     }
 
     private String loadToken() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("TOKEN_KEY", null);
-        int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
+        String token = null;
+        try {
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+            token = sharedPreferences.getString("TOKEN_KEY", null);
+            int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
+        }
+        catch (Exception ignored){
+        }
         return token;
     }
 }

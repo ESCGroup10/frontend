@@ -69,7 +69,7 @@ public class StatusConfirmationFragment extends Fragment {
                             .commit();
                 } else {
                     StatusConfirmationFragment.this.getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new MyReportsFragment(), "MyReportsFragment")
+                            .replace(R.id.fragment_container, new MyReportsFragment(), "getReport")
                             .commit();
                 }
 
