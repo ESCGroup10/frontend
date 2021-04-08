@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EspressoCountingIdlingResource {
     private static final String RESOURCE = "GLOBAL";
-    private static AtomicBoolean testing = new AtomicBoolean(false);
     private static CountingIdlingResource mCountingIdlingResource = new CountingIdlingResource(RESOURCE);
 
     public static void increment() {

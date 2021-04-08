@@ -41,11 +41,12 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -83,7 +84,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private String token;
     private int userID;
     private int tenantID;
-    private String datetime;
     private String tenantCompany;
     private String tenantLocation;
     String tenantType;
@@ -399,8 +399,10 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     stopCreatingCases = true;
                     return false;
                 }
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");
-                String datetime = dateFormat.format(new Date()).toLowerCase();
+                SimpleDateFormat dateFormat = new SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                String datetime = dateFormat.format(new Date());
                 Log.d(TAG, "createCases: datetime: "+datetime);
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
                         photoName, comments, datetime);

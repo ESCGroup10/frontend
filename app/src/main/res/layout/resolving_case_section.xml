@@ -70,6 +70,7 @@
     </LinearLayout>
 
     <EditText
+        android:id="@+id/resolvedCommentsEditText"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:hint="@string/describe_how_you_resolved_the_problem"
@@ -77,7 +78,9 @@
         android:paddingHorizontal="5dp"
         android:textSize="20sp"
         android:background="@drawable/imageview_border"
-        android:layout_marginHorizontal="40dp"/>
+        android:layout_marginHorizontal="40dp"
+        android:imeOptions="actionDone"
+        android:inputType="text" />
 
     <Button
         android:id="@+id/confirmButton"

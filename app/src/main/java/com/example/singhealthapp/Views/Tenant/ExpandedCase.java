@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,7 +30,6 @@ import androidx.fragment.app.Fragment;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
-import com.example.singhealthapp.HelperClasses.ParseDate;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
@@ -41,7 +41,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -75,6 +79,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     Button confirmButton;
     TextView unresolvedImageViewPlaceholder;
     TextView resolvedImageViewPlaceholder;
+    EditText resolvedCommentsEditText;
 
     // database stuff
     Case thisCase;
@@ -169,6 +174,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         confirmButton = view.findViewById(R.id.confirmButton);
         unresolvedImageViewPlaceholder = view.findViewById(R.id.unresolvedImageViewPlaceholder);
         resolvedImageViewPlaceholder = view.findViewById(R.id.resolvedImageViewPlaceholder);
+        resolvedCommentsEditText = view.findViewById(R.id.resolvedCommentsEditText);
     }
 
     private void setOnClickListeners() {
@@ -219,18 +225,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: patch the case
-                setResolvedDate();
-                while (resolvedImageDate == null) {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                thisCase.setResolved_photo(resolvedImageName);
-                thisCase.setResolved_date(resolvedImageDate);
-                thisCase.setResolved_comments(resolvedComments);
+                createUpdatedCase();
                 Call<Void> patchCall = apiCaller.patchCase("Token "+token, caseID, thisCase);
 
                 patchCall.enqueue(new Callback<Void>() {
@@ -252,9 +247,15 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         });
     }
 
-    private synchronized void setResolvedDate() {
-        resolvedImageDate = ParseDate.getDate();
-        notifyAll();
+    private void createUpdatedCase() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String datetime = dateFormat.format(new Date());
+        thisCase.setResolved_date(datetime);
+        thisCase.setResolved_photo(resolvedImageName);
+        resolvedComments = resolvedCommentsEditText.getText().toString();
+        thisCase.setResolved_comments(resolvedComments);
     }
 
     private void submit() {

@@ -14,11 +14,17 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -84,7 +90,9 @@ public class TenantsFragment extends Fragment {
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteTenant(tenant.getId()))
                     .create().show();
         });
-        ((Ping)requireActivity()).decrementCountingIdlingResource();
+        if (savedInstanceState == null) {
+            EspressoCountingIdlingResource.decrement();
+        }
         return view;
     }
 

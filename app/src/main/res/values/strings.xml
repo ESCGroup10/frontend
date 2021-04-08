@@ -23,6 +23,6 @@
     <string name="unresolved_image">unresolved image</string>
     <string name="resolved_image">resolved image</string>
     <string name="confirm">Confirm</string>
-    <string name="describe_how_you_resolved_the_problem">Describe how you resolved the problem:</string>
+    <string name="describe_how_you_resolved_the_problem">Describe how you resolved the \nproblem:</string>
 
 </resources>
