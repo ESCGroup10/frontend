@@ -1,6 +1,7 @@
 package com.example.singhealthapp.Views.Statistics;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,11 +11,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.Models.DatabaseApiCaller;
@@ -28,6 +31,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.opencsv.CSVWriter;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Array;
@@ -81,8 +85,6 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
         super.onAttach(context);
         System.out.println("Context Score attach");
         StatisticsFragment.registerTenantIdUpdateListener(this);
-
-        getActivity().registerForActivityResult();
     }
 
     @Override
@@ -206,57 +208,34 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     }
 
     private void exportData() throws IOException {
-        ActivityResultLauncher<String> requestPermissionLauncher =
-                registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                    if (isGranted) {
-                        // Permission is granted. Continue the action or workflow in your
-                        // app.
+        //generate data
+        StringBuilder data = new StringBuilder();
+        data.append("Scores,FoodHygiene,HealthierChoice,HouseKeeping,StaffHygiene,Safety");
+        for(int i = 0; i< mScores.length; i++){
+            data.append("\n"+mScores[i]+","+mFoodHygiene[i]+","+mHealthierChoice[i]+","+mHouseKeeping[i]+","+mStaffHygiene[i]+","+mSafety[i]);
+        }
 
-                        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-                        String fileName = "scores_data.csv";
-                        String filePath = baseDir + File.separator + fileName;
-                        File f = new File(filePath);
+        try{
+            //saving the file into device
+            FileOutputStream out = getActivity().getApplicationContext().openFileOutput("datafile.csv", Context.MODE_PRIVATE);
+            out.write((data.toString()).getBytes());
+            out.close();
 
-                        System.out.println(filePath);
+            //exporting
+            Context context = getActivity().getApplicationContext();
+            File filelocation = new File(getActivity().getApplicationContext().getFilesDir(), "datafile.csv");
+            Uri path = FileProvider.getUriForFile(context, "com.example.android.fileprovider", filelocation);
+            Intent fileIntent = new Intent(Intent.ACTION_SEND);
+            fileIntent.setType("text/csv");
+            fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Data");
+            fileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            fileIntent.putExtra(Intent.EXTRA_STREAM, path);
+            startActivity(Intent.createChooser(fileIntent, "Send mail"));
+        }
 
-                        // create FileWriter object with file as parameter
-                        FileWriter outputfile = null;
-                        try {
-                            outputfile = new FileWriter(f);
-                            // create CSVWriter object filewriter object as parameter
-                            CSVWriter writer = new CSVWriter(outputfile);
-
-                            // adding header to csv
-                            String[] header = { "Scores", "Food Hygiene", "Healthier Choice", "House Keeping", "Staff Hygiene", "Safety" };
-                            writer.writeNext(header);
-
-                            // add data to csv
-                            writer.writeNext(mScores);
-                            writer.writeNext(mFoodHygiene);
-                            writer.writeNext(mHealthierChoice);
-                            writer.writeNext(mHouseKeeping);
-                            writer.writeNext(mStaffHygiene);
-                            writer.writeNext(mSafety);
-
-                            // closing writer connection
-                            writer.close();
-
-                            Toast.makeText(getContext(), "Successful export of data", Toast.LENGTH_SHORT).show();
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        // Explain to the user that the feature is unavailable because the
-                        // features requires a permission that the user has denied. At the
-                        // same time, respect the user's decision. Don't link to system
-                        // settings in an effort to convince the user to change their
-                        // decision.
-
-                        Toast.makeText(getContext(), "Permission not granted to create csv file", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        catch(Exception e){
+            e.printStackTrace();
+        }
 
 
     }
