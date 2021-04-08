@@ -8,7 +8,6 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,7 @@ import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
 import com.google.android.material.tabs.TabLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +65,11 @@ public class StatisticsFragment extends Fragment {
 
         searchButton.setOnClickListener(v -> {
             tenantId = tenantIdEditText.getText().toString();
-            tenantIdUpdate();
+            try {
+                tenantIdUpdate();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             System.out.println("Activity context: " + getContext());
         });
         ((Ping)requireActivity()).decrementCountingIdlingResource();
@@ -83,7 +87,7 @@ public class StatisticsFragment extends Fragment {
     }
 
     public interface TenantIdUpdateListener {
-        void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller);
+        void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller) throws IOException;
     }
 
     public static synchronized void registerTenantIdUpdateListener(TenantIdUpdateListener listener) {
@@ -94,7 +98,7 @@ public class StatisticsFragment extends Fragment {
         listenerList.remove(listener);
     }
 
-    public synchronized void tenantIdUpdate() {
+    public synchronized void tenantIdUpdate() throws IOException {
         System.out.println("ListenerList: " + listenerList);
         for (TenantIdUpdateListener l : listenerList) {
             l.onTenantIdUpdate(tenantId, token, apiCaller);
