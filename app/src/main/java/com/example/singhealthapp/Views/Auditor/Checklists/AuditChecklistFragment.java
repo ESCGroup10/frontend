@@ -399,18 +399,26 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     stopCreatingCases = true;
                     return false;
                 }
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");
-                String datetime = dateFormat.format(new Date()).toString().toLowerCase();
-                Log.d(TAG, "createCases: datetime: "+datetime);
+//                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm aa");
+//                String datetime = dateFormat.format(new Date()).toString().toLowerCase();
+//                Log.d(TAG, "createCases: datetime: "+datetime);
+                Log.d(TAG, "createCases: token: "+token+"\n"+
+                        "reportID: "+reportID+"\n"+
+                        "question: "+question+"\n"+
+                        "non compliance type: "+non_compliance_type+"\n"+
+                        "photo name: "+photoName+"\n"+
+                        "comments: "+comments);
                 caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
-                        photoName, comments, datetime);
+                        photoName, comments);
                 caseCall.enqueue(new Callback<Case>() {
                     @Override
                     public void onResponse(@NotNull Call<Case> call, @NotNull Response<Case> response) {
                         Log.d(TAG, "createCases response code: "+response.code());
                         int caseID = response.body().getId();
                         String question = response.body().getQuestion();
-                        submittedCaseIDs.add(caseID); //keep track of the caseIDs that have been created
+                        synchronized(submittedCaseIDs) { // make sure we don't have undesirable modifications
+                            submittedCaseIDs.add(caseID); //keep track of the caseIDs that have been created
+                        }
                         HandleImageOperations.uploadImageToDatabase(photoBitmap, photoName); //upload non-null bitmap to database
                         if (stopCreatingCases) {
                             deleteCase(caseID);
