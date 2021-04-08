@@ -31,6 +31,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     private final int red = Color.parseColor("#FFFF0000");
     private final int grey = Color.parseColor("#FF808080");
     private final int black = Color.parseColor("#FF000000");
+    private final int white = Color.parseColor("#FFFFFFFF");
 
     private ArrayList<ChecklistItem> checklist_items_array = new ArrayList<>();
     private boolean isAudit;
@@ -150,6 +151,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 cameraButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        cardView.setCardBackgroundColor(white);
                         callTakePhoto(getAdapterPosition());
                     }
                 });
@@ -162,6 +164,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             textViewTrue.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    cardView.setCardBackgroundColor(white);
                     if (colourStatusIndicator.getBackground().equals(green)) { // view has been clicked before
                         colourStatusIndicator.setBackgroundColor(black);
                     } else { // view has not been clicked before
@@ -195,6 +198,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             textViewNA.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    cardView.setCardBackgroundColor(white);
                     if (colourStatusIndicator.getBackground().equals(grey)) { // view has been clicked before
                         colourStatusIndicator.setBackgroundColor(black);
                     } else { // view has not been clicked before

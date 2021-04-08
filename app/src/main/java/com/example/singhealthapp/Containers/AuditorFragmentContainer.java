@@ -8,15 +8,12 @@ import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,9 +22,9 @@ import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.test.espresso.IdlingResource;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -38,7 +35,7 @@ import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragme
 import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
-import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
+import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
@@ -48,8 +45,6 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -191,6 +186,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
             auditor_drawer.closeDrawer(GravityCompat.START);
         } else {
+            EspressoCountingIdlingResource.decrement();
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder.setMessage("Do you want to log out? ");
@@ -257,7 +253,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
             File photoFile = null;
             try {
-                photoFile = createTempPhotoFile();
+                photoFile = HandleImageOperations.createFile(this);
             } catch (IOException ex) {
                 Log.d(TAG, "takePhoto: error in creating file for image to go into");
             }
@@ -285,28 +281,11 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         /**
-        * Gets photo taken and updates recyclerview with a thumbnail
+        * Usage: Get image bitmap
         * */
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            mChecklistAdapter.photoTaken(mAdapterPosition);
-            if(Build.VERSION.SDK_INT < 28) {
-                try {
-                    mCurrentPhotoBitmap = MediaStore.Images.Media.getBitmap(
-                            this.getContentResolver(),
-                            mCurrentPhotoURI
-                    );
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), mCurrentPhotoURI);
-                try {
-                    mCurrentPhotoBitmap = ImageDecoder.decodeBitmap(source);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            mCurrentPhotoBitmap = HandleImageOperations.getBitmap(resultCode, this, mCurrentPhotoURI);
             updatePhotoHashMap();
         }
         EspressoCountingIdlingResource.decrement();
@@ -317,24 +296,12 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         token = sharedPreferences.getString("TOKEN_KEY", null);
     }
 
-    public File createTempPhotoFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        return image;
-    }
-
     private void updatePhotoHashMap() {
         if (mCurrentPhotoBitmap == null) {
             Log.e(TAG, "createCases: mCurrentPhotoBitmap is null, question: "+mCurrentQuestion);
         }
         photoBitmapHashMap.put(mCurrentQuestion, mCurrentPhotoBitmap);
+        mChecklistAdapter.photoTaken(mAdapterPosition);
     }
 
     @Override
