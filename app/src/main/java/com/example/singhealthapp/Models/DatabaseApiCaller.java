@@ -95,18 +95,17 @@ public interface DatabaseApiCaller {
         @Query("tenant_id") int tenant_id
     );
 
-    @POST("/api/filterCases/")
-    Call<ResponseBody> postCase (
+
+    @FormUrlEncoded
+    @POST("/api/case/")
+    Call<Case> postCase (
             @Header("authorization") String token,
-            @Query("report_id") int report_id,
-            @Query("question") String question,
-            @Query("is_resolved") boolean is_resolved,
-            @Query("non_compliance_type") String non_compliance_type,
-            @Query("unresolved_photo") String unresolved_photo,
-            @Query("unresolved_comments") String unresolved_comments,
-            @Query("resolved_photo") String resolved_photo,
-            @Query("resolved_comments") String resolved_comments,
-            @Query("resolved_date") String resolved_date
+            @Field("report_id") int report_id,
+            @Field("question") String question,
+            @Field("is_resolved") boolean is_resolved,
+            @Field("non_compliance_type") String non_compliance_type,
+            @Field("unresolved_photo") String unresolved_photo,
+            @Field("unresolved_comments") String unresolved_comments
     );
 
     @FormUrlEncoded
@@ -133,4 +132,11 @@ public interface DatabaseApiCaller {
             @Header("authorization") String token,
             @Path("id") int id
     );
+    @DELETE("/api/report/{id}/")
+    Call<Void> deleteReport(@Header("authorization") String token,
+                            @Path("id") int reportID);
+
+    @DELETE("/api/case/{id}/")
+    Call<Void> deleteCase(@Header("authorization") String token,
+                            @Path("id") int caseID);
 }

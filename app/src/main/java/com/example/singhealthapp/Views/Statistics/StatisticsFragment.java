@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.singhealthapp.Models.DatabaseApiCaller;
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
 import com.google.android.material.tabs.TabLayout;
 
@@ -67,6 +68,7 @@ public class StatisticsFragment extends Fragment {
             tenantIdUpdate();
             System.out.println("Activity context: " + getContext());
         });
+        ((Ping)requireActivity()).decrementCountingIdlingResource();
         return view;
     }
 

@@ -42,7 +42,8 @@ public class CaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getActivity().setTitle("Report " + id + " Cases");
+        if (report.getTenant_display_id() != null) getActivity().setTitle("Report " + report.getTenant_display_id() + " Cases");
+        else getActivity().setTitle("Report " + id + " Cases");
         view = inflater.inflate(R.layout.fragment_case, container, false);
         System.out.println( unresolvedCases.size() );
 

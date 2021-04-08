@@ -6,7 +6,8 @@
     android:orientation="horizontal"
     android:layout_margin="5dp"
     app:cardCornerRadius="10dp"
-    app:cardElevation="5dp">
+    app:cardElevation="5dp"
+    android:id="@+id/cardview">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -55,18 +56,6 @@
                 android:backgroundTint="@color/blue"
                 app:iconTint="@color/black"/>
 
-<!--            <Button-->
-<!--                android:id="@+id/containedButton"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_weight="33"-->
-<!--                android:text="True"-->
-<!--                android:textSize="10sp"-->
-<!--                android:textStyle="bold"-->
-<!--                android:gravity="center"-->
-<!--                android:backgroundTint="@color/blue"/>-->
-<!--                style="@style/Widget.MaterialComponents.Button.TextButton"-->
-
             <Button
                 android:id="@+id/button_false"
                 android:layout_width="0dp"
@@ -103,6 +92,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/camera_level"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -111,6 +101,7 @@
             android:weightSum="100">
 
             <EditText
+                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/remarks"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -129,6 +120,13 @@
                 android:background="@drawable/camera"/>
 
         </LinearLayout>
+
+        <View
+            android:id="@+id/extra_layer"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:visibility="gone"
+            android:layout_below="@id/camera_level"/>
 
 
     </RelativeLayout>

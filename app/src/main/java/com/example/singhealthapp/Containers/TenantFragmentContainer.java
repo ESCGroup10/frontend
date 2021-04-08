@@ -15,6 +15,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
+import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
+import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
+import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.TestFragment;
 import com.example.singhealthapp.Views.Tenant.LatestReportFragment;
@@ -65,6 +69,33 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
 
     @Override
     public void onBackPressed() {
+
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
+                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new LatestReportFragment()).commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new MyReportsFragment(), "getReport").commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+        try {
+            if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
+                CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
+                getSupportFragmentManager().beginTransaction()
+                        .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
+                                , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
+                return;
+            }
+        }
+        catch (Exception ignored){ }
+
         Log.d(TAG, "onBackPressed: ");
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -96,7 +127,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_MyReport:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment(), "getReport").commit();
                 break;
 
             case R.id.nav_Tenant_Statistics:

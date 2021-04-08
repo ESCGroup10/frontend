@@ -32,15 +32,14 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
     public void onBindViewHolder(@NonNull CasePreviewHolder holder, int position) {
         if (cases.get(position).isIs_resolved()) {
             holder.is_resolved.setText("Resolved");
-            holder.cardView.setCardBackgroundColor(Color.rgb(239, 117, 119));
-
+            holder.cardView.setCardBackgroundColor(Color.rgb(159, 221, 88));
         }
         else {
             holder.is_resolved.setText("Unresolved");
-            holder.cardView.setCardBackgroundColor(Color.rgb(159, 221, 88));
+            holder.cardView.setCardBackgroundColor(Color.rgb(239, 117, 119));
         }
         holder.type.setText(cases.get(position).getNon_compliance_type());
-        holder.id.setText("Case " + cases.get(position).getId());
+        holder.id.setText("Case ID " + cases.get(position).getId());
 
     }
 

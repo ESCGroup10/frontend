@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
@@ -204,15 +205,21 @@ public class ReportsFragment extends Fragment {
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
             view.setItemAnimator(new DefaultItemAnimator());
             view.setAdapter(adapterCompleted);
+            ((Ping)requireActivity()).decrementCountingIdlingResource();
         } catch (Exception e) {
             System.out.println("Completed recycleView not set");
         }
     }
 
     private String loadToken() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("TOKEN_KEY", null);
-        int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
+        String token = null;
+        try {
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+            token = sharedPreferences.getString("TOKEN_KEY", null);
+            int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
+        }
+        catch (Exception ignored){
+        }
         return token;
     }
 }

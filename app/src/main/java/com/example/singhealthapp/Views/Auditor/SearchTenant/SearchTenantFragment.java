@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
@@ -30,11 +31,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SearchTenantFragment extends Fragment implements SearchAdapter.NavFromTenantSelection {
+
     SearchAdapter adapter;
     private ArrayList<SearchMain> tenantPreviews, getTenantPreviews;
     private List<Tenant> tenants, displayTenants;
-
-
 
     @Nullable
     @Override
@@ -89,6 +89,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
                     view.setLayoutManager(new LinearLayoutManager(getActivity()));
                     view.setItemAnimator(new DefaultItemAnimator());
                     view.setAdapter(adapter);
+                    ((Ping)requireActivity()).decrementCountingIdlingResource();
                 }
                 catch (Exception e) {
                     System.out.println("recycleView not set");
@@ -101,7 +102,6 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
         });
     }
 
-
     private String loadToken() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         String token = sharedPreferences.getString("TOKEN_KEY", null);
@@ -112,6 +112,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
 
     @Override
     public void navigate(int position) {
+        ((Ping)requireActivity()).incrementCountingIdlingResource(1);
         SearchTenantFragment.this.getParentFragmentManager()
                 .beginTransaction()
                 .replace(R.id.auditor_fragment_container, new TenantsFragment(tenants.get(position)),"tenantsFragment")
