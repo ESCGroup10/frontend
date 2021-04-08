@@ -1,6 +1,7 @@
 package com.example.singhealthapp.Views.Statistics;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -82,7 +85,27 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
         System.out.println("Context Score attach");
         StatisticsFragment.registerTenantIdUpdateListener(this);
 
-        getActivity().registerForActivityResult();
+        ActivityResultContract contract = new ActivityResultContract() {
+            @NonNull
+            @Override
+            public Intent createIntent(@NonNull Context context, Object input) {
+                return null;
+            }
+
+            @Override
+            public Object parseResult(int resultCode, @Nullable Intent intent) {
+                return null;
+            }
+        };
+
+        ActivityResultCallback callback = new ActivityResultCallback() {
+            @Override
+            public void onActivityResult(Object result) {
+
+            }
+        };
+
+        ActivityResultLauncher launcher = TotalScoreStatsFragment.this.registerForActivityResult(contract, callback);
     }
 
     @Override
