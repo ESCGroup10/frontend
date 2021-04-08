@@ -78,9 +78,13 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     ImageView cameraButton;
     ImageView uploadButton;
     Button confirmButton;
+    Button rejectButton;
+    Button acceptButton;
     TextView unresolvedImageViewPlaceholder;
     TextView resolvedImageViewPlaceholder;
     EditText resolvedCommentsEditText;
+
+    private Bundle bundle;
 
     // database stuff
     Case thisCase;
@@ -88,6 +92,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     private String token;
     private int reportID;
     private int caseID;
+    private String userType;
 
     private int reportNumber;
     private Integer caseNumber;
@@ -113,13 +118,19 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_expaded_case, container, false);
+        loadUserType();
         findAllViews(view);
 
         loadToken();
         initApiCaller();
         loadCompanyAndInstitution();
 
-        Bundle bundle = getArguments();
+        bundle = getArguments();
+        try {
+            company = bundle.getString("COMPANY_KEY");
+        } catch (Exception e) {
+            company = "Kopitiam";
+        }
         try {
             reportNumber = bundle.getInt("REPORT_NUMBER_KEY");
         } catch (Exception e) {
@@ -153,7 +164,20 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         return view;
     }
 
-    private void findAllViews(View view) {
+    private synchronized void loadUserType() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        userType = sharedPreferences.getString("USER_TYPE_KEY", null);
+        notifyAll();
+    }
+
+    private synchronized void findAllViews(View view) {
+        while (userType == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         Log.d(TAG, "findAllViews: called");
         companyTextView = view.findViewById(R.id.companyTextView);
         institutionTextView = view.findViewById(R.id.institutionTextView);
@@ -167,87 +191,152 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         resolvedImageView = view.findViewById(R.id.resolvedImageView);
         resolvedImageDateTextView = view.findViewById(R.id.resolvedImageDateTextView);
         resolvedCommentsTextView = view.findViewById(R.id.resolvedCommentsTextView);
-        resolveButton = view.findViewById(R.id.resolveButton);
-        resolvingCaseSection = view.findViewById(R.id.resolvingCaseSection);
-        cameraButton = view.findViewById(R.id.cameraButton);
-        uploadButton = view.findViewById(R.id.uploadButton);
-        confirmButton = view.findViewById(R.id.confirmButton);
         unresolvedImageViewPlaceholder = view.findViewById(R.id.unresolvedImageViewPlaceholder);
         resolvedImageViewPlaceholder = view.findViewById(R.id.resolvedImageViewPlaceholder);
-        resolvedCommentsEditText = view.findViewById(R.id.resolvedCommentsEditText);
+        if (userType.equals("Auditor")) {
+            acceptButton = view.findViewById(R.id.acceptButton);
+            rejectButton = view.findViewById(R.id.rejectButton);
+        } else {
+            resolveButton = view.findViewById(R.id.resolveButton);
+            resolvingCaseSection = view.findViewById(R.id.resolvingCaseSection);
+            cameraButton = view.findViewById(R.id.cameraButton);
+            uploadButton = view.findViewById(R.id.uploadButton);
+            confirmButton = view.findViewById(R.id.confirmButton);
+            resolvedCommentsEditText = view.findViewById(R.id.resolvedCommentsEditText);
+        }
     }
 
     private void setOnClickListeners() {
-        resolveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resolveButton.setVisibility(View.GONE);
-                resolvingCaseSection.setVisibility(View.VISIBLE);
-            }
-        });
-
-        cameraButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    File photoFile = null;
-                    try {
-                        photoFile = HandleImageOperations.createFile(getActivity());
-                    } catch (IOException ex) {
-                        Log.d(TAG, "takePhoto: error in creating file for image to go into");
-                    }
-                    if (photoFile != null) {
-                        mImageURI = FileProvider.getUriForFile(getActivity(),
-                                "com.example.android.fileprovider",
-                                photoFile);
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageURI);
-                        EspressoCountingIdlingResource.increment();
-                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                    } else {
-                        Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
-                        CentralisedToast.makeText(getActivity(), "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
-                    }
-                } else {
-                    CentralisedToast.makeText(getActivity(), "Camera does not exist", CentralisedToast.LENGTH_SHORT);
+        if (!userType.equals("Auditor")) {
+            resolveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    resolveButton.setVisibility(View.GONE);
+                    resolvingCaseSection.setVisibility(View.VISIBLE);
                 }
-            }
-        });
+            });
 
-        uploadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                startActivityForResult(pickPhoto , REQUEST_IMAGE_FROM_GALLERY);
-            }
-        });
+            cameraButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        File photoFile = null;
+                        try {
+                            photoFile = HandleImageOperations.createFile(getActivity());
+                        } catch (IOException ex) {
+                            Log.d(TAG, "takePhoto: error in creating file for image to go into");
+                        }
+                        if (photoFile != null) {
+                            mImageURI = FileProvider.getUriForFile(getActivity(),
+                                    "com.example.android.fileprovider",
+                                    photoFile);
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageURI);
+                            EspressoCountingIdlingResource.increment();
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                        } else {
+                            Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
+                            CentralisedToast.makeText(getActivity(), "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
+                        }
+                    } else {
+                        CentralisedToast.makeText(getActivity(), "Camera does not exist", CentralisedToast.LENGTH_SHORT);
+                    }
+                }
+            });
 
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createUpdatedCase();
-                Call<Void> patchCall = apiCaller.patchCase("Token "+token, caseID, thisCase);
+            uploadButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                    startActivityForResult(pickPhoto , REQUEST_IMAGE_FROM_GALLERY);
+                }
+            });
 
-                patchCall.enqueue(new Callback<Void>() {
-                                      @Override
-                                      public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                                          Log.d(TAG, "patchCall onResponse: "+response);
-                                          Log.d(TAG, "patchCall onResponse: code: "+response.code());
-                                          submit();
-                                      }
-                                      @Override
-                                      public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
-                                          Log.d(TAG, "deleteReport onFailure: "+t.toString());
-                                          Toast.makeText(getActivity(), "Failed to update database", Toast.LENGTH_SHORT).show();
-                                      }
-                                  });
-                // upload non-null bitmap to database
-                HandleImageOperations.uploadImageToDatabase(mImageBitmap, resolvedImageName);
-            }
-        });
+            confirmButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    createUpdatedCase(true);
+                    Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+
+                    patchCall.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                            Log.d(TAG, "patchCall onResponse: " + response);
+                            Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                            submit();
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                            Log.d(TAG, "deleteReport onFailure: " + t.toString());
+                            Toast.makeText(getActivity(), "Failed to update database", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    // upload non-null bitmap to database
+                    HandleImageOperations.uploadImageToDatabase(mImageBitmap, resolvedImageName);
+                }
+            });
+        } else {
+            acceptButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO: update case to be resolved
+                    createUpdatedCase(true);
+                    Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+
+                    patchCall.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                            Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                            CentralisedToast.makeText(getActivity(), "Resolution accepted successfully", CentralisedToast.LENGTH_SHORT);
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                            t.printStackTrace();
+                            CentralisedToast.makeText(getActivity(), "Failed to accept resolution, try again.",
+                                    CentralisedToast.LENGTH_SHORT);
+                        }
+                    });
+                }
+            });
+
+            rejectButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    createUpdatedCase(false);
+                    Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+
+                    patchCall.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                            Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                            CentralisedToast.makeText(getActivity(), "Resolution rejected successfully", CentralisedToast.LENGTH_SHORT);
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                            t.printStackTrace();
+                            CentralisedToast.makeText(getActivity(), "Failed to reject resolution, try again.",
+                                    CentralisedToast.LENGTH_SHORT);
+                        }
+                    });
+                }
+            });
+        }
     }
 
-    private void createUpdatedCase() {
+    private void createUpdatedCase(boolean acccept) {
+        if (userType.equals("Auditor")) {
+            if (acccept) {
+                thisCase.setIs_resolved(true);
+                return;
+            } else {
+                // TODO: add additional comments to the resolved image
+                // TODO: write another textview for that? maybe a scrollable textview bulletin
+                return;
+            }
+        }
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -313,7 +402,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         setHalfBoldTextViews(companyTextView, company);
         setHalfBoldTextViews(institutionTextView, institution);
         caseNumberTextView.setText((String)(caseNumberTextView.getText() + caseNumber.toString()));
-        setHalfBoldTextViews(resolvedStatusTextView, (resolvedStatus?"True":"False"));
+        setHalfBoldTextViews(resolvedStatusTextView, (resolvedStatus?"Resolved":"Unresolved"));
     }
 
     private void setHalfBoldTextViews(TextView mytextview, String textToAdd) {
@@ -329,15 +418,25 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         }
     }
 
+    private String getDate(String date) {
+        return date.substring(0, 10) + " " + date.substring(11, 19);
+    }
+
     private void setAllViewsFromDatabase() {
         Log.d(TAG, "setAllViewsFromDatabase: called");
         setHalfBoldTextViews(nonComplianceTypeTextView, nonComplianceType);
-        unresolvedImageDateTextView.setText((String)(unresolvedImageDateTextView.getText() + unresolvedImageDate));
+        unresolvedImageDateTextView.setText((String)(unresolvedImageDateTextView.getText() + getDate(unresolvedImageDate)));
         unresolvedCommentsTextView.setText((String)(unresolvedCommentsTextView.getText() + unresolvedComments));
         unresolvedImageView.setVisibility(View.VISIBLE);
         HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 300, 300);
         if (resolvedStatus) {
-            resolvedImageDateTextView.setText((String)(resolvedImageDateTextView.getText() + resolvedImageDate));
+            if (userType.equals("Auditor")) {
+                if (resolvedStatus) {
+                    acceptButton.setVisibility(View.VISIBLE);
+                    rejectButton.setVisibility(View.VISIBLE);
+                }
+            }
+            resolvedImageDateTextView.setText((String)(resolvedImageDateTextView.getText() + getDate(resolvedImageDate)));
             resolvedCommentsTextView.setText((String)(resolvedCommentsTextView.getText() + resolvedComments));
             resolvedImageView.setVisibility(View.VISIBLE);
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 300, 300);
@@ -345,15 +444,34 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
             resolvedImageDateTextView.setVisibility(VISIBLE);
             resolvedCommentsTextView.setVisibility(VISIBLE);
         } else {
-            resolveButton.setVisibility(VISIBLE);
+            if (!userType.equals("Auditor")) {
+                resolveButton.setVisibility(VISIBLE);
+            }
         }
     }
 
-    private void loadCompanyAndInstitution() {
+    private synchronized void loadCompanyAndInstitution() {
+        while (userType.equals(null)) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         Log.d(TAG, "loadCompanyAndInstitution: called");
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
-        company = sharedPreferences.getString("COMPANY_KEY", "default company");
-        institution = sharedPreferences.getString("INSTITUTION_KEY", "default institution");
+        if (!userType.equals("Auditor")) {
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+            company = sharedPreferences.getString("COMPANY_KEY", "default company");
+            institution = sharedPreferences.getString("INSTITUTION_KEY", "default institution");
+        } else {
+            if (userType.equals("Auditor")) {
+                try {
+                    institution = bundle.getString("INSTITUTION_KEY");
+                } catch (Exception e) {
+                    institution = "SGH";
+                }
+            }
+        }
     }
 
     private synchronized void loadToken() {
@@ -442,12 +560,17 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
 
     @Override
     public boolean onBackPressed() {
-        if (resolvingCaseSection.getVisibility() == View.VISIBLE) {
-            resolvingCaseSection.setVisibility(View.GONE);
-            resolveButton.setVisibility(View.VISIBLE);
-        } else {
+        if (userType.equals("Auditor")) {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new MyReportsFragment(), "getReport").commit();
+                    .replace(R.id.auditor_fragment_container, new MyReportsFragment(), "getReport").commit();
+        } else {
+            if (resolvingCaseSection.getVisibility() == View.VISIBLE) {
+                resolvingCaseSection.setVisibility(View.GONE);
+                resolveButton.setVisibility(View.VISIBLE);
+            } else {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new MyReportsFragment(), "getReport").commit();
+            }
         }
         return true;
     }

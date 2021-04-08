@@ -121,87 +121,89 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         Log.d(TAG, "onBackPressed: ");
         EspressoCountingIdlingResource.increment();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("safetyChecklist").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
+        if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("safetyChecklist").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            } catch (Exception ignored) {
             }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("auditChecklist").isVisible()) {
-                // TODO: can go to safety fragment if it implements shared pref
-                ((IOnBackPressed)getSupportFragmentManager().findFragmentByTag("auditChecklist")).onBackPressed();
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("auditChecklist").isVisible()) {
+                    // TODO: can go to safety fragment if it implements shared pref
+                    ((IOnBackPressed) getSupportFragmentManager().findFragmentByTag("auditChecklist")).onBackPressed();
 //                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
+                    return;
+                }
+            } catch (Exception ignored) {
             }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            } catch (Exception ignored) {
             }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            } catch (Exception ignored) {
             }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new ReportsFragment(), "getReport").commit();
-                return;
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new ReportsFragment(), "getReport").commit();
+                    return;
+                }
+            } catch (Exception ignored) {
             }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("tenantsFragment").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("tenantsFragment").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            } catch (Exception ignored) {
             }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("safetyFragment").isVisible()) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                return;
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("safetyFragment").isVisible()) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    return;
+                }
+            } catch (Exception ignored) {
             }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
-                getSupportFragmentManager().beginTransaction()
-                        .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
-                return;
+            try {
+                if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
+                    CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
+                                    , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
+                    return;
+                }
+            } catch (Exception ignored) {
             }
-        }
-        catch (Exception ignored){ }
 
-        if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
-            auditor_drawer.closeDrawer(GravityCompat.START);
-        } else {
-            EspressoCountingIdlingResource.decrement();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
+                auditor_drawer.closeDrawer(GravityCompat.START);
+            } else {
+                EspressoCountingIdlingResource.decrement();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-            builder.setMessage("Do you want to log out? ");
-            builder.setPositiveButton("OK", (dialog, id) -> {
-                dialog.dismiss();
-                clearData(); // clear user type (to avoid auto login) and token (for safety)
-                Intent intent = new Intent(AuditorFragmentContainer.this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            });
-            builder.setNegativeButton("Cancel", (dialog, id) -> {
-                dialog.dismiss();
-            });
-            builder.show();
+                builder.setMessage("Do you want to log out? ");
+                builder.setPositiveButton("OK", (dialog, id) -> {
+                    dialog.dismiss();
+                    clearData(); // clear user type (to avoid auto login) and token (for safety)
+                    Intent intent = new Intent(AuditorFragmentContainer.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                });
+                builder.setNegativeButton("Cancel", (dialog, id) -> {
+                    dialog.dismiss();
+                });
+                builder.show();
+            }
         }
     }
 

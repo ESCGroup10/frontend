@@ -130,7 +130,7 @@ public class AuditorReportFragment extends Fragment {
                             button.setOnClickListener(v -> getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(getActivity().getSupportFragmentManager().findFragmentByTag("viewReport").getId()
                                             , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation(), report, token),
-                                            "expandedCase").commit());
+                                            "viewCase").commit());
                         }
                     }
                     @Override

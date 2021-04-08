@@ -52,6 +52,7 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
         Case a = cases.get(position);
         holder.cardView.setOnClickListener(v -> {
             Bundle args = new Bundle();
+            args.putString("COMPANY_KEY", report.getCompany());
             args.putInt("REPORT_NUMBER_KEY", report.getTenant_display_id());
             args.putInt("CASE_NUMBER_KEY", a.getId());
             args.putBoolean("RESOLVED_STATUS_KEY", a.isIs_resolved());
@@ -60,7 +61,7 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
             ExpandedCase expandedCase = new ExpandedCase();
             expandedCase.setArguments(args);
             parent.getSupportFragmentManager().beginTransaction()
-                    .replace(parent.getSupportFragmentManager().findFragmentByTag("expandedCase").getId()
+                    .replace(parent.getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container).getId()
                             , expandedCase).commit();
         });
     }

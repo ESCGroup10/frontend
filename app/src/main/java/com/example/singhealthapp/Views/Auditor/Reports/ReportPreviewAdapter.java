@@ -57,6 +57,9 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
 
     @Override
     public void onBindViewHolder(@NonNull ReportPreviewHolder holder, int position) {
+        Report report;
+        report = reports.get(position);
+        report.setTenant_display_id(position + 1);
         holder.reportName.setText(list.get(position).getReportName());
 //        holder.reportDate.setText(list.get(position).getReportDate());
         holder.reportDate.setText("Created at: ");
