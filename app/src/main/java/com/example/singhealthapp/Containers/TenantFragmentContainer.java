@@ -74,45 +74,44 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
 
     @Override
     public void onBackPressed() {
-
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
-                //getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new LatestReportFragment()).commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new MyReportsFragment(), "getReport").commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
-        try {
-            if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
-                getSupportFragmentManager().beginTransaction()
-                        .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
-                return;
-            }
-        }
-        catch (Exception ignored){ }
-
         Log.d(TAG, "onBackPressed: ");
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else {
+                try {
+                    if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) { // this is the main page so just log out?
+//                        getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new LatestReportFragment()).commit();
+//                        return;
+                    }
+                } catch (Exception ignored) {
+                }
+                try {
+                    if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new MyReportsFragment(), "getReport").commit();
+                        return;
+                    }
+                } catch (Exception ignored) {
+                }
+                try {
+                    if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
+                        CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
+                                        , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
+                        return;
+                    }
+                } catch (Exception ignored) {
+                }
+
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
                 builder.setMessage("Do you want to log out? ");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //AuditorFragmentContainer.super.onBackPressed();
                         dialog.dismiss();
                         clearData(); // clear user type (to avoid auto login) and token (for safety)
                         Intent intent = new Intent(TenantFragmentContainer.this, LoginActivity.class);
@@ -123,11 +122,11 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
-                        //finish();
                     }
                 });
                 builder.show();
             }
+
         }
     }
 
@@ -137,8 +136,6 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         switch (item.getItemId()) {
             case R.id.nav_MyReport:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment(), "getReport").commit();
-//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment()).commit();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ExpandedCase()).commit();
                 break;
 
             case R.id.nav_Tenant_Statistics:
