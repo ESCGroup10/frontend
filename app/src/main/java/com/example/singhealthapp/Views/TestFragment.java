@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -167,9 +168,8 @@ public class TestFragment extends Fragment {
         System.out.println("User ID " + userId);
     }
 
+    // retrieve image list from
     public void retrieveImageList() {
-        // If you don't specify credentials when constructing the client, the client library will
-        // look for credentials via the environment variable GOOGLE_APPLICATION_CREDENTIALS.
 
         // API call needs to be done async or on another thread
         new Thread(() -> {
@@ -226,6 +226,7 @@ public class TestFragment extends Fragment {
         }).start();
     }
 
+    // retrieve image from Google Cloud
     public void retrieveImage() {
 
         // API call needs to be done async or on another thread
@@ -240,7 +241,7 @@ public class TestFragment extends Fragment {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
                 // display bitmap image on ImageView in another thread
-                getActivity().runOnUiThread(() -> uploadedImage.setImageBitmap(bitmap));
+                requireActivity().runOnUiThread(() -> uploadedImage.setImageBitmap(bitmap));
 
             } catch (Exception e) {
                 System.out.println("Retrieval Failed! " + e);

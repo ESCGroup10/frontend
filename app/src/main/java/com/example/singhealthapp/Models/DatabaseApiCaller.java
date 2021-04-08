@@ -89,6 +89,12 @@ public interface DatabaseApiCaller {
             @Query("is_resolved") int is_resolved
     );
 
+    @GET("/api/score/")
+    Call<List<Report>> getScoresById (
+        @Header("authorization") String token,
+        @Query("tenant_id") int tenant_id
+    );
+
     @POST("/api/filterCases/")
     Call<ResponseBody> postCase (
             @Header("authorization") String token,
