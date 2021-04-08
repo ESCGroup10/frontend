@@ -45,8 +45,8 @@ public class ReportPreviewTenantAdapter extends RecyclerView.Adapter<ReportPrevi
         holder.reportName.setText("Report " + String.valueOf(position + 1));
         holder.reportDate.setText(list.get(position).getReportDate());
         holder.resolution.setText(list.get(position).getResolution_date());
-        holder.id.setText("");
-        holder.id.setWidth(0);
+        if (report.isStatus()) holder.id.setText("Completed");
+        else holder.id.setText("Unresolved");
         holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
                 .replace(parent.getSupportFragmentManager().findFragmentByTag("getReport").getId()
                         , new AuditorReportFragment(report, token), "viewReport").commit());

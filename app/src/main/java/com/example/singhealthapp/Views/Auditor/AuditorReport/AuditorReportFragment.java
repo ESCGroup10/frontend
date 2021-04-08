@@ -63,8 +63,10 @@ public class AuditorReportFragment extends Fragment {
         if (report.getTenant_display_id() == null){
             getActivity().setTitle("Report " + report.getId());
         }
-        else getActivity().setTitle("Report " + report.getTenant_display_id());
-        System.out.println(report.getTenant_display_id());
+        else if ( report.isStatus() ){
+            getActivity().setTitle("Completed Report " + report.getTenant_display_id());
+        }
+        else getActivity().setTitle("Completed Report " + report.getTenant_display_id());
 
         view = inflater.inflate(R.layout.fragment_auditor_report, container, false);
 
