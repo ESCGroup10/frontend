@@ -16,5 +16,7 @@
     <string name="singhealth_app">Singhealth App</string>
     <string name="reset_code">Reset Code</string>
     <string name="new_password">New Password</string>
+    <string name="button">Button</string>
+    <string name="fab_desc">Scroll to next sub-header</string>
 
 </resources>

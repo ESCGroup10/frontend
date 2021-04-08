@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
 
@@ -42,9 +43,7 @@ public class StatusConfirmationFragment extends Fragment {
             button_text = bundle.getString(BUTTON_TXT_KEY);
         } catch (Exception e) {
             Log.d(TAG, "onCreateView: "+ Arrays.toString(e.getStackTrace()));
-            // TODO: this does not seem to go back to the previous fragment
-            StatusConfirmationFragment.this.getParentFragmentManager().popBackStack();
-            CentralisedToast.makeText(this.getContext(), "Error going to next page", CentralisedToast.LENGTH_LONG);
+            // TODO: implement back press
         }
 
         getActivity().setTitle(title);
@@ -58,7 +57,10 @@ public class StatusConfirmationFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // if auditor
-                StatusConfirmationFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsFragment()).commit();
+                ((Ping)requireActivity()).incrementCountingIdlingResource(1);
+                StatusConfirmationFragment.this.getParentFragmentManager().beginTransaction()
+                        .replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport")
+                        .commit();
                 // TODO: if tenant
             }
         });

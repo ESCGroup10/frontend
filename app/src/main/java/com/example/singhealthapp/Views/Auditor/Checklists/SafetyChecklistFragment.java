@@ -1,6 +1,7 @@
 package com.example.singhealthapp.Views.Auditor.Checklists;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.singhealthapp.HelperClasses.TakePhotoInterface;
+import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.R;
 
 import java.util.ArrayList;
 
 public class SafetyChecklistFragment extends Fragment {
+    private static final String TAG = "SafetyChecklistFragment";
 
     RecyclerView safetyChecklistRecyclerViewPart1;
     RecyclerView safetyChecklistRecyclerViewPart2;
@@ -28,8 +31,10 @@ public class SafetyChecklistFragment extends Fragment {
     private ChecklistAdapter checklistAdapter1;
     private ChecklistAdapter checklistAdapter2;
 
-    private static final String TENANT_TYPE_KEY = "tenant_type_key";
     String tenantType;
+    private int tenantID;
+    private String tenantCompany;
+    private String tenantLocation;
 
     Button start_audit_button;
 
@@ -37,11 +42,15 @@ public class SafetyChecklistFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //TODO: implement shared pref (if have time)
         getActivity().setTitle("COVID safe measures checklist");
         View view = inflater.inflate(R.layout.fragment_safety_checklist, container, false);
 
         Bundle bundle = getArguments();
-        tenantType = bundle.getString(TENANT_TYPE_KEY);
+        tenantType = bundle.getString("TENANT_TYPE_KEY");
+        tenantID = bundle.getInt("ID_KEY");
+        tenantCompany = bundle.getString("COMPANY_KEY");
+        tenantLocation = bundle.getString("LOCATION_KEY");
 
         checklist_items_array_part1 = new ArrayList<>();
         checklist_items_array_part2 = new ArrayList<>();
@@ -61,20 +70,29 @@ public class SafetyChecklistFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 // if selected tenant type is F&B, then put F&B, if Non F&B, put Non F&B
-                bundle.putString(TENANT_TYPE_KEY, tenantType);
+                bundle.putString("TENANT_TYPE_KEY", tenantType);
+                bundle.putInt("ID_KEY", tenantID);
+                bundle.putString("COMPANY_KEY", tenantCompany);
+                bundle.putString("LOCATION_KEY", tenantLocation);
+                Log.d(TAG, "tenantType sending: "+tenantType);
                 AuditChecklistFragment auditChecklistFragment = new AuditChecklistFragment();
                 auditChecklistFragment.setArguments(bundle);
-                SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, auditChecklistFragment).commit();
+
+                ((Ping)requireActivity()).incrementCountingIdlingResource(12); //12 = number of recyclerViews created + 1 report created
+                SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction()
+                        .replace(R.id.auditor_fragment_container, auditChecklistFragment, "auditChecklist")
+                        .commit();
             }
         });
 
+        ((Ping)requireActivity()).decrementCountingIdlingResource();
         return view;
     }
 
     private void init_recyclerView(RecyclerView recyclerView, ArrayList<ChecklistItem> list, ChecklistAdapter checklistAdapter) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        checklistAdapter = new ChecklistAdapter((TakePhotoInterface)getActivity(), list);
+        checklistAdapter = new ChecklistAdapter((HandlePhotoInterface)getActivity(), list, false);
         recyclerView.setAdapter(checklistAdapter);
     }
 

@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
@@ -31,8 +32,6 @@ public class TenantsFragment extends Fragment {
     View view;
     TextView company, institution, type, location, name;
     Button button, deleteButton;
-
-    private static final String TENANT_TYPE_KEY = "tenant_type_key";
 
     public TenantsFragment(Tenant tenant) {
         this.tenant = tenant;
@@ -62,10 +61,17 @@ public class TenantsFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, "onClick: called");
                 Bundle bundle = new Bundle();
-                bundle.putString(TENANT_TYPE_KEY, tenant.getType());
+                    bundle.putString("TENANT_TYPE_KEY", tenant.getType());
+                    bundle.putInt("ID_KEY", tenant.getId());
+                    bundle.putString("COMPANY_KEY", tenant.getCompany());
+                    bundle.putString("LOCATION_KEY", tenant.getLocation());
                 SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
                 safetyChecklistFragment.setArguments(bundle);
-                TenantsFragment.this.getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyFragment").commit();
+
+                ((Ping)requireActivity()).incrementCountingIdlingResource(1);
+                TenantsFragment.this.getParentFragmentManager().beginTransaction()
+                        .replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyChecklist")
+                        .commit();
             }
         });
 
@@ -78,7 +84,7 @@ public class TenantsFragment extends Fragment {
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteTenant(tenant.getId()))
                     .create().show();
         });
-
+        ((Ping)requireActivity()).decrementCountingIdlingResource();
         return view;
     }
 
