@@ -2,6 +2,7 @@ package com.example.singhealthapp.Models;
 
 public class Report {
     private int id, auditor_id, tenant_id;
+    private Integer tenant_display_id = null;
     private float staffhygiene_score, housekeeping_score, safety_score, healthierchoice_score, foodhygiene_score;
     private String company, location, outlet_type, report_notes, report_date, report_image, resolution_notes, resolution_date, resolution_image;
     private boolean status;
@@ -76,5 +77,13 @@ public class Report {
 
     public boolean isStatus() {
         return status;
+    }
+
+    public Integer getTenant_display_id() {
+        return tenant_display_id;
+    }
+
+    public void setTenant_display_id(Integer tenant_display_id) {
+        this.tenant_display_id = tenant_display_id;
     }
 }
