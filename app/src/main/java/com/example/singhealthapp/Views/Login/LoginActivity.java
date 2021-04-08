@@ -203,8 +203,8 @@ public class LoginActivity extends AppCompatActivity {
         editor.putInt("USER_ID_KEY", userId);
         editor.putString("USER_TYPE_KEY", userType);
         if (!userType.equals(auditorType)) {
-            editor.putString("OUTLET_KEY", company);
-            editor.putInt("INSTITUTION_KEY", userId);
+            editor.putString("COMPANY_KEY", company);
+            editor.putString("INSTITUTION_KEY", institution);
         }
         editor.commit();
     }

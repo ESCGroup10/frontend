@@ -11,6 +11,9 @@
     <color name="red">#FFFF0000</color>
     <color name="grey">#FF808080</color>
     <color name="grey_semi_transparent">#B2808080</color>
+    <color name="light_grey_semi_transparent">#B2c6c7cc</color>
     <color name="blue">#FF3DE2E4</color>
     <color name="mild_blue">#FF3D8FE4</color>
+    <color name="advance_button_green">#FF87DD69</color>
+    <color name="header_green">#FF98F888</color>
 </resources>

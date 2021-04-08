@@ -1,27 +1,45 @@
 package com.example.singhealthapp.Views.Tenant;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.HandleImageOperations;
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.example.singhealthapp.HelperClasses.IOnBackPressed;
+import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -30,7 +48,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ExpandedCase extends Fragment {
+import static android.app.Activity.RESULT_OK;
+import static android.view.View.VISIBLE;
+
+public class ExpandedCase extends Fragment implements IOnBackPressed {
     private static final String TAG = "ExpandedCase";
 
     // UI stuff
@@ -45,8 +66,17 @@ public class ExpandedCase extends Fragment {
     ImageView resolvedImageView;
     TextView resolvedImageInformationTextView;
     TextView resolvedCommentsTextView;
+    View unresolvedResolvedSeparator;
+    Button resolveButton;
+    LinearLayout resolvingCaseSection;
+    ImageView cameraButton;
+    ImageView uploadButton;
+    Button confirmButton;
+    TextView unresolvedImageViewPlaceholder;
+    TextView resolvedImageViewPlaceholder;
 
     // database stuff
+    Case thisCase;
     DatabaseApiCaller apiCaller;
     private String token;
     private int reportID;
@@ -58,14 +88,18 @@ public class ExpandedCase extends Fragment {
     private String institution;
     private String nonComplianceType;
     private boolean resolvedStatus;
-    private Bitmap unresolvedImageBitmap;
-    private Bitmap resolvedImageBitmap;
     private String unresolvedComments;
     private String resolvedComments;
     private String unresolvedImageName;
     private String resolvedImageName;
     private String unresolvedImageInformation;
     private String resolvedImageInformation;
+
+    // Camera stuff
+    Uri mImageURI;
+    final int REQUEST_IMAGE_CAPTURE = 0;
+    final int REQUEST_IMAGE_FROM_GALLERY = 1;
+    Bitmap mImageBitmap;
 
     @Nullable
     @Override
@@ -98,16 +132,17 @@ public class ExpandedCase extends Fragment {
         try {
             reportID = bundle.getInt("REPORT_ID_KEY");
         } catch (Exception e) {
-            reportID = 169;
+            reportID = 242;
         }
         try {
             caseID = bundle.getInt("CASE_ID_KEY");
         } catch (Exception e) {
-            caseID = 31;
+            caseID = 58;
         }
         getActivity().setTitle("Report "+reportNumber);
         getCase();
         setAllViewsFromBundle();
+        setOnClickListeners();
 
         return view;
     }
@@ -122,29 +157,185 @@ public class ExpandedCase extends Fragment {
         unresolvedImageView = view.findViewById(R.id.unresolvedImageView);
         unresolvedImageInformationTextView = view.findViewById(R.id.unresolvedImageInformationTextView);
         unresolvedCommentsTextView = view.findViewById(R.id.unresolvedCommentsTextView);
+        unresolvedResolvedSeparator = view.findViewById(R.id.unresolvedResolvedSeparator);
         resolvedImageView = view.findViewById(R.id.resolvedImageView);
         resolvedImageInformationTextView = view.findViewById(R.id.resolvedImageInformationTextView);
         resolvedCommentsTextView = view.findViewById(R.id.resolvedCommentsTextView);
+        resolveButton = view.findViewById(R.id.resolveButton);
+        resolvingCaseSection = view.findViewById(R.id.resolvingCaseSection);
+        cameraButton = view.findViewById(R.id.cameraButton);
+        uploadButton = view.findViewById(R.id.uploadButton);
+        confirmButton = view.findViewById(R.id.confirmButton);
+        unresolvedImageViewPlaceholder = view.findViewById(R.id.unresolvedImageViewPlaceholder);
+        resolvedImageViewPlaceholder = view.findViewById(R.id.resolvedImageViewPlaceholder);
     }
+
+    private void setOnClickListeners() {
+        resolveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resolveButton.setVisibility(View.GONE);
+                resolvingCaseSection.setVisibility(View.VISIBLE);
+            }
+        });
+
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    File photoFile = null;
+                    try {
+                        photoFile = HandleImageOperations.createFile(getActivity());
+                    } catch (IOException ex) {
+                        Log.d(TAG, "takePhoto: error in creating file for image to go into");
+                    }
+                    if (photoFile != null) {
+                        mImageURI = FileProvider.getUriForFile(getActivity(),
+                                "com.example.android.fileprovider",
+                                photoFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageURI);
+                        EspressoCountingIdlingResource.increment();
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    } else {
+                        Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
+                        CentralisedToast.makeText(getActivity(), "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
+                    }
+                } else {
+                    CentralisedToast.makeText(getActivity(), "Camera does not exist", CentralisedToast.LENGTH_SHORT);
+                }
+            }
+        });
+
+        uploadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                startActivityForResult(pickPhoto , REQUEST_IMAGE_FROM_GALLERY);
+            }
+        });
+
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: patch the case
+                thisCase.setResolved_photo(resolvedImageName);
+                thisCase.setResolved_date(resolvedImageInformation);
+                thisCase.setResolved_comments(resolvedComments);
+                Call<Void> patchCall = apiCaller.patchCase("Token "+token, caseID, thisCase);
+
+                patchCall.enqueue(new Callback<Void>() {
+                                      @Override
+                                      public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                                          Log.d(TAG, "patchCall onResponse: "+response);
+                                          Log.d(TAG, "patchCall onResponse: code: "+response.code());
+                                          submit();
+                                      }
+                                      @Override
+                                      public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                                          Log.d(TAG, "deleteReport onFailure: "+t.toString());
+                                          Toast.makeText(getActivity(), "Failed to update database", Toast.LENGTH_SHORT).show();
+                                      }
+                                  });
+                // upload non-null bitmap to database
+                HandleImageOperations.uploadImageToDatabase(mImageBitmap, resolvedImageName);
+            }
+        });
+    }
+
+    private void submit() {
+        Bundle bundle = new Bundle();
+        //keys
+        String TITLE_KEY = "title_key";
+        bundle.putString(TITLE_KEY, "Case Resolution Submitted");
+        String MSG_KEY = "message_key";
+        bundle.putString(MSG_KEY, "Thank you!");
+        String BUTTON_TXT_KEY = "button_text_key";
+        bundle.putString(BUTTON_TXT_KEY, "Return to reports");
+        StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
+        statusConfirmationFragment.setArguments(bundle);
+        ExpandedCase.this.getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, statusConfirmationFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        /**
+         * Usage: Get image bitmap
+         * */
+//        super.onActivityResult(requestCode, resultCode, data);
+        Bitmap oldBitmap = mImageBitmap;
+        switch (requestCode) {
+            case REQUEST_IMAGE_CAPTURE:
+                mImageBitmap = HandleImageOperations.getBitmap(resultCode, getActivity(), mImageURI);
+                break;
+            case REQUEST_IMAGE_FROM_GALLERY:
+                if (resultCode == RESULT_OK && data != null) {
+                    Uri selectedImage = data.getData();
+                    try {
+                        mImageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
+                    } catch (FileNotFoundException e) {
+                        Log.d(TAG, "onActivityResult: file not found");
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        Log.d(TAG, "onActivityResult: interrupted exception");
+                        e.printStackTrace();
+                    }
+                }
+                break;
+        }
+        if (mImageBitmap == oldBitmap) {
+            Log.d(TAG, "onActivityResult: photo not taken");
+        } else {
+            Log.d(TAG, "onActivityResult: image bitmap received");
+        }
+    }
+
+
 
     private void setAllViewsFromBundle() {
         Log.d(TAG, "setAllViews: called");
-        companyTextView.setText(companyTextView.getText() + company);
-        institutionTextView.setText(institutionTextView.getText() + institution);
-        caseNumberTextView.setText(caseNumberTextView.getText() + caseNumber.toString());
-        resolvedStatusTextView.setText(resolvedStatusTextView.getText() + (resolvedStatus?"true":"false"));
+        setHalfBoldTextViews(companyTextView, company);
+        setHalfBoldTextViews(institutionTextView, institution);
+        caseNumberTextView.setText((String)(caseNumberTextView.getText() + caseNumber.toString()));
+        setHalfBoldTextViews(resolvedStatusTextView, (resolvedStatus?"True":"False"));
+    }
+
+    private void setHalfBoldTextViews(TextView mytextview, String textToAdd) {
+        String originalText = mytextview.getText().toString();
+        if(Build.VERSION.SDK_INT < 24) {
+            String sourceString = "<b>" + originalText + "</b> " + textToAdd;
+            mytextview.setText(Html.fromHtml(sourceString));
+        } else {
+            int INT_END = originalText.length();
+            SpannableStringBuilder str = new SpannableStringBuilder(originalText + textToAdd);
+            str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mytextview.setText(str);
+        }
     }
 
     private void setAllViewsFromDatabase() {
         Log.d(TAG, "setAllViewsFromDatabase: called");
-        nonComplianceTypeTextView.setText(nonComplianceTypeTextView.getText() + nonComplianceType);
-        unresolvedImageInformationTextView.setText(unresolvedImageInformationTextView.getText() + unresolvedImageInformation);
-        unresolvedCommentsTextView.setText(unresolvedCommentsTextView.getText() + unresolvedComments);
-        retrieveImage(unresolvedImageName, unresolvedImageView);
+        setHalfBoldTextViews(nonComplianceTypeTextView, nonComplianceType);
+        unresolvedImageInformationTextView.setText((String)(unresolvedImageInformationTextView.getText() + unresolvedImageInformation));
+        unresolvedCommentsTextView.setText((String)(unresolvedCommentsTextView.getText() + unresolvedComments));
+        unresolvedImageView.setVisibility(View.VISIBLE);
+//        unresolvedImageViewPlaceholder.setVisibility(View.GONE);
+        HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 300, 300);
         if (resolvedStatus) {
-            resolvedImageInformationTextView.setText(resolvedImageInformationTextView.getText() + resolvedImageInformation);
-            resolvedCommentsTextView.setText(resolvedCommentsTextView.getText() + resolvedComments);
-            retrieveImage(resolvedImageName, resolvedImageView);
+            resolvedImageInformationTextView.setText((String)(resolvedImageInformationTextView.getText() + resolvedImageInformation));
+            resolvedCommentsTextView.setText((String)(resolvedCommentsTextView.getText() + resolvedComments));
+            resolvedImageView.setVisibility(View.VISIBLE);
+//            resolvedImageViewPlaceholder.setVisibility(View.GONE);
+            HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 300, 300);
+            unresolvedResolvedSeparator.setVisibility(VISIBLE);
+            resolvedImageInformationTextView.setVisibility(VISIBLE);
+            resolvedCommentsTextView.setVisibility(VISIBLE);
+        } else {
+            resolveButton.setVisibility(VISIBLE);
         }
     }
 
@@ -160,31 +351,6 @@ public class ExpandedCase extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN_KEY", null);
         notifyAll();
-    }
-
-    public void retrieveImage(String imageName, ImageView imageView) {
-        Log.d(TAG, "retrieveImage: called");
-        Log.d(TAG, "retrieveImage: imageName:"+imageName);
-        Log.d(TAG, "retrieveImage: imageView:"+imageView.toString());
-
-        // API call needs to be done async or on another thread
-        new Thread(() -> {
-            try {
-                Storage storage = StorageOptions.getDefaultInstance().getService(); // get the Cloud Storage space
-
-                // retrieve image in the form of byte array from Cloud Storage
-                byte[] bitmapdata = storage.get("case-images").get(imageName).getContent();
-
-                //convert the byte array into a bitmap
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-
-                // display bitmap image on ImageView in another thread
-                getActivity().runOnUiThread(() -> imageView.setImageBitmap(bitmap));;
-
-            } catch (Exception e) {
-                System.out.println("Retrieval Failed! " + e);
-            }
-        }).start();
     }
 
     private synchronized void initApiCaller() {
@@ -236,26 +402,27 @@ public class ExpandedCase extends Fragment {
         myCaseList = apiCaller.getCasesById("Token " + token, reportID, (resolvedStatus?1:0));
         myCaseList.enqueue(new Callback<List<Case>>() {
             @Override
-            public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
+            public void onResponse(@NotNull Call<List<Case>> call, @NotNull Response<List<Case>> response) {
                 Log.d(TAG, "getCase response code: " + response.code());
                 System.out.println("getCase response code: " + response.code());
-                Case myCase = null;
                 for (Case c : response.body()) {
                     if (c.getId() == caseID) {
-                        myCase = c;
+                        thisCase = c;
                     }
                 }
-                if (myCase != null) {
-                    nonComplianceType = myCase.getNon_compliance_type();
-                    unresolvedComments = myCase.getUnresolved_comments();
-                    unresolvedImageInformation = myCase.getUnresolved_date();
-                    unresolvedImageName = myCase.getUnresolved_photo();
+                if (thisCase != null) {
+                    nonComplianceType = thisCase.getNon_compliance_type();
+                    unresolvedComments = thisCase.getUnresolved_comments();
+                    unresolvedImageInformation = thisCase.getUnresolved_date();
+                    unresolvedImageName = thisCase.getUnresolved_photo();
 
                     // if the case is resolved, get the data, else leave relevant fields as null
                     if (resolvedStatus) {
-                        resolvedImageName = myCase.getResolved_photo();
-                        resolvedComments = myCase.getResolved_comments();
-                        resolvedImageName = myCase.getResolved_date();
+                        resolvedImageName = thisCase.getResolved_photo();
+                        resolvedImageInformation = thisCase.getResolved_date();
+                        resolvedComments = thisCase.getResolved_comments();
+                    } else {
+                        resolvedImageName = unresolvedImageName + "_resolved";
                     }
                     setAllViewsFromDatabase();
                 } else {
@@ -265,12 +432,13 @@ public class ExpandedCase extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<Case>> call, Throwable t) {
+            public void onFailure(@NotNull Call<List<Case>> call, @NotNull Throwable t) {
                 System.out.println(t.toString());
             }
         });
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "ExpandedCase{" +
@@ -294,8 +462,6 @@ public class ExpandedCase extends Fragment {
                 ", institution='" + institution + '\'' +
                 ", nonComplianceType='" + nonComplianceType + '\'' +
                 ", resolvedStatus=" + resolvedStatus +
-                ", unresolvedImageBitmap=" + unresolvedImageBitmap +
-                ", resolvedImageBitmap=" + resolvedImageBitmap +
                 ", unresolvedComments='" + unresolvedComments + '\'' +
                 ", resolvedComments='" + resolvedComments + '\'' +
                 ", unresolvedImageName='" + unresolvedImageName + '\'' +
@@ -303,6 +469,18 @@ public class ExpandedCase extends Fragment {
                 ", unresolvedImageInformation='" + unresolvedImageInformation + '\'' +
                 ", resolvedImageInformation='" + resolvedImageInformation + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (resolvingCaseSection.getVisibility() == View.VISIBLE) {
+            resolvingCaseSection.setVisibility(View.GONE);
+            resolveButton.setVisibility(View.VISIBLE);
+        } else {
+            // TODO: go back to previous fragment
+            CentralisedToast.makeText(getActivity(), "going to previous fragment", CentralisedToast.LENGTH_SHORT);
+        }
+        return true;
     }
 
 }

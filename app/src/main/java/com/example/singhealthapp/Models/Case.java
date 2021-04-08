@@ -49,4 +49,20 @@ public class Case {
     public String getResolved_date() {
         return resolved_date;
     }
+
+    public void setResolved_photo(String resolved_photo) {
+        this.resolved_photo = resolved_photo;
+    }
+
+    public void setResolved_comments(String resolved_comments) {
+        this.resolved_comments = resolved_comments;
+    }
+
+    public void setResolved_date(String resolved_date) {
+        this.resolved_date = resolved_date;
+    }
+
+    public void setIs_resolved(boolean is_resolved) {
+        this.is_resolved = is_resolved;
+    }
 }
