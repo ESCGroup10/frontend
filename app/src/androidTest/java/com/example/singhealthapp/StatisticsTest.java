@@ -6,6 +6,7 @@ import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.DrawerActions;
 
+import androidx.test.espresso.contrib.ViewPagerActions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
@@ -18,7 +19,6 @@ import org.junit.Test;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static androidx.test.espresso.action.ViewActions.swipeLeft;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.DrawerMatchers.isClosed;
@@ -39,13 +39,13 @@ public class StatisticsTest {
                 .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
                 .perform(DrawerActions.open());
         onView(withId(R.id.nav_Auditor_Statistics)).perform(click());
-        Thread.sleep(3000);
+        Thread.sleep(100);
     }
 
     @Test
     public void TestEmptyFieldInput() {
         onView(withId(R.id.searchTenantId_button)).perform(click());
-        Espresso.onView(ViewMatchers.withId(R.id.chartLayout)).perform(ViewActions.swipeUp());
+        Espresso.onView(ViewMatchers.withId(R.id.stats_viewPager)).perform(ViewActions.swipeUp());
         onView(withId(R.id.exportcases_button)).check(matches(not(isEnabled())));
     }
 
@@ -56,7 +56,7 @@ public class StatisticsTest {
 
         Thread.sleep(3000);
 
-        Espresso.onView(ViewMatchers.withId(R.id.chartLayout)).perform(ViewActions.swipeUp());
+        Espresso.onView(ViewMatchers.withId(R.id.stats_viewPager)).perform(ViewActions.swipeUp());
         onView(withId(R.id.exportcases_button)).check(matches(not(isEnabled())));
     }
 
@@ -67,7 +67,11 @@ public class StatisticsTest {
 
         Thread.sleep(3000);
 
-        Espresso.onView(ViewMatchers.withId(R.id.chartLayout)).perform(ViewActions.swipeUp());
+        onView(withId(R.id.stats_viewPager)).perform(ViewPagerActions.scrollRight());
+
+        Thread.sleep(3000);
+
+        Espresso.onView(ViewMatchers.withId(R.id.stats_viewPager)).perform(ViewActions.swipeUp());
         onView(withId(R.id.exportcases_button)).check(matches(not(isEnabled())));
     }
 
@@ -78,7 +82,10 @@ public class StatisticsTest {
 
         Thread.sleep(3000);
 
-        Espresso.onView(ViewMatchers.withId(R.id.chartLayout)).perform(ViewActions.swipeUp());
+        Espresso.onView(ViewMatchers.withId(R.id.stats_viewPager)).perform(ViewActions.swipeUp());
+
+        Thread.sleep(3000);
+
         onView(withId(R.id.exportcases_button)).perform(click());
     }
 
@@ -89,9 +96,15 @@ public class StatisticsTest {
 
         Thread.sleep(3000);
 
-        onView(withId(R.id.stats_viewPager)).perform(swipeLeft());
-        Espresso.onView(ViewMatchers.withId(R.id.chartLayout)).perform(ViewActions.swipeUp());
+        onView(withId(R.id.stats_viewPager)).perform(ViewPagerActions.scrollRight());
+
+        Thread.sleep(3000);
+
+        Espresso.onView(ViewMatchers.withId(R.id.stats_viewPager)).perform(ViewActions.swipeUp());
+
+        Thread.sleep(3000);
 
         onView(withId(R.id.exportscore_button)).perform(click());
     }
+
 }
