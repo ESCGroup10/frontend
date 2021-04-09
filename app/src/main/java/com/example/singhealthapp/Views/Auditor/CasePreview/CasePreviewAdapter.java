@@ -1,5 +1,7 @@
 package com.example.singhealthapp.Views.Auditor.CasePreview;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +25,7 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
     List<Case> cases;
     Report report;
     FragmentActivity parent;
+    String userType;
 
     public CasePreviewAdapter(List<Case> cases, Report report, FragmentActivity parent) {
         this.cases = cases;
@@ -32,6 +36,7 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
     @NonNull
     @Override
     public CasePreviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        loadUserType();
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.case_card_layout, null);
         return new CasePreviewHolder(view);
@@ -60,8 +65,14 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
             args.putInt("CASE_ID_KEY", a.getId());
             ExpandedCase expandedCase = new ExpandedCase();
             expandedCase.setArguments(args);
+            int fragment_id;
+            if (userType.equals("Auditor")) {
+                fragment_id = R.id.auditor_fragment_container;
+            } else {
+                fragment_id = R.id.fragment_container;
+            }
             parent.getSupportFragmentManager().beginTransaction()
-                    .replace(parent.getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container).getId()
+                    .replace(parent.getSupportFragmentManager().findFragmentById(fragment_id).getId()
                             , expandedCase).commit();
         });
     }
@@ -69,5 +80,10 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
     @Override
     public int getItemCount() {
         return cases.size();
+    }
+
+    private void loadUserType() {
+        SharedPreferences sharedPreferences = parent.getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        userType = sharedPreferences.getString("USER_TYPE_KEY", null);
     }
 }

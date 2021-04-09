@@ -64,11 +64,11 @@ public class StatusConfirmationFragment extends Fragment {
             public void onClick(View v) {
                 ((Ping) requireActivity()).incrementCountingIdlingResource(1);
                 if (userType.equals("Auditor")) {
-                    StatusConfirmationFragment.this.getParentFragmentManager().beginTransaction()
+                    getParentFragmentManager().beginTransaction()
                             .replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport")
                             .commit();
                 } else {
-                    StatusConfirmationFragment.this.getParentFragmentManager().beginTransaction()
+                    getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, new MyReportsFragment(), "getReport")
                             .commit();
                 }

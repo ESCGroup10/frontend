@@ -255,6 +255,10 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
             confirmButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (mImageBitmap == null) {
+                        CentralisedToast.makeText(getActivity(), "Please set an image before submitting your resolution!", CentralisedToast.LENGTH_SHORT);
+                        return;
+                    }
                     createUpdatedCase(true);
                     Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
 
@@ -326,7 +330,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         }
     }
 
-    private void createUpdatedCase(boolean acccept) {
+    private void createUpdatedCase (boolean acccept) {
         if (userType.equals("Auditor")) {
             if (acccept) {
                 thisCase.setIs_resolved(true);
