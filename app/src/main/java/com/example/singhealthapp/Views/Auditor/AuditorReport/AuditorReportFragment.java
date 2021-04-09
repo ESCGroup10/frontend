@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AuditorReportFragment extends Fragment {
+    private static final String TAG = "AuditorReportFragment";
     Report report;
     View view;
     TextView company, location, resolved, unresolved;
@@ -63,8 +65,10 @@ public class AuditorReportFragment extends Fragment {
         if (report.getTenant_display_id() == null){
             getActivity().setTitle("Report " + report.getId());
         }
-        else getActivity().setTitle("Report " + report.getTenant_display_id());
-        System.out.println(report.getTenant_display_id());
+        else if ( report.isStatus() ){
+            getActivity().setTitle("Completed Report " + report.getTenant_display_id());
+        }
+        else getActivity().setTitle("Completed Report " + report.getTenant_display_id());
 
         view = inflater.inflate(R.layout.fragment_auditor_report, container, false);
 
@@ -100,6 +104,10 @@ public class AuditorReportFragment extends Fragment {
                 }
                 if (response.body().isEmpty()) resolved.setText("0");
                 else resolved.setText(String.valueOf(response.body().size()));
+                Log.d(TAG, "onResponse: "+"size of response body: "+response.body().size());
+                Log.d(TAG, "onResponse: "+"response body: "+response.body());
+                System.out.println("size of response body: "+response.body().size());
+                System.out.println("response body: "+response.body());
                 resolvedCases.addAll(response.body());
                 call = apiCaller.getCasesById("Token " + token, report.getId(), 0);
                 call.enqueue(new Callback<List<Case>>() {
@@ -109,6 +117,10 @@ public class AuditorReportFragment extends Fragment {
                             Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                             return ;
                         }
+                        Log.d(TAG, "onResponse: "+"size of response body: "+response.body().size());
+                        Log.d(TAG, "onResponse: "+"response body: "+response.body());
+                        System.out.println("size of response body: "+response.body().size());
+                        System.out.println("response body: "+response.body());
                         if (response.body().isEmpty()) unresolved.setText("0");
                         else unresolved.setText(String.valueOf(response.body().size()));
                         unresolvedCases.addAll(response.body());

@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
-import com.example.singhealthapp.HelperClasses.DatabasePhotoOperations;
+import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
@@ -35,15 +35,21 @@ import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.InterfacesAndAbstractClasses.IOnBackPressed;
+import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -111,12 +117,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     HashMap<String, Bitmap> photoBitmapHashMap;
     int photoNameCounter = 0;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Audit checklist");
+
+        new Thread(() -> {
+                Storage storage = StorageOptions.getDefaultInstance().getService();
+        }).start();
 
         Bundle bundle = getArguments();
         tenantType = bundle.getString("TENANT_TYPE_KEY");
@@ -212,8 +220,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                photoNameCounter = 0;
-                                new Thread(AuditChecklistFragment.this::deleteReport).start();
+                                resetPhotoNameCounter();
                                 dialog.dismiss();
                             }
                         })
@@ -278,7 +285,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     @Override
-    public void onBackPressed() {
+    public boolean onBackPressed() {
         if (reportID > 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
             builder.setTitle("Are you sure you want to leave?\nOngoing report will be deleted!")
@@ -293,6 +300,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             deleteReport();
+                            deleteRecentlySubmittedCases();
                             getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.auditor_fragment_container, new SearchTenantFragment())
                                     .commit();
@@ -301,6 +309,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     })
                     .show();
         }
+        return true;
     }
 
     public interface HandlePhotoListener {
@@ -374,44 +383,49 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private boolean createCases() {
         stopCreatingCases = false;
         photoBitmapHashMap = getAllPhotos();
-        for (int i=0; i<checklistAdapterArrayList.size(); i++) {
-            String non_compliance_type = recyclerViewNameArrayList.get(i);
-            ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases();
-            for (int j=0; j<caseList.size(); j+=2) {
+        Log.d(TAG, "createCases: len photos: "+photoBitmapHashMap.size());
+        for (int i=0; i<checklistAdapterArrayList.size(); i++) { //loop through all the recyclerView adapters
+            String non_compliance_type = recyclerViewNameArrayList.get(i); //get the non-compliance type associated with this adapter
+            ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases(); //get the cases from the recyclerView associated with this adapter
+            for (int j=0; j<caseList.size(); j+=2) { //extract the question and comments
                 String question = caseList.get(j);
                 String comments = caseList.get(j+1);
                 Bitmap photoBitmap = photoBitmapHashMap.get(question); // get bitmap using question
                 if (photoBitmap == null) {
                     Log.e(TAG, "createCases: photobitmap is null, questions: "+question);
-                    handleNullPhoto(question);
+                    handleNullPhoto(question); //delete submitted cases, reset photoNameCounter and prompt photo taking
                     stopCreatingCases = true;
+                    return false;
                 }
                 String photoName = getUniquePhotoName();
                 if (photoName.equals("")) {
                     Log.d(TAG, "createCases: error creating unique photo name");
+                    stopCreatingCases = true;
                     return false;
                 }
-                if (stopCreatingCases) {
-                    return false;
-                }
-                caseCall = apiCaller.postCase("Token "+token, reportID, question, false, non_compliance_type,
-                        photoName, comments);
+                SimpleDateFormat dateFormat = new SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                String datetime = dateFormat.format(new Date());
+                Log.d(TAG, "createCases: datetime: "+datetime);
+                caseCall = apiCaller.postCase("Token "+token, reportID, tenantID, question, 0, non_compliance_type,
+                        photoName, comments, datetime);
                 caseCall.enqueue(new Callback<Case>() {
                     @Override
-                    public void onResponse(Call<Case> call, Response<Case> response) {
+                    public void onResponse(@NotNull Call<Case> call, @NotNull Response<Case> response) {
                         Log.d(TAG, "createCases response code: "+response.code());
                         int caseID = response.body().getId();
                         String question = response.body().getQuestion();
-                        submittedCaseIDs.add(caseID);
-                        try {
-                            DatabasePhotoOperations.uploadImage(photoBitmap, photoName);
-                        } catch (NullPointerException e) {
-                            handleNullPhoto(question);
-                            stopCreatingCases = true;
+                        synchronized(submittedCaseIDs) { // make sure we don't have undesirable modifications
+                            submittedCaseIDs.add(caseID); //keep track of the caseIDs that have been created
+                        }
+                        HandleImageOperations.uploadImageToDatabase(photoBitmap, photoName); //upload non-null bitmap to database
+                        if (stopCreatingCases) {
+                            deleteCase(caseID);
                         }
                     }
                     @Override
-                    public void onFailure(Call<Case> call, Throwable t) {
+                    public void onFailure(@NotNull Call<Case> call, @NotNull Throwable t) {
                         Log.d(TAG, "createCases onFailure: "+t);
                     }
                 });
@@ -421,6 +435,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void deleteCase(int caseID) {
+        Log.d(TAG, "deleteCase: called");
         Call<Void> deleteRequest = apiCaller.deleteCase("Token "+token, caseID);
         deleteRequest.enqueue(new Callback<Void>() {
             @Override
@@ -435,8 +450,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         });
     }
 
+    private void resetPhotoNameCounter() {
+        photoNameCounter = 0;
+    }
+
     private void deleteRecentlySubmittedCases() {
+        Log.d(TAG, "deleteRecentlySubmittedCases: called");
         for (int caseID : submittedCaseIDs) {
+            Log.d(TAG, "deleteRecentlySubmittedCases: id: "+caseID);
             deleteCase(caseID);
         }
     }
@@ -444,6 +465,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private void handleNullPhoto(String question) {
         CentralisedToast.makeText(getContext(), "Please take a photo for all non-compliance cases.", CentralisedToast.LENGTH_LONG);
         deleteRecentlySubmittedCases();
+        resetPhotoNameCounter();
         ArrayList<View> outViews = new ArrayList<View>();
         getView().findViewsWithText(outViews, question, View.FIND_VIEWS_WITH_TEXT);
         if (outViews.size() > 1) {

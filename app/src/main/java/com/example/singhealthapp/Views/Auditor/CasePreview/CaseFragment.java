@@ -3,6 +3,7 @@ package com.example.singhealthapp.Views.Auditor.CasePreview;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,7 +48,7 @@ public class CaseFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_case, container, false);
         System.out.println( unresolvedCases.size() );
 
-        unresolvedAdapter = new CasePreviewAdapter(unresolvedCases);
+        unresolvedAdapter = new CasePreviewAdapter(unresolvedCases, report, getActivity());
         try {
             RecyclerView view1 = (RecyclerView) view.findViewById(R.id.casePreviewRecyclerViewUnresolved);
             view1.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -57,7 +58,7 @@ public class CaseFragment extends Fragment {
             System.out.println("Unresolved recycleView not set");
         }
 
-        resolvedAdapter = new CasePreviewAdapter(resolvedCases);
+        resolvedAdapter = new CasePreviewAdapter(resolvedCases, report, getActivity());
         try {
             RecyclerView view2 = (RecyclerView) view.findViewById(R.id.casePreviewRecyclerViewResolved);
             view2.setLayoutManager(new LinearLayoutManager(getActivity()));
