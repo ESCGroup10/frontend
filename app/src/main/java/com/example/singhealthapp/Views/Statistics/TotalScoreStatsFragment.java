@@ -11,10 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -29,13 +25,10 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.opencsv.CSVWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +90,8 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     // api call to get the tenant's audit performance scores
     @Override
     public void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller) {
+        mExportButton.setEnabled(false);
+
         Call<List<Report>> getScores = apiCaller.getScoresById("Token " + token, Integer.parseInt(tenantId));
 
         getScores.enqueue(new Callback<List<Report>>() {
@@ -117,57 +112,65 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
             }
 
             @Override
-            public void onFailure(Call<List<Report>> call, Throwable t) { }
+            public void onFailure(Call<List<Report>> call, Throwable t) {
+                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
+            }
         });
         System.out.println("TotalScoreStatsFragment UPDATED!" + tenantId);
     }
 
     private void plotChart() {
-        LineDataSet set, set1, set2, set3, set4, set5, set6;
-        set1 = new LineDataSet(scores, "Total");
-        set1.setColor(Color.GREEN);
-        set1.setCircleColor(Color.GREEN);
 
-        set2 = new LineDataSet(houseKeeping, "Housekeeping & General Cleanliness");
-        set2.setColor(Color.RED);
-        set2.setCircleColor(Color.RED);
+        if (!scores.isEmpty()) {
+            LineDataSet set, set1, set2, set3, set4, set5, set6;
+            set1 = new LineDataSet(scores, "Total");
+            set1.setColor(Color.GREEN);
+            set1.setCircleColor(Color.GREEN);
 
-        set3 = new LineDataSet(safety, "Workplace Safety & Health");
-        set3.setColor(Color.GRAY);
-        set3.setCircleColor(Color.GRAY);
+            set2 = new LineDataSet(houseKeeping, "Housekeeping & General Cleanliness");
+            set2.setColor(Color.RED);
+            set2.setCircleColor(Color.RED);
 
-
-        set4 = new LineDataSet(staffHygiene, "Professionalism & Staff Hygiene");
-        set4.setColor(Color.YELLOW);
-        set4.setCircleColor(Color.YELLOW);
+            set3 = new LineDataSet(safety, "Workplace Safety & Health");
+            set3.setColor(Color.GRAY);
+            set3.setCircleColor(Color.GRAY);
 
 
-        set5 = new LineDataSet(foodHygiene, "Food Hygiene");
-        set5.setColor(Color.BLUE);
-        set5.setCircleColor(Color.BLUE);
+            set4 = new LineDataSet(staffHygiene, "Professionalism & Staff Hygiene");
+            set4.setColor(Color.YELLOW);
+            set4.setCircleColor(Color.YELLOW);
 
+            set5 = new LineDataSet(foodHygiene, "Food Hygiene");
+            set5.setColor(Color.BLUE);
+            set5.setCircleColor(Color.BLUE);
 
-        set6 = new LineDataSet(healthierChoice, "Healthier Choice");
-        set6.setColor(Color.MAGENTA);
-        set6.setCircleColor(Color.MAGENTA);
+            set6 = new LineDataSet(healthierChoice, "Healthier Choice");
+            set6.setColor(Color.MAGENTA);
+            set6.setCircleColor(Color.MAGENTA);
 
-        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
 
-        dataSets.add(set1);
-        dataSets.add(set2);
-        dataSets.add(set3);
-        dataSets.add(set4);
-        dataSets.add(set5);
-        dataSets.add(set6);
+            dataSets.add(set1);
+            dataSets.add(set2);
+            dataSets.add(set3);
+            dataSets.add(set4);
+            dataSets.add(set5);
+            dataSets.add(set6);
 
-        LineData data = new LineData(dataSets);
+            LineData data = new LineData(dataSets);
 
-        mChart.getAxisLeft().setDrawGridLines(false);
-        mChart.getXAxis().setDrawGridLines(false);
-        mChart.getXAxis().setDrawLabels(false);
-        mChart.setData(data);
-        mChart.notifyDataSetChanged();
-        mChart.invalidate();
+            mChart.getAxisLeft().setDrawGridLines(false);
+            mChart.getXAxis().setDrawGridLines(false);
+            mChart.getXAxis().setDrawLabels(false);
+            mChart.setData(data);
+            mChart.notifyDataSetChanged();
+            mChart.invalidate();
+
+            mExportButton.setEnabled(true);
+        } else {
+            Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void resetArray(List<Report> responseBody){
@@ -228,7 +231,7 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
             Uri path = FileProvider.getUriForFile(context, "com.example.android.fileprovider", filelocation);
             Intent fileIntent = new Intent(Intent.ACTION_SEND);
             fileIntent.setType("text/csv");
-            fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Data");
+            fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Performance Scores");
             fileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             fileIntent.putExtra(Intent.EXTRA_STREAM, path);
             startActivity(Intent.createChooser(fileIntent, "Send mail"));
