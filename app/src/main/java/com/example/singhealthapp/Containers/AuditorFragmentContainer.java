@@ -42,6 +42,8 @@ import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
 import com.example.singhealthapp.Views.TestFragment;
 import com.google.android.material.navigation.NavigationView;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +57,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         HandlePhotoInterface, AuditChecklistFragment.HandlePhotoListener, Ping {
 
     private static final String TAG = "AuditorFragmentContain";
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
     ChecklistAdapter mChecklistAdapter;
     int mAdapterPosition;
     String mCurrentQuestion;
@@ -77,7 +78,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -252,33 +252,20 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         * - Opens camera app to take photo
         * - Updates global variables mChecklistAdapter and mAdapterPosition
         * */
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = HandleImageOperations.createFile(this);
-            } catch (IOException ex) {
-                Log.d(TAG, "takePhoto: error in creating file for image to go into");
-            }
-            if (photoFile != null) {
-                mCurrentPhotoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentPhotoURI);
-                EspressoCountingIdlingResource.increment();
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                mChecklistAdapter = checklistAdapter;
-                mAdapterPosition = adapterPosition;
-                mCurrentQuestion = question;
-                return true;
-            } else {
-                Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
-                CentralisedToast.makeText(this, "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
-            }
-        } else {
-            CentralisedToast.makeText(this, "Camera does not exist", CentralisedToast.LENGTH_SHORT);
+        // start picker to get image for cropping and then use the image in cropping activity
+        try {
+            mChecklistAdapter = checklistAdapter;
+            mAdapterPosition = adapterPosition;
+            mCurrentQuestion = question;
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .start(this);
+            EspressoCountingIdlingResource.increment();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "takePhoto: ", e);
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -287,9 +274,22 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         * Usage: Get image bitmap
         * */
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                File photoFile = null;
+            try {
+                photoFile = HandleImageOperations.createFile(this);
+            } catch (IOException ex) {
+                Log.e(TAG, "onActivityResult: error in creating file for image to go into", ex);
+                return;
+            }
+            mCurrentPhotoURI = result.getUri();
             mCurrentPhotoBitmap = HandleImageOperations.getBitmap(resultCode, this, mCurrentPhotoURI);
             updatePhotoHashMap();
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
         }
         EspressoCountingIdlingResource.decrement();
     }
