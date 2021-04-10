@@ -551,6 +551,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
                     }
                     setAllViewsFromDatabase();
                 } else {
+                    CentralisedToast.makeText(getActivity(), "Unable to find case "+caseNumber+".\n It might have been deleted.", CentralisedToast.LENGTH_SHORT);
                     System.out.println("onResponse: no cases match given caseID");
                     Log.d(TAG, "onResponse: no cases match given caseID");
                 }

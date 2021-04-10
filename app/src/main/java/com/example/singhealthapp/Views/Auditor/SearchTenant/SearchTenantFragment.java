@@ -103,7 +103,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
     }
 
     private String loadToken() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         String token = sharedPreferences.getString("TOKEN_KEY", null);
         int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
         System.out.println("User ID " + userId);

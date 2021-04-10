@@ -56,6 +56,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.textViewQuestion.setText(checklist_items_array.get(position).getStatement());
+        holder.editTextRemarks.setText(checklist_items_array.get(position).getRemarks());
         if (isAudit) {
             checklist_items_array.get(position).setRemarks(holder.editTextRemarks.getText().toString());
             if (checklist_items_array.get(position).isPhotoTaken()) {
