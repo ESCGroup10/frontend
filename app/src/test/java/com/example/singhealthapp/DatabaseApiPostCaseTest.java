@@ -77,8 +77,8 @@ public class DatabaseApiPostCaseTest {
                 .build()
                 .create(DatabaseApiCaller.class);
 
-        Call<Case> testCall = mockApiCaller.postCase("Token "+token, report_id,  question, is_resolved, non_compliance_type,
-                unresolved_photo, unresolved_comments);
+        Call<Case> testCall = mockApiCaller.postCase("Token "+token, report_id,  2, "question", 0, "non_compliance type",
+                unresolved_photo, unresolved_comments, "");
 
         int actual_response_code = testCall.execute().code();
         System.out.println("Actual response code: "+actual_response_code);

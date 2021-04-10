@@ -44,5 +44,4 @@ public class AuditChecklistFragmentTest {
         // Shut down the server. Instances cannot be reused.
         server.shutdown();
     }
-
 }
