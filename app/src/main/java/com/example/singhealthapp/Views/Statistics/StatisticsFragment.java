@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -64,13 +65,19 @@ public class StatisticsFragment extends Fragment {
         searchButton = view.findViewById(R.id.searchTenantId_button);
 
         searchButton.setOnClickListener(v -> {
-            tenantId = tenantIdEditText.getText().toString();
-            try {
-                tenantIdUpdate();
-            } catch (IOException e) {
-                e.printStackTrace();
+
+            if (!(tenantIdEditText.length() == 0)) {
+                tenantId = tenantIdEditText.getText().toString();
+                try {
+                    tenantIdUpdate();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(getActivity(), "Please fill in a tenant ID", Toast.LENGTH_SHORT).show();
             }
             System.out.println("Activity context: " + getContext());
+
         });
         ((Ping)requireActivity()).decrementCountingIdlingResource();
         return view;
