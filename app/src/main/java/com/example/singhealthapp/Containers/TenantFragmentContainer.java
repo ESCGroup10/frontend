@@ -81,9 +81,9 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 drawer.closeDrawer(GravityCompat.START);
             } else {
                 try {
-                    if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) { // this is the main page so just log out?
-//                        getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new LatestReportFragment()).commit();
-//                        return;
+                    if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
+                        getSupportFragmentManager().beginTransaction().replace(getSupportFragmentManager().findFragmentByTag("getReport").getId(), new LatestReportFragment()).commit();
+                       return;
                     }
                 } catch (Exception ignored) {
                 }
