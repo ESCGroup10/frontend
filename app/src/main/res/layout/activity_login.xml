@@ -5,14 +5,15 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".LoginActivity">
+    tools:context=".Views.Login.LoginActivity"
+    android:id="@+id/login_page">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
         android:paddingBottom="12dp"
-        android:text="Singhealth App"
+        android:text="@string/singhealth_app"
         android:textSize="28sp"
         />
 
@@ -24,28 +25,33 @@
         android:textSize="22sp" />
 
     <EditText
-        android:id="@+id/signup_username"
+        android:id="@+id/login_email"
         android:layout_width="wrap_content"
         android:ems="10"
-        android:hint=" User ID"
+        android:hint="@string/login_email"
+        android:text=""
         android:layout_height="45dp"
         android:backgroundTint="@color/cardview_shadow_start_color"
         android:textColorHighlight="#ff7eff15"
-        android:textSize="20sp" />
+        android:inputType="textEmailAddress"
+        android:imeOptions="actionNext"
+        android:textSize="20sp"/>
 
     <EditText
-        android:id="@+id/signup_password"
+        android:id="@+id/login_password"
         android:layout_width="wrap_content"
         android:layout_height="45dp"
         android:layout_marginTop="5dp"
         android:ems="10"
         android:backgroundTint="@color/cardview_shadow_start_color"
-        android:hint=" Password"
+        android:hint="@string/login_password"
+        android:text=""
         android:layout_marginVertical="10dp"
         android:inputType="textPassword"
+        android:imeOptions="actionDone"
         android:textSize="20sp" />
 
-    <Button
+     <Button
         android:id="@+id/loginButton"
         android:layout_width="110dp"
         android:layout_height="wrap_content"
@@ -54,5 +60,21 @@
         android:text="Login"
         android:textSize="18sp" />
 
+    <Button
+        android:id="@+id/tenantButton"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="#a4bf"
+        android:text="Tenant"
+        android:textSize="18sp" />
+    <Button
+        android:id="@+id/auditorButton"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="#a4bf"
+        android:text="Auditor"
+        android:textSize="18sp" />
 
 </LinearLayout>

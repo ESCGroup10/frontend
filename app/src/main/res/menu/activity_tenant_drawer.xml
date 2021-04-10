@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item
+        android:icon="@drawable/ic_home"
+        android:id="@+id/nav_LatestReport"
+        android:title="Latest Report" />
+    <item
+        android:icon="@drawable/ic_report"
+        android:id="@+id/nav_MyReport"
+        android:title="My Reports" />
+    <item
+        android:icon="@drawable/ic_statistics"
+        android:id="@+id/nav_Tenant_Statistics"
+        android:title="View Statistics" />
+    <item android:title="Manage">
+        <menu>
+            <item
+                android:icon="@drawable/ic_report"
+                android:id="@+id/nav_Test"
+                android:title="Test Example"/>
+        </menu>
+    </item>
+
+</menu>

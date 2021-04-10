@@ -2,4 +2,27 @@
     <string name="app_name">SinghealthApp</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="drawer_open">Open drawer</string>
+    <string name="drawer_close">Close drawer</string>
+    <string name="title_activity_auditor_fragment_container">AuditorFragmentContainer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="reset_password">Reset password</string>
+    <string name="singhealth_app">Singhealth App</string>
+    <string name="reset_code">Reset Code</string>
+    <string name="new_password">New Password</string>
+    <string name="button">Button</string>
+    <string name="fab_desc">Scroll to next sub-header</string>
+    <string name="non_compliance_type">Non-Compliance Type: </string>
+    <string name="status">Status: </string>
+    <string name="unresolved_image">unresolved image</string>
+    <string name="resolved_image">resolved image</string>
+    <string name="confirm">Confirm</string>
+    <string name="describe_how_you_resolved_the_problem">Describe how you resolved the \nproblem:</string>
+
 </resources>

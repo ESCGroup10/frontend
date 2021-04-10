@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:icon="@drawable/ic_store"
+            android:id="@+id/nav_Tenants"
+            android:title="Tenants" />
+
+        <item
+            android:icon="@drawable/ic_report"
+            android:id="@+id/nav_Reports"
+            android:title="Reports" />
+
+        <item
+            android:icon="@drawable/ic_statistics"
+            android:id="@+id/nav_Auditor_Statistics"
+            android:title="View Statistics" />
+    </group>
+
+<item android:title="Manage">
+    <menu>
+        <item
+            android:icon="@drawable/ic_add"
+            android:id="@+id/nav_Add_Tenant"
+            android:title="Add Tenant"/>
+        <item
+            android:icon="@drawable/ic_report"
+            android:id="@+id/nav_Test"
+            android:title="Test Example"/>
+    </menu>
+</item>
+</menu>
