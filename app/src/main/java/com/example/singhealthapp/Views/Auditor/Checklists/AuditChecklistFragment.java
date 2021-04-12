@@ -4,9 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +13,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
@@ -26,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -93,22 +93,22 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private int reportID = -2;
 
     //scores
-    private double staff_hygiene_score = 0;
-    private double housekeeping_score = 0;
-    private double safety_score = 0;
-    private double healthierchoice_score = 0;
-    private double foodhygiene_score = 0;
-    private double original_staff_hygiene_score = 0;
-    private double original_housekeeping_score = 0;
-    private double original_safety_score = 0;
-    private double original_healthierchoice_score = 0;
-    private double original_foodhygiene_score = 0;
+    private float staff_hygiene_score = 0;
+    private float housekeeping_score = 0;
+    private float safety_score = 0;
+    private float healthierchoice_score = 0;
+    private float foodhygiene_score = 0;
+    private float original_staff_hygiene_score = 0;
+    private float original_housekeeping_score = 0;
+    private float original_safety_score = 0;
+    private float original_healthierchoice_score = 0;
+    private float original_foodhygiene_score = 0;
 
-    private double staff_hygiene_weightage = 0;
-    private double housekeeping_weightage = 0;
-    private double safety_weightage = 0;
-    private double healthierchoice_weightage = 0;
-    private double foodhygiene_weightage = 0;
+    private float staff_hygiene_weightage = 0;
+    private float housekeeping_weightage = 0;
+    private float safety_weightage = 0;
+    private float healthierchoice_weightage = 0;
+    private float foodhygiene_weightage = 0;
 
     Call<Report> reportCall;
     Call<Case> caseCall;
@@ -122,9 +122,10 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Audit checklist");
 
-        new Thread(() -> {
-                Storage storage = StorageOptions.getDefaultInstance().getService();
-        }).start();
+//        new Thread(() -> {
+//            // warm up the storage...
+//                Storage storage = StorageOptions.getDefaultInstance().getService();
+//        }).start();
 
         Bundle bundle = getArguments();
         tenantType = bundle.getString("TENANT_TYPE_KEY");
@@ -142,7 +143,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         initApiCaller();
         new Thread(AuditChecklistFragment.this::loadToken).start();
         new Thread(AuditChecklistFragment.this::loadUserID).start();
-        new Thread(AuditChecklistFragment.this::createReport).start();
+        new Thread(() -> createReport(false)).start();
 
         return view;
     }
@@ -229,6 +230,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (createCases()) {
                                     submit();
+                                    createReport(true);
                                     clearAllPhotosFromContainerActivity();
                                 }
                                 dialog.dismiss();
@@ -237,6 +239,18 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         .show();
             }
         });
+    }
+
+    private Report updateReportScores() {
+        Log.d(TAG, "updateReportScores: called");
+        Report finalReport = new Report();
+        // set all scores
+        finalReport.setFoodhygiene_score(foodhygiene_score);
+        finalReport.setHealthierchoice_score(healthierchoice_score);
+        finalReport.setHousekeeping_score(housekeeping_score);
+        finalReport.setSafety_score(safety_score);
+        finalReport.setStaffhygiene_score(staff_hygiene_score);
+        return finalReport;
     }
 
     private final void focusOnView(TextView tv){
@@ -340,35 +354,67 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         return Math.round(num * (Math.pow(10.0, dec)) / (Math.pow(10.0, dec)));
     }
 
-    private void createReport() {
-        if (tenantType.equals("F&B")) {
-            reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
-                    false, getOverallNotes(), null, round(staff_hygiene_score, 2),
-                    round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
-                    round(foodhygiene_score, 2));
-        } else {
-            reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
-                    false, getOverallNotes(), null, round(staff_hygiene_score, 2),
-                    round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
-        }
-        reportCall.enqueue(new Callback<Report>() {
-            @Override
-            public void onResponse(Call<Report> call, Response<Report> response) {
-                // sometimes, response comes back as null the first time
-                try {
-                    reportID = response.body().getId();
-                    ((Ping)requireActivity()).decrementCountingIdlingResource();
-                } catch (Exception e) {
-                    createReport();
+    private void createReport(boolean patch) {
+        if (patch) {
+            Log.d(TAG, "createReport: patching report");
+            Report finalReport = updateReportScores();
+            Call<Void> patchReport = apiCaller.patchReport("Token " + token, reportID, finalReport);
+            patchReport.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                    Log.d(TAG, "patchReport onResponse: code: " + response.code());
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Report> call, Throwable t) {
-                Log.d(TAG, "createReport onFailure: "+t);
-                reportID = -1;
+                @Override
+                public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                    Log.d(TAG, "patchReport onFailure: " + t.toString());
+                    Toast.makeText(getActivity(), "Failed to update report scores", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Log.d(TAG, "createReport: initial report");
+            if (tenantType.equals("F&B")) {
+                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
+                        false, getOverallNotes(), null, round(staff_hygiene_score, 2),
+                        round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
+                        round(foodhygiene_score, 2));
+            } else {
+                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
+                        false, getOverallNotes(), null, round(staff_hygiene_score, 2),
+                        round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
             }
-        });
+            reportCall.enqueue(new Callback<Report>() {
+                @Override
+                public void onResponse(Call<Report> call, Response<Report> response) {
+                    // sometimes, response comes back as null the first time
+                    Log.d(TAG, "onResponse: code: "+response.code());
+                    try {
+                        reportID = response.body().getId();
+                        Log.d(TAG, "onResponse: reportID="+reportID);
+                        EspressoCountingIdlingResource.decrement();
+                    } catch (Exception e) {
+                        Log.d(TAG, "onResponse: error making initial report");
+                        Log.d(TAG, "onResponse: reportID="+reportID);
+                        e.printStackTrace();
+                        new android.os.Handler(Looper.getMainLooper()).postDelayed(
+                                new Runnable() {
+                                    public void run() {
+                                        Log.i("tag", "This'll run 300 milliseconds later");
+                                        createReport(false);
+                                    }
+                                },
+                                300);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Report> call, Throwable t) {
+                    t.printStackTrace();
+                    Log.d(TAG, "createReport onFailure: " + t);
+                    reportID = -1;
+                }
+            });
+        }
     }
 
     private String getUniquePhotoName() {
@@ -376,6 +422,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             photoNameCounter++;
             return ""+reportID+"_"+photoNameCounter;
         } else {
+            Log.d(TAG, "getUniquePhotoName: reportID="+reportID);
             return "";
         }
     }
@@ -504,24 +551,31 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         }
         for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String name = recyclerViewNameArrayList.get(i);
+            Log.d(TAG, "calculateScores: name: "+name);
             int currentChecklistNumCases = checklistAdapterArrayList.get(i).getNumCases();
+            Log.d(TAG, "calculateScores: num cases for this name: "+currentChecklistNumCases);
             numCases += currentChecklistNumCases;
 
             switch (name) {
                 case "Professional & Staff Hygiene":
                     staff_hygiene_score-=currentChecklistNumCases;
+                    Log.d(TAG, "calculateScores: current staff_hygiene_score: "+staff_hygiene_score);
                     break;
                 case "Housekeeping & General Cleanliness":
                     housekeeping_score-=currentChecklistNumCases;
+                    Log.d(TAG, "calculateScores: current housekeeping_score: "+housekeeping_score);
                     break;
                 case "Healthier Choice":
                     foodhygiene_score-=currentChecklistNumCases;
+                    Log.d(TAG, "calculateScores: current foodhygiene_score: "+foodhygiene_score);
                     break;
                 case "Food Hygiene":
                     healthierchoice_score-=currentChecklistNumCases;
+                    Log.d(TAG, "calculateScores: current healthierchoice_score: "+healthierchoice_score);
                     break;
                 case "Workplace Safety & Health":
                     safety_score-=currentChecklistNumCases;
+                    Log.d(TAG, "calculateScores: current safety_score: "+safety_score);
                     break;
                 default:
                     throw new IllegalArgumentException();
@@ -534,11 +588,17 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             healthierchoice_score = healthierchoice_score * healthierchoice_weightage / original_healthierchoice_score;
             foodhygiene_score = foodhygiene_score * foodhygiene_weightage / original_foodhygiene_score;
         }
+        Log.d(TAG, "calculateScores: final scores: staff_hygiene_score: "+staff_hygiene_score+"\n"+
+                "housekeeping_score: "+housekeeping_score+"\n"+
+                "healthierchoice_score: "+healthierchoice_score+"\n"+
+                "foodhygiene_score: "+foodhygiene_score+"\n"+
+                "safety_score: "+safety_score);
         if (staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 0.95) {
             passFail = "Fail";
         } else {
             passFail = "Pass";
         }
+        Log.d(TAG, "calculateScores: final score: "+(staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score));
     }
 
     private synchronized void init_recyclerView(RecyclerView recyclerView, ArrayList<ChecklistItem> list, String recyclerViewName) {
@@ -549,7 +609,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         recyclerView.setAdapter(checklistAdapter);
         checklistAdapterArrayList.add(checklistAdapter);
         recyclerViewNameArrayList.add(recyclerViewName);
-        ((Ping)requireActivity()).decrementCountingIdlingResource();
+        EspressoCountingIdlingResource.decrement();
     }
 
     private String getRecyclerViewName(String subHeader) {
@@ -705,11 +765,11 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             original_safety_score = 18;
             original_healthierchoice_score = 11;
             original_foodhygiene_score = 37;
-            staff_hygiene_weightage = 0.10;
-            housekeeping_weightage = 0.20;
-            safety_weightage = 0.20;
-            healthierchoice_weightage = 0.15;
-            foodhygiene_weightage = 0.35;
+            staff_hygiene_weightage = 0.10f;
+            housekeeping_weightage = 0.20f;
+            safety_weightage = 0.20f;
+            healthierchoice_weightage = 0.15f;
+            foodhygiene_weightage = 0.35f;
             Log.d(TAG, "initScoresAndPercentages: scores set for F&B");
         } else if (tenantType.equals("Non F&B")) {
             staff_hygiene_score = 6;
@@ -718,9 +778,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             original_staff_hygiene_score = 6;
             original_housekeeping_score = 12;
             original_safety_score = 16;
-            staff_hygiene_weightage = 0.20;
-            housekeeping_weightage = 0.40;
-            safety_weightage = 0.40;
+            staff_hygiene_weightage = 0.20f;
+            housekeeping_weightage = 0.40f;
+            safety_weightage = 0.40f;
             Log.d(TAG, "initScoresAndPercentages: scores set for Non F&B");
         } else {
             Log.d(TAG, "initScoresAndPercentages: not set, check tenant type");

@@ -69,6 +69,53 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tentativeImageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Preview Image"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+
+    <ImageView
+        android:id="@+id/resolvedImageTentative"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/imageview_border"
+        android:adjustViewBounds="true"
+        android:layout_marginHorizontal="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginVertical="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="40dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/resolvedImageTentativePlaceholder"
+        android:layout_width="327dp"
+        android:layout_height="200dp"
+        android:layout_marginHorizontal="50dp"
+        android:text="Loading image..."
+        android:gravity="center"
+        android:textSize="30sp"
+        android:background="@color/light_grey_semi_transparent"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/resolvedCommentsEditTextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="Description of resolution"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textStyle="bold"/>
+
     <EditText
         android:id="@+id/resolvedCommentsEditText"
         android:layout_width="match_parent"
@@ -79,6 +126,7 @@
         android:textSize="20sp"
         android:background="@drawable/imageview_border"
         android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="10dp"
         android:imeOptions="actionDone"
         android:inputType="text" />
 
@@ -92,6 +140,6 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:background="@color/advance_button_green"
-        android:layout_marginVertical="80dp"/>
+        android:layout_marginVertical="40dp"/>
 
 </LinearLayout>

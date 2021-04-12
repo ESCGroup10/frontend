@@ -18,8 +18,8 @@
     <string name="new_password">New Password</string>
     <string name="button">Button</string>
     <string name="fab_desc">Scroll to next sub-header</string>
-    <string name="non_compliance_type">Non-Compliance Type: </string>
-    <string name="status">Status: </string>
+    <string name="non_compliance_type">Non-Compliance Type:  </string>
+    <string name="status">Status:  </string>
     <string name="unresolved_image">unresolved image</string>
     <string name="resolved_image">resolved image</string>
     <string name="confirm">Confirm</string>

@@ -32,6 +32,17 @@
         android:textColor="@color/black"
         android:gravity="center_horizontal"/>
 
+    <TextView
+        android:id="@+id/additional_message_text"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:layout_weight="15"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:visibility="gone"/>
+
     <View
         android:id="@+id/middle"
         android:layout_width="match_parent"

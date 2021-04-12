@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.singhealthapp.HelperClasses.TextAestheticsAndParsing;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
@@ -70,8 +71,8 @@ public class CaseFragment extends Fragment {
 
         companyView = view.findViewById(R.id.reportCaseCompany);
         locationView = view.findViewById(R.id.reportCaseLocation);
-        companyView.setText("Company: " + company);
-        locationView.setText("Location: " + location);
+        TextAestheticsAndParsing.setHalfBoldTextViews(companyView, "Company: ", company);
+        TextAestheticsAndParsing.setHalfBoldTextViews(locationView, "Location: ", location);
         return view;
     }
 

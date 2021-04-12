@@ -1,6 +1,7 @@
 package com.example.singhealthapp.Views.Auditor.Checklists;
 
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -62,6 +63,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             if (checklist_items_array.get(position).isPhotoTaken()) {
                 holder.cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
                 holder.colourStatusIndicator.setBackgroundColor(red);
+                checklist_items_array.get(position).setCase(true);
+                Log.d(TAG, "onBindViewHolder: setting qn: "+checklist_items_array.get(position).getStatement()+"\n"+
+                        "to a case");
             }
         }
     }
@@ -166,7 +170,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 @Override
                 public void onClick(View v) {
                     cardView.setCardBackgroundColor(white);
-                    if (colourStatusIndicator.getBackground().equals(green)) { // view has been clicked before
+                    if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == green) { // view has been clicked before
                         colourStatusIndicator.setBackgroundColor(black);
                     } else { // view has not been clicked before
                         colourStatusIndicator.setBackgroundColor(green);
@@ -181,8 +185,10 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             textViewFalse.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (colourStatusIndicator.getBackground().equals(red)) { // view has been clicked before
-                        colourStatusIndicator.setBackgroundColor(black);
+                    if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == red) { // view has been clicked before
+                        if (!checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
+                            colourStatusIndicator.setBackgroundColor(black);
+                        }
                     } else { // view has not been clicked before
                         Log.d(TAG, "onClick: set false");
                         colourStatusIndicator.setBackgroundColor(red);
@@ -200,7 +206,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 @Override
                 public void onClick(View v) {
                     cardView.setCardBackgroundColor(white);
-                    if (colourStatusIndicator.getBackground().equals(grey)) { // view has been clicked before
+                    if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == grey) { // view has been clicked before
                         colourStatusIndicator.setBackgroundColor(black);
                     } else { // view has not been clicked before
                         colourStatusIndicator.setBackgroundColor(grey);

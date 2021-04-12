@@ -16,4 +16,11 @@
     <color name="mild_blue">#FF3D8FE4</color>
     <color name="advance_button_green">#FF87DD69</color>
     <color name="header_green">#FF98F888</color>
+
+    // rebby's suggestion
+    <color name="icon_and_text_colour">#FF371D31</color>
+<!--    <color name="header_green">#FF563C50</color>-->
+    <color name="header_colour">#FFF95950</color>
+    <color name="background_orange">#FFEDD1CB</color>
+
 </resources>

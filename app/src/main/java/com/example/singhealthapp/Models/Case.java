@@ -2,8 +2,24 @@ package com.example.singhealthapp.Models;
 
 public class Case {
     private int id, report_id, tenant_id;
-    private String question, unresolved_photo, unresolved_comments, resolved_photo,
-            resolved_comments, non_compliance_type, unresolved_date, resolved_date;
+    private String question;
+    private String unresolved_photo;
+    private String unresolved_comments;
+    private String resolved_photo;
+    private String resolved_comments;
+    private String non_compliance_type;
+    private String unresolved_date;
+    private String resolved_date;
+
+    public void setRejected_comments(String rejected_comments) {
+        this.rejected_comments = rejected_comments;
+    }
+
+    public String getRejected_comments() {
+        return rejected_comments;
+    }
+
+    private String rejected_comments;
     private boolean is_resolved;
 
     public int getTenant_id() {

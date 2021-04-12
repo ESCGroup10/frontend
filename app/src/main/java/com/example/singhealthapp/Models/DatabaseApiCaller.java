@@ -122,7 +122,8 @@ public interface DatabaseApiCaller {
             @Field("non_compliance_type") String non_compliance_type,
             @Field("unresolved_photo") String unresolved_photo,
             @Field("unresolved_comments") String unresolved_comments,
-            @Field("unresolved_date") String unresolved_date
+            @Field("unresolved_date") String unresolved_date,
+            @Field("rejected_comments") String rejected_comments
     );
 
     @FormUrlEncoded
@@ -133,15 +134,16 @@ public interface DatabaseApiCaller {
             @Field("tenant_id") int tenant_id,
             @Field("company") String company,
             @Field("location") String location,
+            @Field("institution") String institution,
             @Field("outlet_type") String outlet_type,
             @Field("status") boolean status,
             @Field("report_notes") String report_notes,
             @Field("resolution_date") String resolution_date,
-            @Field("staff_hygiene_score") double staff_hygiene_score,
-            @Field("housekeeping_score") double housekeeping_score,
-            @Field("safety_score") double safety_score,
-            @Field("healthierchoice_score") double healthierchoice_score,
-            @Field("foodhygiene_score") double foodhygiene_score
+            @Field("staff_hygiene_score") float staff_hygiene_score,
+            @Field("housekeeping_score") float housekeeping_score,
+            @Field("safety_score") float safety_score,
+            @Field("healthierchoice_score") float healthierchoice_score,
+            @Field("foodhygiene_score") float foodhygiene_score
     );
 
     @DELETE("/api/users/{id}/")
@@ -161,5 +163,10 @@ public interface DatabaseApiCaller {
     Call<Void> patchCase(@Header("authorization") String token,
                          @Path("id") int caseID,
                          @Body Case mCase);
+
+    @PATCH("/api/report/{id}/")
+    Call<Void> patchReport(@Header("authorization") String token,
+                         @Path("id") int reportID,
+                         @Body Report report);
 
 }

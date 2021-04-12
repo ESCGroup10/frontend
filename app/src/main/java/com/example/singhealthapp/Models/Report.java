@@ -4,11 +4,15 @@ public class Report {
     private int id, auditor_id, tenant_id;
     private Integer tenant_display_id = null;
     private float staffhygiene_score, housekeeping_score, safety_score, healthierchoice_score, foodhygiene_score;
-    private String company, location, outlet_type, report_notes, report_date, report_image, resolution_notes, resolution_date, resolution_image;
+    private String company, institution, location, outlet_type, report_notes, report_date, report_image, resolution_notes, resolution_date, resolution_image;
     private boolean status;
 
     public int getId() {
         return id;
+    }
+
+    public String getInstitution() {
+        return institution;
     }
 
     public int getAuditor_id() {
@@ -27,20 +31,40 @@ public class Report {
         return staffhygiene_score;
     }
 
+    public void setStaffhygiene_score(float staffhygiene_score) {
+        this.staffhygiene_score = staffhygiene_score;
+    }
+
     public float getHousekeeping_score() {
         return housekeeping_score;
+    }
+
+    public void setHousekeeping_score(float housekeeping_score) {
+        this.housekeeping_score = housekeeping_score;
     }
 
     public float getSafety_score() {
         return safety_score;
     }
 
+    public void setSafety_score(float safety_score) {
+        this.safety_score = safety_score;
+    }
+
     public float getHealthierchoice_score() {
         return healthierchoice_score;
     }
 
+    public void setHealthierchoice_score(float healthierchoice_score) {
+        this.healthierchoice_score = healthierchoice_score;
+    }
+
     public float getFoodhygiene_score() {
         return foodhygiene_score;
+    }
+
+    public void setFoodhygiene_score(float foodhygiene_score) {
+        this.foodhygiene_score = foodhygiene_score;
     }
 
     public String getLocation() {
