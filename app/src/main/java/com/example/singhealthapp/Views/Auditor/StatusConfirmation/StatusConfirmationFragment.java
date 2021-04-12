@@ -78,7 +78,7 @@ public class StatusConfirmationFragment extends Fragment {
                 EspressoCountingIdlingResource.increment();
                 if (userType.equals("Auditor")) {
                     getParentFragmentManager().beginTransaction()
-                            .replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport")
+                            .replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "getReport")
                             .commit();
                 } else {
                     getParentFragmentManager().beginTransaction()

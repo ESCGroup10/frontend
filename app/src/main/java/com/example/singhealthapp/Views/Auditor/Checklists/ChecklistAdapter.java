@@ -28,8 +28,8 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
 
     private static final String TAG = "ChecklistAdapter";
 
-    private final int green = Color.parseColor("#00000000");
-    private final int red = Color.parseColor("#ff791e");
+    private final int green = Color.parseColor("#FF03AC13");
+    private final int red = Color.parseColor("#FFDD3930");
     private final int grey = Color.parseColor("#FF808080");
     private final int black = Color.parseColor("#FF000000");
     private final int white = Color.parseColor("#FFFFFFFF");
@@ -71,7 +71,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     }
 
     public boolean callTakePhoto(int position) {
-        /*
+        /**
         * Usage: allows adapter to ask underlying activity to take photo.
         * */
         String question = checklist_items_array.get(position).getStatement();
@@ -153,12 +153,9 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                     public void afterTextChanged(Editable s) {
                     }
                 });
-                cameraButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        cardView.setCardBackgroundColor(white);
-                        callTakePhoto(getAdapterPosition());
-                    }
+                cameraButton.setOnClickListener(v -> {
+                    cardView.setCardBackgroundColor(white);
+                    callTakePhoto(getAdapterPosition());
                 });
             } else {
                 cameraButton.setVisibility(View.GONE);
@@ -166,55 +163,46 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 extraLayer.setVisibility(View.VISIBLE);
             }
 
-            textViewTrue.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    cardView.setCardBackgroundColor(white);
-                    if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == green) { // view has been clicked before
+            textViewTrue.setOnClickListener(v -> {
+                cardView.setCardBackgroundColor(white);
+                if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == green) { // view has been clicked before
+                    colourStatusIndicator.setBackgroundColor(black);
+                } else { // view has not been clicked before
+                    colourStatusIndicator.setBackgroundColor(green);
+                    checklist_items_array.get(getAdapterPosition()).setCase(false);
+                }
+                if (isAudit) {
+                    cameraButton.setBackgroundResource(R.drawable.camera);
+                }
+            });
+
+            textViewFalse.setOnClickListener(v -> {
+                if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == red) { // view has been clicked before
+                    if (!checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
                         colourStatusIndicator.setBackgroundColor(black);
-                    } else { // view has not been clicked before
-                        colourStatusIndicator.setBackgroundColor(green);
-                        checklist_items_array.get(getAdapterPosition()).setCase(false);
                     }
+                } else { // view has not been clicked before
+                    Log.d(TAG, "onClick: set false");
+                    colourStatusIndicator.setBackgroundColor(red);
+                    checklist_items_array.get(getAdapterPosition()).setCase(true);
+                }
+                if (checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
                     if (isAudit) {
-                        cameraButton.setBackgroundResource(R.drawable.camera);
+                        cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
                     }
                 }
             });
 
-            textViewFalse.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == red) { // view has been clicked before
-                        if (!checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
-                            colourStatusIndicator.setBackgroundColor(black);
-                        }
-                    } else { // view has not been clicked before
-                        Log.d(TAG, "onClick: set false");
-                        colourStatusIndicator.setBackgroundColor(red);
-                        checklist_items_array.get(getAdapterPosition()).setCase(true);
-                    }
-                    if (checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
-                        if (isAudit) {
-                            cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
-                        }
-                    }
+            textViewNA.setOnClickListener(v -> {
+                cardView.setCardBackgroundColor(white);
+                if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == grey) { // view has been clicked before
+                    colourStatusIndicator.setBackgroundColor(black);
+                } else { // view has not been clicked before
+                    colourStatusIndicator.setBackgroundColor(grey);
+                    checklist_items_array.get(getAdapterPosition()).setCase(false);
                 }
-            });
-
-            textViewNA.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    cardView.setCardBackgroundColor(white);
-                    if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == grey) { // view has been clicked before
-                        colourStatusIndicator.setBackgroundColor(black);
-                    } else { // view has not been clicked before
-                        colourStatusIndicator.setBackgroundColor(grey);
-                        checklist_items_array.get(getAdapterPosition()).setCase(false);
-                    }
-                    if (isAudit) {
-                        cameraButton.setBackgroundResource(R.drawable.camera);
-                    }
+                if (isAudit) {
+                    cameraButton.setBackgroundResource(R.drawable.camera);
                 }
             });
         }

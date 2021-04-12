@@ -1,6 +1,7 @@
 package com.example.singhealthapp.Containers;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -162,14 +163,8 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     }
 
     @Override
-    public void decrementCountingIdlingResource() {
-        EspressoCountingIdlingResource.decrement();
-    }
-
-    @Override
-    public void incrementCountingIdlingResource(int numResources) {
-        for (int i = 0; i < numResources; i++) {
-            EspressoCountingIdlingResource.increment();
-        }
+    @VisibleForTesting
+    public void activateEspressoIdlingResource() {
+        EspressoCountingIdlingResource.activate();
     }
 }

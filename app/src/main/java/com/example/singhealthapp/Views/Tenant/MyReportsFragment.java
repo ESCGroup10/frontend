@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
@@ -201,7 +202,7 @@ public class MyReportsFragment extends Fragment {
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
             view.setItemAnimator(new DefaultItemAnimator());
             view.setAdapter(adapterCompleted);
-            ((Ping)requireActivity()).decrementCountingIdlingResource();
+            EspressoCountingIdlingResource.decrement();
         } catch (Exception e) {
             System.out.println("Completed recycleView not set");
         }

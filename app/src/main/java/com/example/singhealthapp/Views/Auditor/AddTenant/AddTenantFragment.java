@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
@@ -142,7 +143,7 @@ public class AddTenantFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        ((Ping)requireActivity()).decrementCountingIdlingResource();
+        EspressoCountingIdlingResource.decrement();
         loadToken();
     }
 

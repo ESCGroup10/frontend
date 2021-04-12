@@ -76,13 +76,6 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton;
     Button resolveButton, confirmButton, rejectButton, acceptButton;
     LinearLayout resolvingCaseSection;
-    ImageView cameraButton;
-    ImageView uploadButton;
-    Button confirmButton;
-    Button rejectButton;
-    Button acceptButton;
-    TextView unresolvedImageViewPlaceholder;
-    TextView resolvedImageViewPlaceholder;
     TextView resolvedImageTentativePlaceholder;
     EditText resolvedCommentsEditText;
     ImageView resolvedImageTentative;
@@ -401,7 +394,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     auditorButtonsLinearLayout.setVisibility(View.VISIBLE);
                 }
             }
-            unresolvedResolvedSeparator.setVisibility(VISIBLE);
+//            unresolvedResolvedSeparator.setVisibility(VISIBLE);
             resolvedImageDateTextView.setVisibility(VISIBLE);
             resolvedCommentsTextView.setVisibility(VISIBLE);
             resolvedImageViewPlaceholder.setVisibility(View.VISIBLE);

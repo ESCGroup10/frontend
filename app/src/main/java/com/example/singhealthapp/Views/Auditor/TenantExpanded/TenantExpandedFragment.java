@@ -76,7 +76,7 @@ public class TenantExpandedFragment extends Fragment {
                 SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
                 safetyChecklistFragment.setArguments(bundle);
 
-                ((Ping)requireActivity()).incrementCountingIdlingResource(1);
+                EspressoCountingIdlingResource.increment();
                 TenantExpandedFragment.this.getParentFragmentManager().beginTransaction()
                         .replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyChecklist")
                         .commit();

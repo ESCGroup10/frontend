@@ -6,10 +6,4 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="recyclerView_style">
-        <item name="backgroundColor">@color/background_orange</item>
-        <item name="android:textColor">@color/icon_and_text_colour</item>
-        <item name="android:icon">@color/icon_and_text_colour</item>
-    </style>
-
 </resources>

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
@@ -89,7 +90,7 @@ public class TenantsPreviewFragment extends Fragment implements TenantsPreviewAd
                     view.setLayoutManager(new LinearLayoutManager(getActivity()));
                     view.setItemAnimator(new DefaultItemAnimator());
                     view.setAdapter(adapter);
-                    ((Ping)requireActivity()).decrementCountingIdlingResource();
+                    EspressoCountingIdlingResource.decrement();
                 }
                 catch (Exception e) {
                     System.out.println("recycleView not set");
@@ -112,7 +113,7 @@ public class TenantsPreviewFragment extends Fragment implements TenantsPreviewAd
 
     @Override
     public void navigate(int position) {
-        ((Ping)requireActivity()).incrementCountingIdlingResource(1);
+        EspressoCountingIdlingResource.increment();
         TenantsPreviewFragment.this.getParentFragmentManager()
                 .beginTransaction()
                 .replace(R.id.auditor_fragment_container, new TenantExpandedFragment(tenants.get(position)),"tenantsFragment")

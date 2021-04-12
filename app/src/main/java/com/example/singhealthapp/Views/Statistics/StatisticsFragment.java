@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
@@ -79,7 +80,7 @@ public class StatisticsFragment extends Fragment {
             System.out.println("Activity context: " + getContext());
 
         });
-        ((Ping)requireActivity()).decrementCountingIdlingResource();
+        EspressoCountingIdlingResource.decrement();
         return view;
     }
 

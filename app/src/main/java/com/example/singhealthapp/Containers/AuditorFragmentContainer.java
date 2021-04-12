@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -128,7 +129,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 if (getSupportFragmentManager().findFragmentByTag("auditChecklist").isVisible()) {
                     // TODO: can go to safety fragment if it implements shared pref
                     ((IOnBackPressed) getSupportFragmentManager().findFragmentByTag("auditChecklist")).onBackPressed();
-//                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
                     return;
                 }
             } catch (Exception ignored) {
@@ -314,20 +314,14 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         mCurrentPhotoBitmap = null;
     }
 
+    @Override
+    @VisibleForTesting
+    public void activateEspressoIdlingResource() {
+        EspressoCountingIdlingResource.activate();
+    }
+
     public interface OnPhotoTakenListener {
         void photoTaken(int position);
-    }
-
-    @Override
-    public void decrementCountingIdlingResource() {
-        EspressoCountingIdlingResource.decrement();
-    }
-
-    @Override
-    public void incrementCountingIdlingResource(int numResources) {
-        for (int i = 0; i < numResources; i++) {
-            EspressoCountingIdlingResource.increment();
-        }
     }
 
 }

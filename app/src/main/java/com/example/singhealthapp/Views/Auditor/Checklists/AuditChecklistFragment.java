@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +29,6 @@ import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
-import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.HelperClasses.QuestionBank;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.ChecklistItem;
@@ -48,6 +49,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,62 +62,37 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     Button submit_audit_button;
     EditText overall_notes_editText;
-    FloatingActionButton ProfessionalismAndStaffHygieneFAB;
-    FloatingActionButton HousekeepingAndGeneralCleanlinessFAB;
-    FloatingActionButton FoodHygieneFAB;
-    FloatingActionButton HealthierChoiceFAB;
-    FloatingActionButton WorkplaceSafetyAndHealthFAB;
-    TextView ProfessionalismAndStaffHygieneTextView;
-    TextView HousekeepingAndGeneralCleanlinessTextView;
-    TextView FoodHygieneTextView;
-    TextView HealthierChoiceTextView;
-    TextView WorkplaceSafetyAndHealthTextView;
-    NestedScrollView nestedScrollView;
+    FloatingActionButton ProfessionalismAndStaffHygieneFAB, HousekeepingAndGeneralCleanlinessFAB, FoodHygieneFAB, HealthierChoiceFAB,
+            WorkplaceSafetyAndHealthFAB;
+    TextView ProfessionalismAndStaffHygieneTextView, HousekeepingAndGeneralCleanlinessTextView, FoodHygieneTextView, HealthierChoiceTextView,
+            WorkplaceSafetyAndHealthTextView, nestedScrollView;
 
     private String[] header_files;
     private ArrayList<ChecklistAdapter> checklistAdapterArrayList = new ArrayList<>();
     private ArrayList<String> recyclerViewNameArrayList = new ArrayList<>();
-    int numCases;
-    String passFail;
-    private boolean endOfView = false;
+    private int numCases;
+    private String passFail;
+    private boolean endOfView, stopCreatingCases = false;
     private ArrayList<Integer> submittedCaseIDs = new ArrayList<>();
-    boolean stopCreatingCases = false;
 
     private static DatabaseApiCaller apiCaller;
     private Report thisReport;
-    private String token;
-    private int userID;
-    private int tenantID;
-    private String tenantCompany;
-    private String tenantLocation;
-    private String tenentInstitution;
-    String tenantType;
+    private int userID, tenantID;
+    private String token, tenantType, tenantCompany, tenantLocation, tenentInstitution;
     private int reportID = -2;
 
     //scores
-    private float staffhygiene_score = 0;
-    private float housekeeping_score = 0;
-    private float safety_score = 0;
-    private float healthierchoice_score = 0;
-    private float foodhygiene_score = 0;
-    private float original_staffhygiene_score = 0;
-    private float original_housekeeping_score = 0;
-    private float original_safety_score = 0;
-    private float original_healthierchoice_score = 0;
-    private float original_foodhygiene_score = 0;
+    private float staffhygiene_score, housekeeping_score, safety_score, healthierchoice_score, foodhygiene_score, original_staffhygiene_score,
+            original_housekeeping_score, original_safety_score, original_healthierchoice_score, original_foodhygiene_score = 0;
 
-    private float staffhygiene_weightage = 0;
-    private float housekeeping_weightage = 0;
-    private float safety_weightage = 0;
-    private float healthierchoice_weightage = 0;
-    private float foodhygiene_weightage = 0;
+    private float staffhygiene_weightage, housekeeping_weightage, safety_weightage, healthierchoice_weightage, foodhygiene_weightage = 0;
 
-    Call<Report> reportCall;
-    Call<Case> caseCall;
+    private Call<Report> reportCall;
+    private Call<Case> caseCall;
 
-    HandlePhotoListener mActivityCallback;
-    HashMap<String, Bitmap> photoBitmapHashMap;
-    int photoNameCounter = 0;
+    private HandlePhotoListener mActivityCallback;
+    private HashMap<String, Bitmap> photoBitmapHashMap;
+    private int photoNameCounter = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -171,78 +148,60 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void setAllListeners() {
-        ProfessionalismAndStaffHygieneFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                focusOnView(ProfessionalismAndStaffHygieneTextView);
-            }
-        });
-        HousekeepingAndGeneralCleanlinessFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                focusOnView(HousekeepingAndGeneralCleanlinessTextView);
-            }
-        });
+        ProfessionalismAndStaffHygieneFAB.setOnClickListener(v -> focusOnView(ProfessionalismAndStaffHygieneTextView));
+        HousekeepingAndGeneralCleanlinessFAB.setOnClickListener(v -> focusOnView(HousekeepingAndGeneralCleanlinessTextView));
         if (tenantType.equals("F&B")) {
-            FoodHygieneFAB.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    focusOnView(FoodHygieneTextView);
-                }
-            });
-            HealthierChoiceFAB.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    focusOnView(HealthierChoiceTextView);
-                }
-            });
+            FoodHygieneFAB.setOnClickListener(v -> focusOnView(FoodHygieneTextView));
+            HealthierChoiceFAB.setOnClickListener(v -> focusOnView(HealthierChoiceTextView));
         }
-        WorkplaceSafetyAndHealthFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                focusOnView(WorkplaceSafetyAndHealthTextView);
-            }
-        });
-        submit_audit_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                print_scores();
-                try {
-                    calculateScores();
-                } catch (IllegalArgumentException ex) {
-                    ex.printStackTrace();
-                    Log.d(TAG, "calculateScores IllegalArgumentException");
+        WorkplaceSafetyAndHealthFAB.setOnClickListener(v -> focusOnView(WorkplaceSafetyAndHealthTextView));
+        submit_audit_button.setOnClickListener(v -> {
+            int count = 0;
+            while (reportID < 0) {
+                CentralisedToast.makeText(getContext(), "Report not created, \nretrying...", CentralisedToast.LENGTH_SHORT);
+                createReport(false);
+                count++;
+                if (count > 2) {
+                    CentralisedToast.makeText(getContext(), "Report could not be created, \nplease check your internet connection.", CentralisedToast.LENGTH_SHORT);
+                    return;
                 }
-                print_scores();
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-                builder.setTitle("Confirm Submission?")
-                        .setMessage("Total non compliance cases: "+numCases+"\nResult: "+passFail)
-                        .setCancelable(false)
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                resetPhotoNameCounter();
-                                dialog.dismiss();
-                            }
-                        })
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (createCases()) {
-                                    print_scores();
-                                    submit();
-                                    createReport(true);
-                                    clearAllPhotosFromContainerActivity();
-                                }
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
             }
+            print_scores("Before score calculation");
+            try {
+                calculateScores();
+            } catch (IllegalArgumentException ex) {
+                ex.printStackTrace();
+                Log.d(TAG, "calculateScores IllegalArgumentException");
+            }
+            print_scores("After score calculation");
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+            builder.setTitle("Confirm Submission?")
+                    .setMessage("Total non compliance cases: "+numCases+"\nResult: "+passFail)
+                    .setCancelable(false)
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            resetPhotoNameCounter();
+                            dialog.dismiss();
+                        }
+                    })
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (createCases()) {
+                                submit();
+                                createReport(true);
+                                clearAllPhotosFromContainerActivity();
+                            }
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
         });
     }
 
-    private void print_scores() {
+    private void print_scores(String msg) {
+        Log.d(TAG, "print_scores: "+msg);
         Log.d(TAG, "print_scores{" +
                 "staffhygiene_score=" + staffhygiene_score +
                 ", housekeeping_score=" + housekeeping_score +
@@ -381,38 +340,42 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 }
             });
         } else {
-            if (tenantType.equals("F&B")) {
-                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
-                        tenantType, false, getOverallNotes(), null, round(staffhygiene_score, 2),
-                        round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
-                        round(foodhygiene_score, 2));
-            } else {
-                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
-                        tenantType, false, getOverallNotes(), null, round(staffhygiene_score, 2),
-                        round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
-            }
-            reportCall.enqueue(new Callback<Report>() {
-                @Override
-                public void onResponse(Call<Report> call, Response<Report> response) {
-                    // sometimes, response comes back as null the first time
-                    Log.d(TAG, "onResponse: code: "+response.code());
-                    Log.d(TAG, "onResponse: reportID="+reportID);
-                    try {
-                        thisReport = response.body();
-                        reportID = response.body().getId();
-                        EspressoCountingIdlingResource.decrement();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            final Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(() -> {
+                if (tenantType.equals("F&B")) {
+                    reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
+                            tenantType, false, getOverallNotes(), null, round(staffhygiene_score, 2),
+                            round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
+                            round(foodhygiene_score, 2));
+                } else {
+                    reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
+                            tenantType, false, getOverallNotes(), null, round(staffhygiene_score, 2),
+                            round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
+                }
+                reportCall.enqueue(new Callback<Report>() {
+                    @Override
+                    public void onResponse(Call<Report> call, Response<Report> response) {
+                        // sometimes, response comes back as null the first time
+                        Log.d(TAG, "onResponse: code: " + response.code());
+                        try {
+                            thisReport = response.body();
+                            reportID = response.body().getId();
+                            EspressoCountingIdlingResource.decrement();
+                        } catch (Exception e) {
+                            Log.d(TAG, "onResponse: report may not have been created");
+                            Log.d(TAG, "onResponse: reportID: " + reportID);
+                            e.printStackTrace();
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<Report> call, Throwable t) {
-                    t.printStackTrace();
-                    Log.d(TAG, "createReport onFailure: " + t);
-                    reportID = -1;
-                }
-            });
+                    @Override
+                    public void onFailure(Call<Report> call, Throwable t) {
+                        t.printStackTrace();
+                        Log.d(TAG, "createReport onFailure: " + t);
+                        reportID = -1;
+                    }
+                });
+            }, 500);
         }
     }
 
