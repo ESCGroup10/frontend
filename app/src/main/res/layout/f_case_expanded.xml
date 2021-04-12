@@ -134,7 +134,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="20dp"
                     android:contentDescription="@string/unresolved_image"
-                    android:visibility="invisible"/>
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/unresolvedImageViewPlaceholder"
@@ -172,7 +172,7 @@
                     android:adjustViewBounds="true"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@string/resolved_image"
-                    android:visibility="invisible"/>
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/resolvedImageViewPlaceholder"
@@ -202,10 +202,8 @@
                     android:layout_margin="20dp"
                     android:textSize="16sp"
                     android:layout_gravity="center_horizontal"
-                    android:visibility="invisible"/>
-
+                    android:visibility="gone"/>
             </LinearLayout>
-
 
         </androidx.cardview.widget.CardView>
 
@@ -223,7 +221,7 @@
                 android:text="Resolve"
                 android:background="#ffaf7a"
                 android:layout_gravity="center"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -236,7 +234,7 @@
                     android:layout_height="wrap_content"
                     android:text="Reject"
                     android:background="#fff5ed"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     android:layout_margin="20dp"/>
 
                 <Button
@@ -245,7 +243,7 @@
                     android:layout_height="wrap_content"
                     android:text="Accept"
                     android:background="#ffaf7a"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     android:layout_margin="20dp"/>
 
             </LinearLayout>
