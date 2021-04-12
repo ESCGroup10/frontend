@@ -28,8 +28,8 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
 
     private static final String TAG = "ChecklistAdapter";
 
-    private final int green = Color.parseColor("#FF00FF00");
-    private final int red = Color.parseColor("#FFFF0000");
+    private final int green = Color.parseColor("#00000000");
+    private final int red = Color.parseColor("#ff791e");
     private final int grey = Color.parseColor("#FF808080");
     private final int black = Color.parseColor("#FF000000");
     private final int white = Color.parseColor("#FFFFFFFF");
@@ -49,7 +49,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.model_checklist_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_checklist, parent, false);
         return new ViewHolder(view);
     }
 

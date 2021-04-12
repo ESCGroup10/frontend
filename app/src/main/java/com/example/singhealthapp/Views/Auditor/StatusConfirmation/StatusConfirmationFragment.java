@@ -18,7 +18,7 @@ import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
+import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
 import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
 
 import java.util.Arrays;

@@ -5,25 +5,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
@@ -31,13 +26,13 @@ import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
-import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
-import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
+import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
+import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
+import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
+import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
 import com.example.singhealthapp.Views.TestFragment;
@@ -85,7 +80,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        setContentView(R.layout.activity_auditor_fragment_container);
+        setContentView(R.layout.a_fragmentcontainer_auditor);
 
         Toolbar auditor_toolbar = findViewById(R.id.auditor_toolbar);
         setSupportActionBar(auditor_toolbar);
@@ -100,7 +95,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
         if (savedInstanceState == null) {
             EspressoCountingIdlingResource.increment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment(), "getTenant").commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment(), "getTenant").commit();
         }
 
         loadToken();
@@ -124,7 +119,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
             try {
                 if (getSupportFragmentManager().findFragmentByTag("safetyChecklist").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
                     return;
                 }
             } catch (Exception ignored) {
@@ -133,21 +128,21 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 if (getSupportFragmentManager().findFragmentByTag("auditChecklist").isVisible()) {
                     // TODO: can go to safety fragment if it implements shared pref
                     ((IOnBackPressed) getSupportFragmentManager().findFragmentByTag("auditChecklist")).onBackPressed();
-//                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+//                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
                     return;
                 }
             } catch (Exception ignored) {
             }
             try {
                 if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
                     return;
                 }
             } catch (Exception ignored) {
             }
             try {
                 if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
                     return;
                 }
             } catch (Exception ignored) {
@@ -155,31 +150,31 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
             try {
                 if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new ReportsFragment(), "getReport").commit();
+                            .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new ReportsPreviewFragment(), "getReport").commit();
                     return;
                 }
             } catch (Exception ignored) {
             }
             try {
                 if (getSupportFragmentManager().findFragmentByTag("tenantsFragment").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
                     return;
                 }
             } catch (Exception ignored) {
             }
             try {
                 if (getSupportFragmentManager().findFragmentByTag("safetyFragment").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
                     return;
                 }
             } catch (Exception ignored) {
             }
             try {
                 if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                    CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
+                    CasesPreviewFragment casesPreviewFragment = (CasesPreviewFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
                     getSupportFragmentManager().beginTransaction()
                             .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                    , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
+                                    , new ReportSummaryFragment(casesPreviewFragment.getReport(), casesPreviewFragment.getToken()), "viewReport").commit();
                     return;
                 }
             } catch (Exception ignored) {
@@ -215,11 +210,11 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Tenants:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
                 break;
 
             case R.id.nav_Reports:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport").commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "getReport").commit();
                 break;
 
             case R.id.nav_Add_Tenant:

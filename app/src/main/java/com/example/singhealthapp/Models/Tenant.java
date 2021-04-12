@@ -26,4 +26,9 @@ public class Tenant {
     }
 
     public String getName(){return name;}
+
+    public boolean isStatus() {
+        return status;
+    }
+
 }
