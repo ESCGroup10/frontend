@@ -17,11 +17,12 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Safe Management Measures for Front-of-house"
-            android:textSize="30sp"
+            android:text="Safe Management Measures \nfor Front-of-house"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:layout_margin="8dp"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:layout_marginHorizontal="5dp"/>
+            android:textStyle="bold"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/safety_checklist_recyclerview_part1"
@@ -31,12 +32,12 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Staff Hygiene &amp; Safe Management Measures"
-            android:textSize="30sp"
+            android:text="Staff Hygiene &amp; \nSafe Management Measures"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:layout_margin="8dp"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:layout_marginTop="20dp"
-            android:layout_marginHorizontal="5dp"/>
+            android:textStyle="bold"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/safety_checklist_recyclerview_part2"
@@ -51,8 +52,9 @@
 
         <Button
             android:id="@+id/start_audit_button"
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
+            android:background="#ffb684"
             android:text="Start Audit"
             android:layout_gravity="center"/>
 

@@ -65,12 +65,9 @@ public class AuditorReportFragment extends Fragment {
         if (report.getTenant_display_id() == null){
             getActivity().setTitle("Report " + report.getId());
         }
-        else if ( report.isStatus() ){
-            getActivity().setTitle("Completed Report " + report.getTenant_display_id());
-        }
-        else getActivity().setTitle("Unresolved Report " + report.getTenant_display_id());
+        else getActivity().setTitle("Report " + report.getTenant_display_id());
 
-        view = inflater.inflate(R.layout.fragment_auditor_report, container, false);
+        view = inflater.inflate(R.layout.f_report_summary, container, false);
 
         chart1 = view.findViewById(R.id.reportBarChart1);
         barChartOperation(chart1, 0);
@@ -84,9 +81,9 @@ public class AuditorReportFragment extends Fragment {
         barChartOperation(chart5, 4);
 
         company = view.findViewById(R.id.reportCompany);
-        company.setText("COMPANY: " + report.getCompany());
+        company.setText("" + report.getCompany());
         location = view.findViewById(R.id.reportLocation);
-        location.setText("LOCATION: " + report.getLocation());
+        location.setText("" + report.getLocation());
 
         resolved = view.findViewById(R.id.auditorReportResolved);
         unresolved = view.findViewById(R.id.auditorReportUnresolved);
@@ -126,7 +123,6 @@ public class AuditorReportFragment extends Fragment {
                         unresolvedCases.addAll(response.body());
                         if ( ! resolved.getText().toString().equals("0") || ! unresolved.getText().toString().equals("0")) {
                             button.setEnabled(true);
-                            button.setBackgroundColor(Color.rgb(115, 194, 239));
                             button.setOnClickListener(v -> getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(getActivity().getSupportFragmentManager().findFragmentByTag("viewReport").getId()
                                             , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation(), report, token),

@@ -37,7 +37,7 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
     @Override
     public ReportPreviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.report_preview_card, null);
+                .inflate(R.layout.card_report, null);
 
         return new ReportPreviewHolder(view);
     }
@@ -62,14 +62,14 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
         report.setTenant_display_id(position + 1);
         holder.reportName.setText(list.get(position).getReportName());
 //        holder.reportDate.setText(list.get(position).getReportDate());
-        holder.reportDate.setText("Created at: ");
+        holder.reportDate.setText("Created on: ");
         setHalfBoldTextViews(holder.reportDate, list.get(position).getReportDate());
         if (!list.get(position).getResolution_date().equals("NOT RESOLVED")) {
-            holder.resolution.setText("Resolved at: "+list.get(position).getResolution_date());
+            holder.resolution.setText("Resolved on: "+list.get(position).getResolution_date());
         }
 //        holder.resolution.setText(list.get(position).getResolution_date());
 //        holder.id.setText("TENANT ID: " + list.get(position).getTenant_id());
-        holder.resolution.setText("");
+        holder.resolution.setText("No resolution record");
         holder.id.setText("");
         holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
                 .replace(parent.getSupportFragmentManager().findFragmentByTag("getReport").getId()

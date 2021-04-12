@@ -18,7 +18,7 @@
             android:layout_gravity="center"
             android:inputType="number"
             android:layout_width="200dp"
-            android:backgroundTint="@color/black"
+            android:backgroundTint="@color/grey_semi_transparent"
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
             android:hint="Tenant ID"/>
@@ -27,7 +27,7 @@
             android:layout_margin="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#a4bf"
+            android:background="#ffb684"
             android:text="Search"/>
     </LinearLayout>
 
@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabSelectedTextColor="@color/black"
-        app:tabIndicatorColor="#a4bf"/>
+        app:tabIndicatorColor="@color/grey"/>
 
     <androidx.viewpager.widget.ViewPager
         android:layout_width="match_parent"

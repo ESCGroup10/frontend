@@ -10,8 +10,25 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/black"
+            android:id="@+id/reportCompany"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textSize="16dp"
+            android:layout_margin="10dp"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/black"
+            android:id="@+id/reportLocation"/>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -32,17 +49,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:layout_marginTop="20dp"
-                    android:textSize="20dp"
-                    android:id="@+id/dateLatestReport"
-                    android:textColor="@color/black"
-                    android:layout_gravity="center" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
                     android:layout_marginBottom="10dp"
-                    android:textSize="18dp"
-                    android:id="@+id/resolvedLatestReport"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:text="Report Summary"
+                    android:textColor="@color/black"
                     android:layout_gravity="center" />
 
                 <com.github.mikephil.charting.charts.HorizontalBarChart
@@ -127,7 +138,7 @@
                     android:layout_height="30dp"
                     android:textSize="16dp"
                     android:textColor="@color/black"
-                    android:text="Resolved Cases: "
+                    android:text="Resolved: "
                     android:gravity="center" />
 
                 <TextView
@@ -135,7 +146,7 @@
                     android:layout_height="30dp"
                     android:textSize="16dp"
                     android:text="~"
-                    android:textColor="@color/green"
+                    android:textColor="#62bd69"
                     android:id="@+id/auditorReportResolved"
                     android:gravity="center" />
 
@@ -153,7 +164,7 @@
                     android:layout_height="30dp"
                     android:textSize="16dp"
                     android:textColor="@color/black"
-                    android:text="Unresolved Cases: "
+                    android:text="Unresolved: "
                     android:gravity="center" />
 
                 <TextView
@@ -161,12 +172,23 @@
                     android:layout_height="30dp"
                     android:textSize="16dp"
                     android:text="~"
-                    android:textColor="@color/red"
+                    android:textColor="#ff6961"
                     android:id="@+id/auditorReportUnresolved"
                     android:gravity="center" />
 
             </LinearLayout>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/auditorReportViewCases"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"            android:layout_marginTop="20dp"
+            android:enabled="false"
+            android:layout_marginBottom="10dp"
+            android:background="#ffb684"
+            android:layout_gravity="center"
+            android:textSize="18sp"
+            android:text="view cases" />
 
     </LinearLayout>
 

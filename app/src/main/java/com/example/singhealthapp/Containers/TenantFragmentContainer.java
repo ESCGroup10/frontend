@@ -18,13 +18,10 @@ import android.view.MenuItem;
 
 import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
 import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Views.Login.LoginActivity;
-import com.example.singhealthapp.Views.Tenant.ExpandedCase;
 import com.example.singhealthapp.Views.TestFragment;
 import com.example.singhealthapp.Views.Tenant.LatestReportFragment;
 import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
@@ -44,7 +41,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tenant_fragmentcontainer);
+        setContentView(R.layout.a_fragmentcontainer_tenant);
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);

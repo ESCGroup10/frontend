@@ -22,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Company: "
+            android:paddingLeft="20dp"
             android:textSize="20sp"
             android:textColor="@color/black"
             android:layout_marginHorizontal="3dp"
@@ -31,6 +32,7 @@
             android:id="@+id/institutionTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
             android:text="Institution: "
             android:textSize="20sp"
             android:textColor="@color/black"
@@ -47,7 +49,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Case "
-            android:textSize="20sp"
+            android:textSize="22sp"
+            android:paddingLeft="20dp"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_marginHorizontal="3dp"
@@ -59,6 +62,8 @@
             android:layout_height="wrap_content"
             android:text="@string/non_compliance_type"
             android:textSize="20sp"
+            android:paddingLeft="20dp"
+
             android:textColor="@color/black"
             android:layout_marginHorizontal="3dp"
             android:layout_gravity="start"/>
@@ -68,6 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/status"
+            android:paddingLeft="20dp"
             android:textSize="20sp"
             android:textColor="@color/black"
             android:layout_marginHorizontal="3dp"
@@ -217,7 +223,7 @@
 
         </LinearLayout>
 
-        <include layout="@layout/resolving_case_section"/>
+        <include layout="@layout/f_case_resolution"/>
 
     </LinearLayout>
 

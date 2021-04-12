@@ -1,6 +1,5 @@
 package com.example.singhealthapp.Views.Statistics;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,8 +12,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
-
-import org.jetbrains.annotations.NotNull;
 
 
 public class PerformanceStatsFragment extends Fragment implements StatisticsFragment.TenantIdUpdateListener {
@@ -41,7 +38,7 @@ public class PerformanceStatsFragment extends Fragment implements StatisticsFrag
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_stats_performance, container, false);
+        View view = inflater.inflate(R.layout.f_stats_performance, container, false);
         return view;
     }
 

@@ -41,7 +41,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Search Tenant");
-        View view = inflater.inflate(R.layout.fragment_tenants, container, false);
+        View view = inflater.inflate(R.layout.f_tenants_all, container, false);
         return view;
     }
 

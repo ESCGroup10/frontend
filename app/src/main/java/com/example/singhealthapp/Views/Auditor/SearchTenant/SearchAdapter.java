@@ -5,13 +5,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.Tenants.TenantsFragment;
 
 import java.util.List;
 
@@ -36,7 +34,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
     @Override
     public SearchHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_tenants_items, null);
+                .inflate(R.layout.card_tenant, null);
 
         return new SearchHolder(view, this.parent, tenants);
     }

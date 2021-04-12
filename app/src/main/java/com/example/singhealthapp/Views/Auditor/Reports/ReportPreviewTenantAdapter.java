@@ -37,7 +37,7 @@ public class ReportPreviewTenantAdapter extends RecyclerView.Adapter<ReportPrevi
     @Override
     public ReportPreviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.report_preview_card, null);
+                .inflate(R.layout.card_report, null);
 
         return new ReportPreviewHolder(view);
     }

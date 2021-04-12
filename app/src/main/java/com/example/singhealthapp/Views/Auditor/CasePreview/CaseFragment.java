@@ -3,7 +3,6 @@ package com.example.singhealthapp.Views.Auditor.CasePreview;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.CasePreview.CasePreviewAdapter;
 
 import java.util.List;
 
@@ -45,7 +43,7 @@ public class CaseFragment extends Fragment {
                              Bundle savedInstanceState) {
         if (report.getTenant_display_id() != null) getActivity().setTitle("Report " + report.getTenant_display_id() + " Cases");
         else getActivity().setTitle("Report " + id + " Cases");
-        view = inflater.inflate(R.layout.fragment_case, container, false);
+        view = inflater.inflate(R.layout.f_cases_all, container, false);
         System.out.println( unresolvedCases.size() );
 
         unresolvedAdapter = new CasePreviewAdapter(unresolvedCases, report, getActivity());

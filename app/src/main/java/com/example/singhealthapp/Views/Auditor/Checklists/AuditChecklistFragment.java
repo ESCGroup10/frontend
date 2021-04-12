@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
@@ -654,16 +651,16 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         View view;
         if (tenantType.equals("F&B")) {
             Log.d(TAG, "onCreateView: setting up for F&B");
-            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+            view = inflater.inflate(R.layout.f_checklist_audit_fb, container, false);
             header_files = new String[]{"F&B_food_hygiene.txt", "F&B_healthier_choice.txt", "F&B_professionalism_and_staff_hygiene.txt", "F&B_workplace_safety_and_health.txt", "F&B_housekeeping_and_general_cleanliness.txt"};
         } else if (tenantType.equals("Non F&B")) {
             Log.d(TAG, "onCreateView: setting up for Non F&B");
-            view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
+            view = inflater.inflate(R.layout.f_checklist_audit_nfb, container, false);
             header_files = new String[]{"Non_F&B_professionalism_and_staff_hygiene.txt", "Non_F&B_workplace_safety_and_health.txt", "Non_F&B_housekeeping_and_general_cleanliness.txt"};
         } else {
             Log.d(TAG, "onCreateView: invalid tenant type: "+tenantType);
             Log.d(TAG, "inflateFragmentLayout: maybe check file names?");
-            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+            view = inflater.inflate(R.layout.f_checklist_audit_fb, container, false);
         }
 
         return view;

@@ -35,7 +35,6 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
-import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -117,7 +116,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_expaded_case, container, false);
+        View view = inflater.inflate(R.layout.f_case_expanded, container, false);
         loadUserType();
         findAllViews(view);
 

@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
@@ -53,27 +52,24 @@ public class StatusConfirmationFragment extends Fragment {
         }
 
         getActivity().setTitle(title);
-        View view = inflater.inflate(R.layout.fragment_status_confirmation, container, false);
+        View view = inflater.inflate(R.layout.f_checklist_confirmation, container, false);
         messageText = view.findViewById(R.id.message_text);
         button  = view.findViewById(R.id.button_return);
         messageText.setText(message);
         button.setText(button_text);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((Ping) requireActivity()).incrementCountingIdlingResource(1);
-                if (userType.equals("Auditor")) {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport")
-                            .commit();
-                } else {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new MyReportsFragment(), "getReport")
-                            .commit();
-                }
-
+        button.setOnClickListener(v -> {
+            ((Ping) requireActivity()).incrementCountingIdlingResource(1);
+            if (userType.equals("Auditor")) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport")
+                        .commit();
+            } else {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new MyReportsFragment(), "getReport")
+                        .commit();
             }
+
         });
 
         return view;

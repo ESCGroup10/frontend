@@ -10,7 +10,6 @@
         android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -24,32 +23,28 @@
                 android:id="@+id/ProfessionalismAndStaffHygieneTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_marginBottom="15dp"
-                android:text="Professionalism &amp; Staff Hygiene (10%)"
+                android:text="Professionalism &amp; Staff Hygiene (20%)"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
                 android:textColor="@color/black"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                android:focusable="true"/>
+                android:textStyle="bold"/>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/professionalism"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="Professionalism"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
                     android:textStyle="bold"
-                    android:focusable="true"/>
+                    android:textSize="18dp"
+                    android:textAllCaps="false"
+                    android:text="Professionalism"
+                    android:gravity="center"/>
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -59,23 +54,21 @@
                 android:layout_marginBottom="15dp" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/staff_hygiene"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="Staff Hygiene"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
                     android:textStyle="bold"
-                    android:focusable="true"/>
+                    android:focusable="true"
+                    android:textSize="18dp"
+                    android:textAllCaps="false"
+                    android:text="Staff Hygiene"
+                    android:gravity="center"/>
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -87,33 +80,28 @@
                 android:id="@+id/HousekeepingAndGeneralCleanlinessTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="15dp"
-                android:text="Housekeeping &amp; General Cleanliness (20%)"
+                android:text="Housekeeping &amp;\n General Cleanliness (40%)"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
                 android:textColor="@color/black"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                android:focusable="true"/>
+                android:textStyle="bold"/>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/general_environment_cleanliness"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="General Environment Cleanliness"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
                     android:textStyle="bold"
-                    android:focusable="true"/>
+                    android:textSize="18dp"
+                    android:textAllCaps="false"
+                    android:text="General Environment Cleanliness"
+                    android:gravity="center"/>
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -123,22 +111,20 @@
                 android:layout_marginBottom="15dp" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/hand_hygiene_facilities"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
                     android:text="Hand Hygiene Facilities"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
-                    android:textStyle="bold" />
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
+                    android:textStyle="bold"
+                    android:textSize="18dp"
+                    android:textAllCaps="false"
+                    android:gravity="center" />
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -148,32 +134,29 @@
 
             <TextView
                 android:id="@+id/FoodHygieneTextView"
+                android:text="Food Hygiene (35%)"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="15dp"
-                android:text="Food Hygiene (35%)"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
                 android:textColor="@color/black"
-                android:textSize="30sp"
                 android:textStyle="bold" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/storage_and_preparation_of_food"
+                    android:text="Storage &amp; Preparation of Food"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="Storage &amp; Preparation of Food"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
@@ -184,21 +167,19 @@
                 android:layout_marginBottom="15dp" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/storage_of_food_in_fridge_or_warmer"
+                    android:text="Storage of Food in Refrigerator/ Warmer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="Storage of Food in Refrigerator/ Warmer"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
@@ -209,32 +190,29 @@
 
             <TextView
                 android:id="@+id/HealthierChoiceTextView"
+                android:text="Healthier Choice (15%)"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="15dp"
-                android:text="Healthier Choice (15%)"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
                 android:textColor="@color/black"
-                android:textSize="30sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/food"
+                    android:text="Food"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="Food"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
@@ -245,21 +223,19 @@
                 android:layout_marginBottom="15dp" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/beverage"
+                    android:text="Beverage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="Beverage"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
@@ -270,32 +246,29 @@
 
             <TextView
                 android:id="@+id/WorkplaceSafetyAndHealthTextView"
+                android:text="Workplace Safety &amp; Health (20%)"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="15dp"
-                android:text="Workplace Safety &amp; Health (20%)"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
                 android:textColor="@color/black"
-                android:textSize="30sp"
                 android:textStyle="bold" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/general_safety"
+                    android:text="General Safety"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="General Safety"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
@@ -306,21 +279,19 @@
                 android:layout_marginBottom="15dp" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/fire_safety"
+                    android:text="Fire &amp; Emergency Safety"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="Fire &amp; Emergency Safety"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
@@ -331,21 +302,19 @@
                 android:layout_marginBottom="15dp" />
 
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:orientation="horizontal"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
 
                 <TextView
                     android:id="@+id/electrical_safety"
+                    android:text="Electrical Safety"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:text="Electrical Safety"
-                    android:textColor="@color/purple_500"
-                    android:textSize="25sp"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
 
@@ -363,10 +332,11 @@
 
             <Button
                 android:id="@+id/submit_audit_button"
-                android:layout_width="wrap_content"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Submit Audit" />
+                android:background="#ffb684"
+                android:text="Submit Audit"
+                android:layout_gravity="center" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -375,8 +345,8 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:fab_colorNormal="@color/mild_blue"
-        app:fab_colorPressed="@color/blue"
+        app:fab_colorNormal="#ffb684"
+        app:fab_colorPressed="#ffa161"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
         app:fab_expandDirection="up"
@@ -387,8 +357,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
-            app:fab_colorNormal="@color/mild_blue"
-            app:fab_colorPressed="@color/blue"
+            app:fab_colorNormal="#ffb684"
+            app:fab_colorPressed="#ffa161"
             app:fab_size="normal"
             app:fab_title="Professionalism And Staff Hygiene" />
 
@@ -397,8 +367,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
-            app:fab_colorNormal="@color/mild_blue"
-            app:fab_colorPressed="@color/blue"
+            app:fab_colorNormal="#ffb684"
+            app:fab_colorPressed="#ffa161"
             app:fab_size="normal"
             app:fab_title="Housekeeping And General Cleanliness"/>
 
@@ -407,8 +377,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
-            app:fab_colorNormal="@color/mild_blue"
-            app:fab_colorPressed="@color/blue"
+            app:fab_colorNormal="#ffb684"
+            app:fab_colorPressed="#ffa161"
             app:fab_size="normal"
             app:fab_title="Food Hygiene"/>
 
@@ -417,8 +387,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
-            app:fab_colorNormal="@color/mild_blue"
-            app:fab_colorPressed="@color/blue"
+            app:fab_colorNormal="#ffb684"
+            app:fab_colorPressed="#ffa161"
             app:fab_size="normal"
             app:fab_title="Healthier Choice"/>
 
@@ -427,8 +397,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
-            app:fab_colorNormal="@color/mild_blue"
-            app:fab_colorPressed="@color/blue"
+            app:fab_colorNormal="#ffb684"
+            app:fab_colorPressed="#ffa161"
             app:fab_size="normal"
             app:fab_title="Workplace Safety And Health"/>
 

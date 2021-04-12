@@ -58,7 +58,7 @@ public class AddTenantFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Add New Tenant");
-        View view = inflater.inflate(R.layout.fragment_add_tenant, container, false);
+        View view = inflater.inflate(R.layout.f_add_tenant, container, false);
 
         editList.add(view.findViewById(R.id.text2));
         editList.add(view.findViewById(R.id.text3));

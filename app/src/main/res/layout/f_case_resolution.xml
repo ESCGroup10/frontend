@@ -15,15 +15,12 @@
         android:background="@color/header_green"
         android:text="Resolution"
         android:textSize="30sp"
-        android:textStyle="bold"
-        android:gravity="center_horizontal"
-        android:textColor="@color/black"/>
+        android:gravity="center_horizontal"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Take photo or upload from gallery"
-        android:textColor="@color/black"
         android:textSize="20sp"
         android:layout_gravity="center_horizontal"/>
 
@@ -89,7 +86,6 @@
         android:layout_marginHorizontal="40dp"
         android:paddingVertical="10dp"
         android:text="@string/confirm"
-        android:textColor="@color/black"
         android:textSize="20sp"
         android:background="@color/advance_button_green"
         android:layout_marginVertical="80dp"/>

@@ -10,8 +10,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical"
         android:layout_margin="5dp"
-        app:cardCornerRadius="10dp"
-        app:cardBackgroundColor="#73C2EF"
+        app:cardCornerRadius="3dp"
+        app:cardBackgroundColor="#ffb684"
         app:cardElevation="5dp"
         android:id="@+id/casePreviewCard">
 
@@ -35,7 +35,8 @@
                     android:layout_height="0dp"
                     android:layout_width="match_parent"
                     android:layout_weight="0.6"
-                    android:text="\t\t\tNon-compliance type:"
+                    android:paddingLeft="30dp"
+                    android:text="Non-compliance type:"
                     android:textStyle="bold"
                     android:gravity="left|center_horizontal"/>
 
@@ -44,7 +45,8 @@
                     android:layout_width="match_parent"
                     android:layout_weight="1"
                     android:id="@+id/casePreviewType"
-                    android:gravity="center"/>
+                    android:paddingLeft="30dp"
+                />
 
             </LinearLayout>
 
@@ -57,7 +59,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:textStyle="bold"
-                    android:text="\t\t\tStatus: "
+                    android:paddingLeft="30dp"
+                    android:text="Status: "
                     android:gravity="left|center_horizontal"/>
 
                 <TextView

@@ -66,7 +66,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_stats_reports, container, false);
+        View view = inflater.inflate(R.layout.f_stats_reports, container, false);
         mChart = view.findViewById(R.id.reports_chart);
         mExportButton = view.findViewById(R.id.exportcases_button);
 

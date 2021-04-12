@@ -21,11 +21,6 @@ import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,21 +43,24 @@ public class TenantsFragment extends Fragment {
         if (savedInstanceState == null) {
             EspressoCountingIdlingResource.decrement();
         }
-        getActivity().setTitle(tenant.getCompany());
+        getActivity().setTitle("Tenant " + tenant.getId());
 
-        view = inflater.inflate(R.layout.fragment_tenant_expanded, container, false);
+        view = inflater.inflate(R.layout.f_tenant_expanded, container, false);
 
         location = view.findViewById(R.id.tenantLocation);
-        location.setText("LOCATION: " + tenant.getLocation());
+        location.setText(tenant.getLocation());
 
         institution = view.findViewById(R.id.tenantInstitution);
-        institution.setText("INSTITUTION: " + tenant.getInstitution());
+        institution.setText(tenant.getInstitution());
 
         type = view.findViewById(R.id.tenantType);
-        type.setText("TYPE: " + tenant.getType());
+        type.setText(tenant.getType());
 
         name = view.findViewById(R.id.tenantName);
-        name.setText("OWNER NAME: " + tenant.getName());
+        name.setText(tenant.getName());
+
+        company = view.findViewById(R.id.tenantCompany);
+        company.setText(tenant.getCompany());
 
         button = view.findViewById(R.id.startSafetyChecklistButton);
         button.setOnClickListener(new View.OnClickListener() {

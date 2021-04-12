@@ -44,7 +44,7 @@ public class ReportsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Reports");
-        View view = inflater.inflate(R.layout.fragment_reports, container, false);
+        View view = inflater.inflate(R.layout.f_reports_all, container, false);
         view.findViewById(R.id.reportPreviewSearchButton).setOnClickListener(v -> {
             if ( reportPreviews.isEmpty() ) return;
             TextView textView = view.findViewById(R.id.reportPreviewSearch);
@@ -75,30 +75,12 @@ public class ReportsFragment extends Fragment {
         view.findViewById(R.id.reportPreviewUnresolvedButton).setOnClickListener(v -> {
             if ( reportPreviews.isEmpty() ) return;
             unresolved = !unresolved;
-            Button button = view.findViewById(R.id.reportPreviewUnresolvedButton);
-            if ( ! unresolved ) {
-                button.setBackgroundColor(Color.GRAY);
-                button.setText("show");
-            }
-            else {
-                button.setBackgroundColor(Color.rgb(115, 194, 239));
-                button.setText("hide");
-            }
             displayRecycleView(displayPreviews, displayReports);
         });
 
         view.findViewById(R.id.reportPreviewCompletedButton).setOnClickListener(v -> {
             if ( reportPreviews.isEmpty() ) return;
             completed = !completed;
-            Button button = view.findViewById(R.id.reportPreviewCompletedButton);
-            if ( ! completed ) {
-                button.setBackgroundColor(Color.GRAY);
-                button.setText("show");
-            }
-            else {
-                button.setBackgroundColor(Color.rgb(115, 194, 239));
-                button.setText("hide");
-            }
             displayRecycleView(displayPreviews, displayReports);
         });
         return view;
