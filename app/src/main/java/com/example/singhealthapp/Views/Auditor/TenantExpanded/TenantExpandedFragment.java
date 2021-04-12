@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.Tenants;
+package com.example.singhealthapp.Views.Auditor.TenantExpanded;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,14 +27,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class TenantsFragment extends Fragment {
-    private static final String TAG = "TenantsFragment";
+public class TenantExpandedFragment extends Fragment {
+    private static final String TAG = "TenantExpandedFragment";
     Tenant tenant;
     View view;
     TextView company, institution, type, location, name;
     Button button, deleteButton;
 
-    public TenantsFragment(Tenant tenant) {
+    public TenantExpandedFragment(Tenant tenant) {
         this.tenant = tenant;
     }
     @Override
@@ -76,7 +76,7 @@ public class TenantsFragment extends Fragment {
                 safetyChecklistFragment.setArguments(bundle);
 
                 ((Ping)requireActivity()).incrementCountingIdlingResource(1);
-                TenantsFragment.this.getParentFragmentManager().beginTransaction()
+                TenantExpandedFragment.this.getParentFragmentManager().beginTransaction()
                         .replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyChecklist")
                         .commit();
             }

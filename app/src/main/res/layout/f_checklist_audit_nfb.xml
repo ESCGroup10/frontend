@@ -30,10 +30,6 @@
                 android:textColor="@color/black"
                 android:textStyle="bold"/>
 
-            <androidx.cardview.widget.CardView
-                android:orientation="horizontal"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -44,18 +40,12 @@
                     android:text="Professionalism"
                     android:gravity="center" />
 
-            </androidx.cardview.widget.CardView>
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/audit_checklist_recyclerview_professionalism"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"/>
 
-            <androidx.cardview.widget.CardView
-                android:orientation="horizontal"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -65,8 +55,6 @@
                     android:textAllCaps="false"
                     android:text="Staff Hygiene"
                     android:gravity="center"/>
-
-            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/audit_checklist_recyclerview_staff_hygiene"
@@ -84,10 +72,6 @@
                 android:textColor="@color/black"
                 android:textStyle="bold"/>
 
-            <androidx.cardview.widget.CardView
-                android:orientation="horizontal"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -97,7 +81,6 @@
                     android:textAllCaps="false"
                     android:text="General Environment Cleanliness"
                     android:gravity="center"/>
-            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/audit_checklist_recyclerview_environment"
@@ -115,10 +98,6 @@
                 android:textColor="@color/black"
                 android:textStyle="bold"/>
 
-            <androidx.cardview.widget.CardView
-                android:orientation="horizontal"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -128,7 +107,6 @@
                     android:textAllCaps="false"
                     android:text="General Safety"
                     android:gravity="center"/>
-            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/audit_checklist_recyclerview_general_safety"
@@ -136,10 +114,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"/>
 
-            <androidx.cardview.widget.CardView
-                android:orientation="horizontal"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -149,7 +123,6 @@
                     android:textAllCaps="false"
                     android:text="Fire &amp; Emergency Safety"
                     android:gravity="center"/>
-            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/audit_checklist_recyclerview_fire_safety"
@@ -157,10 +130,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"/>
 
-            <androidx.cardview.widget.CardView
-                android:orientation="horizontal"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -170,7 +139,6 @@
                     android:textAllCaps="false"
                     android:text="Electrical Safety"
                     android:gravity="center"/>
-            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/audit_checklist_recyclerview_electricity_safety"
@@ -191,6 +159,7 @@
                 android:background="#ffb684"
                 android:text="Submit Audit"
                 android:layout_gravity="center"
+                android:layout_margin="20dp"
                 android:layout_marginBottom="20dp"/>
 
         </LinearLayout>

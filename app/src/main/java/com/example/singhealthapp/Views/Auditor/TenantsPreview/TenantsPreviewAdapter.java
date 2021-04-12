@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.SearchTenant;
+package com.example.singhealthapp.Views.Auditor.TenantsPreview;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +13,8 @@ import com.example.singhealthapp.R;
 
 import java.util.List;
 
-public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
-    List<SearchMain> list;
+public class TenantsPreviewAdapter extends RecyclerView.Adapter<TenantsPreviewHolder> {
+    List<Tenant> list;
     FragmentActivity parent;
     List<Tenant> tenants;
     NavFromTenantSelection underlyingFragment;
@@ -23,7 +23,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
         public void navigate(int position);
     }
 
-    public SearchAdapter(List<SearchMain> list, List<Tenant> tenants, FragmentActivity parent, String s, NavFromTenantSelection underlyingFragment) {
+    public TenantsPreviewAdapter(List<Tenant> list, List<Tenant> tenants, FragmentActivity parent, String s, NavFromTenantSelection underlyingFragment) {
         this.list = list;
         this.tenants = tenants;
         this.parent = parent;
@@ -32,15 +32,15 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
 
     @NonNull
     @Override
-    public SearchHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public TenantsPreviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_tenant, null);
 
-        return new SearchHolder(view, this.parent, tenants);
+        return new TenantsPreviewHolder(view, this.parent, tenants);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SearchHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TenantsPreviewHolder holder, int position) {
         holder.tenantCompany.setText(list.get(position).getCompany());
         holder.tenantInstitution.setText(list.get(position).getInstitution());
         holder.tenantType.setText(list.get(position).getType());
@@ -53,7 +53,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
         });
 //        holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
 //                .replace(parent.getSupportFragmentManager().findFragmentByTag("getTenant").getId()
-//                        , new TenantsFragment(tenants.get(position)), "viewTenant").commit());
+//                        , new TenantExpandedFragment(tenants.get(position)), "viewTenant").commit());
     }
 
     @Override

@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Views.Auditor.CasePreview.CaseFragment">
+    android:padding="16dp"
+    tools:context=".Views.Auditor.CasesPreview.CasesPreviewFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,38 +12,34 @@
         android:orientation="vertical">
 
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/reportCaseCompany"
+            android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:textSize="16dp"
-            android:layout_gravity="center_vertical"
+            android:textSize="18dp"
+            android:textStyle="bold"
             android:textColor="@color/black"
-            android:id="@+id/reportCaseCompany"/>
+            android:layout_gravity="center_horizontal" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/reportCaseLocation"
+            android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:textSize="16dp"
-            android:layout_marginBottom="20dp"
-            android:layout_gravity="center_vertical"
-            android:textColor="@color/black"
-            android:id="@+id/reportCaseLocation"/>
+            android:layout_margin="10dp"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/black"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/casePreviewRecyclerViewUnresolved"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginBottom="20dp"/>
+            android:layout_gravity="center_horizontal"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/casePreviewRecyclerViewResolved"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-
+            android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"/>
 
     </LinearLayout>

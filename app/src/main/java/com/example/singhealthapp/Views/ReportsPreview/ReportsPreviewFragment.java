@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.Reports;
+package com.example.singhealthapp.Views.ReportsPreview;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -33,7 +33,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ReportsFragment extends Fragment {
+public class ReportsPreviewFragment extends Fragment {
     ReportPreviewAdapter adapterUnresolved, adapterCompleted;
     private ArrayList<ReportPreview> reportPreviews, displayPreviews;
     private ArrayList<Report> reports, displayReports;

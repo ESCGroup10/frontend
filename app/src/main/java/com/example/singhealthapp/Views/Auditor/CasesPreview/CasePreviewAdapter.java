@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.CasePreview;
+package com.example.singhealthapp.Views.Auditor.CasesPreview;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Models.Case;
-import com.example.singhealthapp.Views.Tenant.ExpandedCase;
+import com.example.singhealthapp.Views.Tenant.CaseExpanded;
 
 import java.util.List;
 
@@ -44,14 +44,14 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
     public void onBindViewHolder(@NonNull CasePreviewHolder holder, int position) {
         if (cases.get(position).isIs_resolved()) {
             holder.is_resolved.setText("Resolved");
-            holder.cardView.setCardBackgroundColor(Color.rgb(159, 221, 88));
+            holder.is_resolved.setTextColor(Color.parseColor("#62bd69"));
         }
         else {
             holder.is_resolved.setText("Unresolved");
-            holder.cardView.setCardBackgroundColor(Color.rgb(239, 117, 119));
+            holder.is_resolved.setTextColor(Color.parseColor("#ff6961"));
         }
         holder.type.setText(cases.get(position).getNon_compliance_type());
-        holder.id.setText("Case ID " + cases.get(position).getId());
+        holder.id.setText("Case " + cases.get(position).getId());
         Case a = cases.get(position);
         holder.cardView.setOnClickListener(v -> {
             Bundle args = new Bundle();
@@ -61,8 +61,8 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
             args.putBoolean("RESOLVED_STATUS_KEY", a.isIs_resolved());
             args.putInt("REPORT_ID_KEY", report.getId());
             args.putInt("CASE_ID_KEY", a.getId());
-            ExpandedCase expandedCase = new ExpandedCase();
-            expandedCase.setArguments(args);
+            CaseExpanded caseExpanded = new CaseExpanded();
+            caseExpanded.setArguments(args);
             int fragment_id;
             if (userType.equals("Auditor")) {
                 fragment_id = R.id.auditor_fragment_container;
@@ -71,7 +71,7 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
             }
             parent.getSupportFragmentManager().beginTransaction()
                     .replace(parent.getSupportFragmentManager().findFragmentById(fragment_id).getId()
-                            , expandedCase).commit();
+                            , caseExpanded).commit();
         });
     }
 

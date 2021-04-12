@@ -16,8 +16,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
-import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
+import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
+import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -94,10 +94,10 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 }
                 try {
                     if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                        CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
+                        CasesPreviewFragment casesPreviewFragment = (CasesPreviewFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
                         getSupportFragmentManager().beginTransaction()
                                 .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                        , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
+                                        , new ReportSummaryFragment(casesPreviewFragment.getReport(), casesPreviewFragment.getToken()), "viewReport").commit();
                         return;
                     }
                 } catch (Exception ignored) {

@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.CasePreview;
+package com.example.singhealthapp.Views.Auditor.CasesPreview;
 
 import android.os.Bundle;
 
@@ -18,7 +18,7 @@ import com.example.singhealthapp.R;
 
 import java.util.List;
 
-public class CaseFragment extends Fragment {
+public class CasesPreviewFragment extends Fragment {
     CasePreviewAdapter unresolvedAdapter, resolvedAdapter;
     List<Case> unresolvedCases, resolvedCases;
     int id;
@@ -28,7 +28,7 @@ public class CaseFragment extends Fragment {
     private Report report;
     private String token;
 
-    public CaseFragment(List<Case> unresolvedCases, List<Case> resolvedCases, int id, String company, String location, Report report, String token){
+    public CasesPreviewFragment(List<Case> unresolvedCases, List<Case> resolvedCases, int id, String company, String location, Report report, String token){
         this.unresolvedCases = unresolvedCases;
         this.resolvedCases = resolvedCases;
         this.id = id;
@@ -68,8 +68,8 @@ public class CaseFragment extends Fragment {
 
         companyView = view.findViewById(R.id.reportCaseCompany);
         locationView = view.findViewById(R.id.reportCaseLocation);
-        companyView.setText("Company: " + company);
-        locationView.setText("Location: " + location);
+        companyView.setText(company);
+        locationView.setText(location);
         return view;
     }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,31 +57,23 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static android.app.Activity.RESULT_OK;
 import static android.view.View.VISIBLE;
 
-public class ExpandedCase extends Fragment implements IOnBackPressed {
-    private static final String TAG = "ExpandedCase";
+public class CaseExpanded extends Fragment implements IOnBackPressed {
+    private static final String TAG = "CaseExpanded";
 
     // UI stuff
-    TextView companyTextView;
-    TextView institutionTextView;
-    TextView caseNumberTextView;
-    TextView nonComplianceTypeTextView;
-    TextView resolvedStatusTextView;
-    ImageView unresolvedImageView;
-    TextView unresolvedImageDateTextView;
-    TextView unresolvedCommentsTextView;
-    ImageView resolvedImageView;
-    TextView resolvedImageDateTextView;
-    TextView resolvedCommentsTextView;
-    View unresolvedResolvedSeparator;
-    Button resolveButton;
+    TextView companyTextView,
+            institutionTextView,
+            nonComplianceTypeTextView,
+            resolvedStatusTextView,
+            unresolvedImageDateTextView,
+            unresolvedCommentsTextView,
+            resolvedImageDateTextView,
+            resolvedCommentsTextView,
+            unresolvedImageViewPlaceholder,
+            resolvedImageViewPlaceholder;
+    ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton;
+    Button resolveButton, confirmButton, rejectButton, acceptButton;
     LinearLayout resolvingCaseSection;
-    ImageView cameraButton;
-    ImageView uploadButton;
-    Button confirmButton;
-    Button rejectButton;
-    Button acceptButton;
-    TextView unresolvedImageViewPlaceholder;
-    TextView resolvedImageViewPlaceholder;
     EditText resolvedCommentsEditText;
 
     private Bundle bundle;
@@ -88,28 +81,23 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
     // database stuff
     Case thisCase;
     DatabaseApiCaller apiCaller;
-    private String token;
-    private int reportID;
-    private int caseID;
-    private String userType;
-
-    private int reportNumber;
+    private String token, userType,
+            company,
+            institution,
+            nonComplianceType,
+            unresolvedComments,
+            resolvedComments,
+            unresolvedImageName,
+            resolvedImageName,
+            unresolvedImageDate,
+            resolvedImageDate;
+    private int reportID, caseID, reportNumber;
     private Integer caseNumber;
-    private String company;
-    private String institution;
-    private String nonComplianceType;
     private boolean resolvedStatus;
-    private String unresolvedComments;
-    private String resolvedComments;
-    private String unresolvedImageName;
-    private String resolvedImageName;
-    private String unresolvedImageDate;
-    private String resolvedImageDate;
 
     // Camera stuff
     Uri mImageURI;
-    final int REQUEST_IMAGE_CAPTURE = 0;
-    final int REQUEST_IMAGE_FROM_GALLERY = 1;
+    final int REQUEST_IMAGE_CAPTURE = 0, REQUEST_IMAGE_FROM_GALLERY = 1;
     Bitmap mImageBitmap;
 
     @Nullable
@@ -155,7 +143,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         } catch (Exception e) {
             caseID = 58;
         }
-        getActivity().setTitle("Report "+reportNumber);
+        getActivity().setTitle("Case "+caseNumber);
         getCase();
         setAllViewsFromBundle();
         setOnClickListeners();
@@ -180,13 +168,11 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         Log.d(TAG, "findAllViews: called");
         companyTextView = view.findViewById(R.id.companyTextView);
         institutionTextView = view.findViewById(R.id.institutionTextView);
-        caseNumberTextView = view.findViewById(R.id.caseNumberTextView);
         nonComplianceTypeTextView = view.findViewById(R.id.nonComplianceTypeTextView);
         resolvedStatusTextView = view.findViewById(R.id.resolvedStatusTextView);
         unresolvedImageView = view.findViewById(R.id.unresolvedImageView);
         unresolvedImageDateTextView = view.findViewById(R.id.unresolvedImageDateTextView);
         unresolvedCommentsTextView = view.findViewById(R.id.unresolvedCommentsTextView);
-        unresolvedResolvedSeparator = view.findViewById(R.id.unresolvedResolvedSeparator);
         resolvedImageView = view.findViewById(R.id.resolvedImageView);
         resolvedImageDateTextView = view.findViewById(R.id.resolvedImageDateTextView);
         resolvedCommentsTextView = view.findViewById(R.id.resolvedCommentsTextView);
@@ -207,124 +193,106 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
 
     private void setOnClickListeners() {
         if (!userType.equals("Auditor")) {
-            resolveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    resolveButton.setVisibility(View.GONE);
-                    resolvingCaseSection.setVisibility(View.VISIBLE);
-                }
+            resolveButton.setOnClickListener(v -> {
+                resolveButton.setVisibility(View.GONE);
+                resolvingCaseSection.setVisibility(View.VISIBLE);
             });
 
-            cameraButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                        File photoFile = null;
-                        try {
-                            photoFile = HandleImageOperations.createFile(getActivity());
-                        } catch (IOException ex) {
-                            Log.d(TAG, "takePhoto: error in creating file for image to go into");
-                        }
-                        if (photoFile != null) {
-                            mImageURI = FileProvider.getUriForFile(getActivity(),
-                                    "com.example.android.fileprovider",
-                                    photoFile);
-                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageURI);
-                            EspressoCountingIdlingResource.increment();
-                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                        } else {
-                            Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
-                            CentralisedToast.makeText(getActivity(), "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
-                        }
+            cameraButton.setOnClickListener(v -> {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    File photoFile = null;
+                    try {
+                        photoFile = HandleImageOperations.createFile(getActivity());
+                    } catch (IOException ex) {
+                        Log.d(TAG, "takePhoto: error in creating file for image to go into");
+                    }
+                    if (photoFile != null) {
+                        mImageURI = FileProvider.getUriForFile(getActivity(),
+                                "com.example.android.fileprovider",
+                                photoFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageURI);
+                        EspressoCountingIdlingResource.increment();
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                     } else {
-                        CentralisedToast.makeText(getActivity(), "Camera does not exist", CentralisedToast.LENGTH_SHORT);
+                        Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
+                        CentralisedToast.makeText(getActivity(), "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
                     }
+                } else {
+                    CentralisedToast.makeText(getActivity(), "Camera does not exist", CentralisedToast.LENGTH_SHORT);
                 }
             });
 
-            uploadButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                    startActivityForResult(pickPhoto , REQUEST_IMAGE_FROM_GALLERY);
-                }
+            uploadButton.setOnClickListener(v -> {
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                startActivityForResult(pickPhoto , REQUEST_IMAGE_FROM_GALLERY);
             });
 
-            confirmButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mImageBitmap == null) {
-                        CentralisedToast.makeText(getActivity(), "Please set an image before submitting your resolution!", CentralisedToast.LENGTH_SHORT);
-                        return;
-                    }
-                    createUpdatedCase(true);
-                    Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
-
-                    patchCall.enqueue(new Callback<Void>() {
-                        @Override
-                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                            Log.d(TAG, "patchCall onResponse: " + response);
-                            Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                            submit();
-                        }
-
-                        @Override
-                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
-                            Log.d(TAG, "deleteReport onFailure: " + t.toString());
-                            Toast.makeText(getActivity(), "Failed to update database", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    // upload non-null bitmap to database
-                    HandleImageOperations.uploadImageToDatabase(mImageBitmap, resolvedImageName);
+            confirmButton.setOnClickListener(v -> {
+                if (mImageBitmap == null) {
+                    CentralisedToast.makeText(getActivity(), "Please set an image before submitting your resolution!", CentralisedToast.LENGTH_SHORT);
+                    return;
                 }
+                createUpdatedCase(true);
+                Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+
+                patchCall.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                        Log.d(TAG, "patchCall onResponse: " + response);
+                        Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                        submit();
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                        Log.d(TAG, "deleteReport onFailure: " + t.toString());
+                        Toast.makeText(getActivity(), "Failed to update database", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                // upload non-null bitmap to database
+                HandleImageOperations.uploadImageToDatabase(mImageBitmap, resolvedImageName);
             });
         } else {
-            acceptButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // TODO: update case to be resolved
-                    createUpdatedCase(true);
-                    Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+            acceptButton.setOnClickListener(v -> {
+                // TODO: update case to be resolved
+                createUpdatedCase(true);
+                Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
 
-                    patchCall.enqueue(new Callback<Void>() {
-                        @Override
-                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                            Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                            CentralisedToast.makeText(getActivity(), "Resolution accepted successfully", CentralisedToast.LENGTH_SHORT);
-                        }
+                patchCall.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                        Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                        CentralisedToast.makeText(getActivity(), "Resolution accepted successfully", CentralisedToast.LENGTH_SHORT);
+                    }
 
-                        @Override
-                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
-                            t.printStackTrace();
-                            CentralisedToast.makeText(getActivity(), "Failed to accept resolution, try again.",
-                                    CentralisedToast.LENGTH_SHORT);
-                        }
-                    });
-                }
+                    @Override
+                    public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                        t.printStackTrace();
+                        CentralisedToast.makeText(getActivity(), "Failed to accept resolution, try again.",
+                                CentralisedToast.LENGTH_SHORT);
+                    }
+                });
             });
 
-            rejectButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    createUpdatedCase(false);
-                    Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+            rejectButton.setOnClickListener(v -> {
+                createUpdatedCase(false);
+                Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
 
-                    patchCall.enqueue(new Callback<Void>() {
-                        @Override
-                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                            Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                            CentralisedToast.makeText(getActivity(), "Resolution rejected successfully", CentralisedToast.LENGTH_SHORT);
-                        }
+                patchCall.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                        Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                        CentralisedToast.makeText(getActivity(), "Resolution rejected successfully", CentralisedToast.LENGTH_SHORT);
+                    }
 
-                        @Override
-                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
-                            t.printStackTrace();
-                            CentralisedToast.makeText(getActivity(), "Failed to reject resolution, try again.",
-                                    CentralisedToast.LENGTH_SHORT);
-                        }
-                    });
-                }
+                    @Override
+                    public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                        t.printStackTrace();
+                        CentralisedToast.makeText(getActivity(), "Failed to reject resolution, try again.",
+                                CentralisedToast.LENGTH_SHORT);
+                    }
+                });
             });
         }
     }
@@ -361,7 +329,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         bundle.putString(BUTTON_TXT_KEY, "Return to reports");
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
-        ExpandedCase.this.getParentFragmentManager()
+        CaseExpanded.this.getParentFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, statusConfirmationFragment)
                 .addToBackStack(null)
@@ -404,7 +372,6 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         Log.d(TAG, "setAllViews: called");
         setHalfBoldTextViews(companyTextView, company);
         setHalfBoldTextViews(institutionTextView, institution);
-        caseNumberTextView.setText((String)(caseNumberTextView.getText() + caseNumber.toString()));
         setHalfBoldTextViews(resolvedStatusTextView, (resolvedStatus?"Resolved":"Unresolved"));
     }
 
@@ -416,7 +383,7 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
         } else {
             int INT_END = originalText.length();
             SpannableStringBuilder str = new SpannableStringBuilder(originalText + textToAdd);
-            str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            str.setSpan(new android.text.style.StyleSpan(Typeface.NORMAL), 0, INT_END, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             mytextview.setText(str);
         }
     }
@@ -443,7 +410,6 @@ public class ExpandedCase extends Fragment implements IOnBackPressed {
             resolvedCommentsTextView.setText((String)(resolvedCommentsTextView.getText() + resolvedComments));
             resolvedImageView.setVisibility(View.VISIBLE);
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 300, 300);
-            unresolvedResolvedSeparator.setVisibility(VISIBLE);
             resolvedImageDateTextView.setVisibility(VISIBLE);
             resolvedCommentsTextView.setVisibility(VISIBLE);
         } else {

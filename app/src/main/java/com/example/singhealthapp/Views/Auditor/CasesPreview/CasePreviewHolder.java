@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.CasePreview;
+package com.example.singhealthapp.Views.Auditor.CasesPreview;
 
 import android.view.View;
 import android.widget.TextView;

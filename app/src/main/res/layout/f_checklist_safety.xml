@@ -56,6 +56,7 @@
             android:layout_height="wrap_content"
             android:background="#ffb684"
             android:text="Start Audit"
+            android:layout_margin="20dp"
             android:layout_gravity="center"/>
 
     </LinearLayout>

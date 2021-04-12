@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.Reports;
+package com.example.singhealthapp.Views.ReportsPreview;
 
 import android.os.Build;
 import android.text.Html;
@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
+import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
 
 import java.util.List;
 
@@ -73,7 +73,7 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
         holder.id.setText("");
         holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
                 .replace(parent.getSupportFragmentManager().findFragmentByTag("getReport").getId()
-                        , new AuditorReportFragment(reports.get(position), token), "viewReport").commit());
+                        , new ReportSummaryFragment(reports.get(position), token), "viewReport").commit());
     }
 
     @Override

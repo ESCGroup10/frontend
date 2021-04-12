@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.AuditorReport;
+package com.example.singhealthapp.Views.Auditor.ReportSummary;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,7 +17,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
+import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -33,8 +33,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AuditorReportFragment extends Fragment {
-    private static final String TAG = "AuditorReportFragment";
+public class ReportSummaryFragment extends Fragment {
+    private static final String TAG = "ReportSummaryFragment";
     Report report;
     View view;
     TextView company, location, resolved, unresolved;
@@ -47,7 +47,7 @@ public class AuditorReportFragment extends Fragment {
     private final String token;
     List<Case> resolvedCases, unresolvedCases;
 
-    public AuditorReportFragment(Report report, String token) {
+    public ReportSummaryFragment(Report report, String token) {
         this.report = report;
         data = new float[][]{new float[]{report.getStaffhygiene_score()*100f, 100f - report.getStaffhygiene_score()*100f},
                 new float[]{report.getHousekeeping_score()*100f, 100f - report.getHousekeeping_score()*100f},
@@ -125,7 +125,7 @@ public class AuditorReportFragment extends Fragment {
                             button.setEnabled(true);
                             button.setOnClickListener(v -> getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(getActivity().getSupportFragmentManager().findFragmentByTag("viewReport").getId()
-                                            , new CaseFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation(), report, token),
+                                            , new CasesPreviewFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation(), report, token),
                                             "viewCase").commit());
                         }
                     }

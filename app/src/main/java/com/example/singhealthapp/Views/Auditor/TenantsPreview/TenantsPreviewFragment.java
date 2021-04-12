@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.SearchTenant;
+package com.example.singhealthapp.Views.Auditor.TenantsPreview;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,7 +19,7 @@ import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.Tenants.TenantsFragment;
+import com.example.singhealthapp.Views.Auditor.TenantExpanded.TenantExpandedFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +30,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SearchTenantFragment extends Fragment implements SearchAdapter.NavFromTenantSelection {
+public class TenantsPreviewFragment extends Fragment implements TenantsPreviewAdapter.NavFromTenantSelection {
 
-    SearchAdapter adapter;
-    private ArrayList<SearchMain> tenantPreviews, getTenantPreviews;
+    TenantsPreviewAdapter adapter;
+    private ArrayList<Tenant> tenantPreviews, getTenantPreviews;
     private List<Tenant> tenants, displayTenants;
 
     @Nullable
@@ -52,10 +52,10 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
     private void queueList(String token){
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-        Call<List<SearchMain>> call = apiCaller.getSearchMain("Token " + token);
-        call.enqueue(new Callback<List<SearchMain>>() {
+        Call<List<Tenant>> call = apiCaller.getTenant("Token " + token);
+        call.enqueue(new Callback<List<Tenant>>() {
             @Override
-            public void onResponse(Call<List<SearchMain>> call, Response<List<SearchMain>> response) {
+            public void onResponse(Call<List<Tenant>> call, Response<List<Tenant>> response) {
                 if (!response.isSuccessful()) {
                     Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                     return;
@@ -64,13 +64,13 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
                 queueReport(token, response.body());
             }
             @Override
-            public void onFailure(Call<List<SearchMain>> call, Throwable t) {
+            public void onFailure(Call<List<Tenant>> call, Throwable t) {
                 Toast.makeText(getActivity(), "Failure: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private void queueReport(String token, List<SearchMain> tenantSearch){
+    private void queueReport(String token, List<Tenant> tenantSearch){
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
         Call<List<Tenant>> call = apiCaller.getTenant("Token " + token);
@@ -82,7 +82,7 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
                     return ;
                 }
                 System.out.println(response.body().get(0).getId());
-                adapter = new SearchAdapter(tenantSearch, response.body(), getActivity(), loadToken(), SearchTenantFragment.this);
+                adapter = new TenantsPreviewAdapter(tenantSearch, response.body(), getActivity(), loadToken(), TenantsPreviewFragment.this);
                 tenants = response.body();
                 try {
                     RecyclerView view = (RecyclerView) getView().findViewById(R.id.tenantRecycler);
@@ -113,9 +113,9 @@ public class SearchTenantFragment extends Fragment implements SearchAdapter.NavF
     @Override
     public void navigate(int position) {
         ((Ping)requireActivity()).incrementCountingIdlingResource(1);
-        SearchTenantFragment.this.getParentFragmentManager()
+        TenantsPreviewFragment.this.getParentFragmentManager()
                 .beginTransaction()
-                .replace(R.id.auditor_fragment_container, new TenantsFragment(tenants.get(position)),"tenantsFragment")
+                .replace(R.id.auditor_fragment_container, new TenantExpandedFragment(tenants.get(position)),"tenantsFragment")
                 .addToBackStack(null)
                 .commit();
     }

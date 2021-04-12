@@ -17,8 +17,8 @@
             android:layout_height="30dp"
             android:textSize="18dp"
             android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
             android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"
             android:id="@+id/reportCompany"/>
 
         <TextView
@@ -187,7 +187,6 @@
             android:layout_marginBottom="10dp"
             android:background="#ffb684"
             android:layout_gravity="center"
-            android:textSize="18sp"
             android:text="view cases" />
 
     </LinearLayout>

@@ -33,7 +33,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
+import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.cloud.storage.Storage;
@@ -267,9 +267,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         Bundle bundle = new Bundle();
         //keys
         String TITLE_KEY = "title_key";
-        bundle.putString(TITLE_KEY, "Audit Submitted");
+        bundle.putString(TITLE_KEY, "Confirmation");
         String MSG_KEY = "message_key";
-        bundle.putString(MSG_KEY, "Audit Complete!");
+        bundle.putString(MSG_KEY, "Audit Successful!");
         String BUTTON_TXT_KEY = "button_text_key";
         bundle.putString(BUTTON_TXT_KEY, "Return");
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
@@ -299,7 +299,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                             deleteReport();
                             deleteRecentlySubmittedCases();
                             getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.auditor_fragment_container, new SearchTenantFragment())
+                                    .replace(R.id.auditor_fragment_container, new TenantsPreviewFragment())
                                     .commit();
                             dialog.dismiss();
                         }

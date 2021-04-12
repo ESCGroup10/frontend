@@ -23,7 +23,7 @@
             android:layout_margin="20dp"
             android:id="@+id/test_button"
             android:text="Get All Users"
-            android:background="#a4bf"
+            android:background="#ffb684"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -37,7 +37,7 @@
             android:layout_margin="20dp"
             android:id="@+id/post_button"
             android:text="Add New User"
-            android:background="#a4bf"
+            android:background="#ffb684"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -51,7 +51,7 @@
             android:layout_margin="20dp"
             android:id="@+id/listimage_button"
             android:text="List images name"
-            android:background="#a4bf"
+            android:background="#ffb684"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -65,7 +65,7 @@
             android:layout_margin="20dp"
             android:id="@+id/uploadImg_button"
             android:text="Upload Image"
-            android:background="#a4bf"
+            android:background="#ffb684"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -78,7 +78,7 @@
             android:layout_margin="20dp"
             android:id="@+id/retrieveImg_button"
             android:text="Retrieve Image"
-            android:background="#a4bf"
+            android:background="#ffb684"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

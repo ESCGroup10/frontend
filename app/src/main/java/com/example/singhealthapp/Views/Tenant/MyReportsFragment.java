@@ -23,7 +23,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportPreviewTenantAdapter;
+import com.example.singhealthapp.Views.ReportsPreview.ReportPreviewTenantAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

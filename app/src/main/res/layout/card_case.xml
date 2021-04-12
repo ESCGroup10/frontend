@@ -5,73 +5,66 @@
     android:layout_marginBottom="20dp">
 
     <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/casePreviewCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:orientation="vertical"
-        android:layout_margin="5dp"
-        app:cardCornerRadius="3dp"
-        app:cardBackgroundColor="#ffb684"
-        app:cardElevation="5dp"
-        android:id="@+id/casePreviewCard">
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="3dp">
+
+        <TextView
+            android:id="@+id/casePreviewName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:gravity="center"/>
+
+        <LinearLayout
+            android:padding="10dp"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:textStyle="bold"
+                android:layout_marginLeft="20dp"
+                android:text="Type"/>
+
+            <TextView
+                android:id="@+id/casePreviewType"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Hello"
+                android:layout_marginRight="20dp"
+                android:gravity="right"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:padding="10dp"
+            android:layout_marginTop="65dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:textStyle="bold"
+                android:text="Status" />
 
             <TextView
+                android:id="@+id/casePreviewStatus"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:textStyle="bold"
-                android:id="@+id/casePreviewName"
-                android:gravity="center"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="65dp"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_height="0dp"
-                    android:layout_width="match_parent"
-                    android:layout_weight="0.6"
-                    android:paddingLeft="30dp"
-                    android:text="Non-compliance type:"
-                    android:textStyle="bold"
-                    android:gravity="left|center_horizontal"/>
-
-                <TextView
-                    android:layout_height="0dp"
-                    android:layout_width="match_parent"
-                    android:layout_weight="1"
-                    android:id="@+id/casePreviewType"
-                    android:paddingLeft="30dp"
-                />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:textStyle="bold"
-                    android:paddingLeft="30dp"
-                    android:text="Status: "
-                    android:gravity="left|center_horizontal"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/casePreviewStatus"
-                    android:gravity="left|center_horizontal"/>
-
-            </LinearLayout>
-
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:text="Hello"
+                android:gravity="right" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
 </RelativeLayout>

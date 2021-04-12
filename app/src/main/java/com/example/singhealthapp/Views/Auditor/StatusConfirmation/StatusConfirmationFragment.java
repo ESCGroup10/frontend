@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
+import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
 import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
 
 import java.util.Arrays;
@@ -62,7 +62,7 @@ public class StatusConfirmationFragment extends Fragment {
             ((Ping) requireActivity()).incrementCountingIdlingResource(1);
             if (userType.equals("Auditor")) {
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport")
+                        .replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "getReport")
                         .commit();
             } else {
                 getParentFragmentManager().beginTransaction()

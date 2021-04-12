@@ -34,19 +34,19 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textSize="18dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/tenantCardType" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:textSize="18dp"
                 android:gravity="center_horizontal"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/tenantCardInstitution" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:textSize="18dp"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/tenantCardType" />
 
         </LinearLayout>
 
