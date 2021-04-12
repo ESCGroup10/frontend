@@ -42,7 +42,7 @@ public class AddTenantFragment extends Fragment {
     private String token;
 
     ArrayList<EditText> editList = new ArrayList<EditText>();
-    private final String[] name = {"TENANT REP NAME", "COMPANY NAME", "EMAIL", "LOCATION", "INSTITUTION"};
+    private final String[] name = {"Owner Name", "Company", "Email Address", "Location", "Institution"};
     private final List<String> nameList = Arrays.asList(name);
     private final String[] type = {"F&B", "Non F&B"};
     private final String regExpnEmail =
@@ -58,7 +58,7 @@ public class AddTenantFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Add New Tenant");
-        View view = inflater.inflate(R.layout.fragment_add_tenant, container, false);
+        View view = inflater.inflate(R.layout.f_add_tenant, container, false);
 
         editList.add(view.findViewById(R.id.text2));
         editList.add(view.findViewById(R.id.text3));
@@ -90,8 +90,8 @@ public class AddTenantFragment extends Fragment {
         view.findViewById(R.id.addTenantConfirm).setOnClickListener(v -> {
             if ( saveTenant(spin.getSelectedItem().toString()) ) {
                 new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                        .setTitle("SUCCESS")
-                        .setMessage("NEW TENANT ADDED!")
+                        .setTitle("Success")
+                        .setMessage("New Tenant Added!")
                         .setPositiveButton(android.R.string.yes, null).create().show();
             }
         });
@@ -105,7 +105,7 @@ public class AddTenantFragment extends Fragment {
         EditText temp = new EditText(getContext());
         temp.setMaxLines(1);
         temp.setInputType(InputType.TYPE_CLASS_TEXT);
-        if (name.equals("EMAIL")) temp.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        if (name.equals("Email Address")) temp.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 
         temp.setText(t.getText());
         alert.setView(temp);
@@ -115,15 +115,15 @@ public class AddTenantFragment extends Fragment {
         alert.setPositiveButton("Ok", (dialog, whichButton) -> {
 
             // check email format
-            if ( name.equals("EMAIL") && ! temp.getText().toString().isEmpty()) {
+            if ( name.equals("Email Address") && ! temp.getText().toString().isEmpty()) {
                 CharSequence inputStr = temp.getText().toString();
                 Pattern pattern = Pattern.compile(regExpnEmail, Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(inputStr);
 
                 if ( ! matcher.matches() ) {
                     new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                            .setTitle("ERROR")
-                            .setMessage("INVALID EMAIL FORMAT!")
+                            .setTitle("Please Try Again")
+                            .setMessage("Invalid email format")
                             .setPositiveButton(android.R.string.yes, (arg0, arg1) ->
                                     t.performClick()).create().show();
                     return ;
@@ -152,8 +152,8 @@ public class AddTenantFragment extends Fragment {
         for (EditText t : editList){
             if (t.getText().toString().isEmpty()) {
                 new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                        .setTitle("ERROR")
-                        .setMessage("THERE ARE STILL BLANK FIELD LEFT!")
+                        .setTitle("Please Try Again")
+                        .setMessage("Fill in all empty fields")
                         .setPositiveButton(android.R.string.yes, null).create().show();
                 return false;
             }

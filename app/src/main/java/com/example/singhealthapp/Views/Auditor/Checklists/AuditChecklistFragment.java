@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
@@ -36,7 +33,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
+import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.cloud.storage.Storage;
@@ -270,9 +267,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         Bundle bundle = new Bundle();
         //keys
         String TITLE_KEY = "title_key";
-        bundle.putString(TITLE_KEY, "Audit Submitted");
+        bundle.putString(TITLE_KEY, "Confirmation");
         String MSG_KEY = "message_key";
-        bundle.putString(MSG_KEY, "Audit Complete!");
+        bundle.putString(MSG_KEY, "Audit Successful!");
         String BUTTON_TXT_KEY = "button_text_key";
         bundle.putString(BUTTON_TXT_KEY, "Return");
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
@@ -302,7 +299,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                             deleteReport();
                             deleteRecentlySubmittedCases();
                             getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.auditor_fragment_container, new SearchTenantFragment())
+                                    .replace(R.id.auditor_fragment_container, new TenantsPreviewFragment())
                                     .commit();
                             dialog.dismiss();
                         }
@@ -654,16 +651,16 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         View view;
         if (tenantType.equals("F&B")) {
             Log.d(TAG, "onCreateView: setting up for F&B");
-            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+            view = inflater.inflate(R.layout.f_checklist_audit_fb, container, false);
             header_files = new String[]{"F&B_food_hygiene.txt", "F&B_healthier_choice.txt", "F&B_professionalism_and_staff_hygiene.txt", "F&B_workplace_safety_and_health.txt", "F&B_housekeeping_and_general_cleanliness.txt"};
         } else if (tenantType.equals("Non F&B")) {
             Log.d(TAG, "onCreateView: setting up for Non F&B");
-            view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
+            view = inflater.inflate(R.layout.f_checklist_audit_nfb, container, false);
             header_files = new String[]{"Non_F&B_professionalism_and_staff_hygiene.txt", "Non_F&B_workplace_safety_and_health.txt", "Non_F&B_housekeeping_and_general_cleanliness.txt"};
         } else {
             Log.d(TAG, "onCreateView: invalid tenant type: "+tenantType);
             Log.d(TAG, "inflateFragmentLayout: maybe check file names?");
-            view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
+            view = inflater.inflate(R.layout.f_checklist_audit_fb, container, false);
         }
 
         return view;

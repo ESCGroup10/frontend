@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_expanded_case">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            app:cardCornerRadius="3dp"
+            app:cardElevation="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="15dp"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:text="Case Information"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:id="@+id/companyTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="15dp"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:layout_gravity="center" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+
+                    android:layout_marginRight="40dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="Type"
+                        />
+
+                    <TextView
+                        android:id="@+id/nonComplianceTypeTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:gravity="right"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="Status"
+                        />
+
+                    <TextView
+                        android:id="@+id/resolvedStatusTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:gravity="right"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="Institution"
+                        />
+
+                    <TextView
+                        android:id="@+id/institutionTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:gravity="right"
+                        />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/unresolvedImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/imageview_border"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="20dp"
+                    android:contentDescription="@string/unresolved_image"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/unresolvedImageViewPlaceholder"
+                    android:layout_width="325dp"
+                    android:layout_height="200dp"
+                    android:background="#fff5ed"
+                    android:elevation="3dp"
+                    android:gravity="center"
+                    android:layout_margin="20dp"
+                    android:text="Loading image..."
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/unresolvedImageDateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Captured on: "
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/unresolvedCommentsTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:text="Cockroaches spotted!"
+                    android:layout_margin="20dp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <ImageView
+                    android:id="@+id/resolvedImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/imageview_border"
+                    android:adjustViewBounds="true"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@string/resolved_image"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/resolvedImageViewPlaceholder"
+                    android:layout_width="325dp"
+                    android:layout_height="200dp"
+                    android:elevation="3dp"
+                    android:text="Loading image..."
+                    android:gravity="center"
+                    android:layout_margin="20dp"
+                    android:textSize="20sp"
+                    android:background="#fff5ed"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/resolvedImageDateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Captured on: "
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/resolvedCommentsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"/>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="30dp"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/resolveButton"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:text="Resolve"
+                android:background="#ffaf7a"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/rejectButton"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Reject"
+                    android:background="#fff5ed"
+                    android:visibility="gone"
+                    android:layout_margin="20dp"/>
+
+                <Button
+                    android:id="@+id/acceptButton"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="Accept"
+                    android:background="#ffaf7a"
+                    android:visibility="gone"
+                    android:layout_margin="20dp"/>
+
+            </LinearLayout>
+
+            <include layout="@layout/f_case_resolution"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -46,7 +46,7 @@ public class StatisticsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("View Statistics");
-        View view = inflater.inflate(R.layout.fragment_statistics, container, false);
+        View view = inflater.inflate(R.layout.f_stats, container, false);
 
         tabLayout = view.findViewById(R.id.stats_tabLayout);
         viewPager = view.findViewById(R.id.stats_viewPager);

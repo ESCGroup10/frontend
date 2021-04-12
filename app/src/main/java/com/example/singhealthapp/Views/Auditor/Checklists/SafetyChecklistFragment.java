@@ -44,7 +44,7 @@ public class SafetyChecklistFragment extends Fragment {
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //TODO: implement shared pref (if have time)
         getActivity().setTitle("COVID safe measures checklist");
-        View view = inflater.inflate(R.layout.fragment_safety_checklist, container, false);
+        View view = inflater.inflate(R.layout.f_checklist_safety, container, false);
 
         Bundle bundle = getArguments();
         tenantType = bundle.getString("TENANT_TYPE_KEY");

@@ -49,7 +49,7 @@ public class LatestReportFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Latest Report");
-        View view = inflater.inflate(R.layout.fragment_latest_report, container, false);
+        View view = inflater.inflate(R.layout.f_report_latest, container, false);
 
         try {
             SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
@@ -95,12 +95,12 @@ public class LatestReportFragment extends Fragment {
                     date.setText(report.getReport_date().substring(0,10) + " " + report.getReport_date().substring(11, 19));
                     resolvedText = view.findViewById(R.id.resolvedLatestReport);
                     if (report.isStatus()) {
-                        resolvedText.setText("COMPLETED");
-                        resolvedText.setTextColor(Color.rgb(159, 221, 88));
+                        resolvedText.setText("Completed");
+                        resolvedText.setTextColor(Color.parseColor("#62bd69"));
                     }
                     else {
-                        resolvedText.setText("UNRESOLVED");
-                        resolvedText.setTextColor(Color.rgb(239, 117, 119));
+                        resolvedText.setText("Unresolved");
+                        resolvedText.setTextColor(Color.parseColor("#ff6961"));
                     }
                     resolved = view.findViewById(R.id.auditorReportResolved);
                     unresolved = view.findViewById(R.id.auditorReportUnresolved);

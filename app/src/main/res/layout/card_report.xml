@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="3dp">
+
+        <LinearLayout
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/reportPreviewName"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:textStyle="bold"
+                android:layout_marginLeft="20dp"
+                android:text="Hello"/>
+
+            <TextView
+                android:id="@+id/reportPreviewDate"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Hello"
+                android:layout_marginRight="20dp"
+                android:gravity="right"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginTop="35dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/idReportPreview"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:textStyle="bold"
+                android:text="Hello" />
+
+            <TextView
+                android:id="@+id/resolutionPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:text="Hello"
+                android:gravity="right" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>
