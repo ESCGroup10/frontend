@@ -35,6 +35,7 @@ public class SafetyChecklistFragment extends Fragment {
     private int tenantID;
     private String tenantCompany;
     private String tenantLocation;
+    private String tenantInstitution;
 
     Button start_audit_button;
 
@@ -51,6 +52,7 @@ public class SafetyChecklistFragment extends Fragment {
         tenantID = bundle.getInt("ID_KEY");
         tenantCompany = bundle.getString("COMPANY_KEY");
         tenantLocation = bundle.getString("LOCATION_KEY");
+        tenantInstitution = bundle.getString("INSTITUTION_KEY");
 
         checklist_items_array_part1 = new ArrayList<>();
         checklist_items_array_part2 = new ArrayList<>();
@@ -74,6 +76,7 @@ public class SafetyChecklistFragment extends Fragment {
                 bundle.putInt("ID_KEY", tenantID);
                 bundle.putString("COMPANY_KEY", tenantCompany);
                 bundle.putString("LOCATION_KEY", tenantLocation);
+                bundle.putString("INSTITUTION_KEY", tenantInstitution);
                 Log.d(TAG, "tenantType sending: "+tenantType);
                 AuditChecklistFragment auditChecklistFragment = new AuditChecklistFragment();
                 auditChecklistFragment.setArguments(bundle);

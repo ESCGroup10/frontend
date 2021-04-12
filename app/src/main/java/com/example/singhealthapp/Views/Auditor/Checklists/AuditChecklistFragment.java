@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,11 +38,10 @@ import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,27 +82,29 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     boolean stopCreatingCases = false;
 
     private static DatabaseApiCaller apiCaller;
+    private Report thisReport;
     private String token;
     private int userID;
     private int tenantID;
     private String tenantCompany;
     private String tenantLocation;
+    private String tenentInstitution;
     String tenantType;
     private int reportID = -2;
 
     //scores
-    private float staff_hygiene_score = 0;
+    private float staffhygiene_score = 0;
     private float housekeeping_score = 0;
     private float safety_score = 0;
     private float healthierchoice_score = 0;
     private float foodhygiene_score = 0;
-    private float original_staff_hygiene_score = 0;
+    private float original_staffhygiene_score = 0;
     private float original_housekeeping_score = 0;
     private float original_safety_score = 0;
     private float original_healthierchoice_score = 0;
     private float original_foodhygiene_score = 0;
 
-    private float staff_hygiene_weightage = 0;
+    private float staffhygiene_weightage = 0;
     private float housekeeping_weightage = 0;
     private float safety_weightage = 0;
     private float healthierchoice_weightage = 0;
@@ -122,16 +122,13 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Audit checklist");
 
-//        new Thread(() -> {
-//            // warm up the storage...
-//                Storage storage = StorageOptions.getDefaultInstance().getService();
-//        }).start();
-
         Bundle bundle = getArguments();
         tenantType = bundle.getString("TENANT_TYPE_KEY");
         tenantID = bundle.getInt("ID_KEY");
         tenantCompany = bundle.getString("COMPANY_KEY");
         tenantLocation = bundle.getString("LOCATION_KEY");
+        tenentInstitution = bundle.getString("INSTITUTION_KEY");
+        Log.d(TAG, "onCreateView: inst: "+tenentInstitution);
         View view = inflateFragmentLayout(tenantType, container, inflater);
         initScoresAndPercentages(tenantType);
 
@@ -141,8 +138,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
         setAllListeners();
         initApiCaller();
-        new Thread(AuditChecklistFragment.this::loadToken).start();
-        new Thread(AuditChecklistFragment.this::loadUserID).start();
+        loadToken();
+        loadUserID();
         new Thread(() -> createReport(false)).start();
 
         return view;
@@ -168,8 +165,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             FoodHygieneTextView = view.findViewById(R.id.FoodHygieneTextView);
             HealthierChoiceTextView = view.findViewById(R.id.HealthierChoiceTextView);
         } else {
-            ((Ping)requireActivity()).decrementCountingIdlingResource();
-            ((Ping)requireActivity()).decrementCountingIdlingResource();
+            EspressoCountingIdlingResource.decrement();
+            EspressoCountingIdlingResource.decrement();
         }
     }
 
@@ -209,11 +206,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         submit_audit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                print_scores();
                 try {
                     calculateScores();
                 } catch (IllegalArgumentException ex) {
-                    Log.d(TAG, "calculateScores IllegalArgumentException: "+ex);
+                    ex.printStackTrace();
+                    Log.d(TAG, "calculateScores IllegalArgumentException");
                 }
+                print_scores();
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                 builder.setTitle("Confirm Submission?")
                         .setMessage("Total non compliance cases: "+numCases+"\nResult: "+passFail)
@@ -229,6 +229,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (createCases()) {
+                                    print_scores();
                                     submit();
                                     createReport(true);
                                     clearAllPhotosFromContainerActivity();
@@ -241,16 +242,25 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         });
     }
 
-    private Report updateReportScores() {
-        Log.d(TAG, "updateReportScores: called");
-        Report finalReport = new Report();
+    private void print_scores() {
+        Log.d(TAG, "print_scores{" +
+                "staffhygiene_score=" + staffhygiene_score +
+                ", housekeeping_score=" + housekeeping_score +
+                ", safety_score=" + safety_score +
+                ", healthierchoice_score=" + healthierchoice_score +
+                ", foodhygiene_score=" + foodhygiene_score +
+                '}');
+    }
+
+    private void updateToFinalReport() {
         // set all scores
-        finalReport.setFoodhygiene_score(foodhygiene_score);
-        finalReport.setHealthierchoice_score(healthierchoice_score);
-        finalReport.setHousekeeping_score(housekeeping_score);
-        finalReport.setSafety_score(safety_score);
-        finalReport.setStaffhygiene_score(staff_hygiene_score);
-        return finalReport;
+        thisReport.setFoodhygiene_score(round(foodhygiene_score, 2));
+        thisReport.setHealthierchoice_score(round(healthierchoice_score, 2));
+        thisReport.setHousekeeping_score(round(housekeeping_score, 2));
+        thisReport.setSafety_score(round(safety_score, 2));
+        thisReport.setStaffhygiene_score(round(staffhygiene_score, 2));
+        // check final report
+        Log.d(TAG, "updateToFinalReport: "+thisReport.toString());
     }
 
     private final void focusOnView(TextView tv){
@@ -268,7 +278,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             deleteRequest.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                    Log.d(TAG, "deleteReport onResponse: "+response);
                     Log.d(TAG, "deleteReport onResponse: code: "+response.code());
                 }
 
@@ -351,14 +360,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private float round(double num, int dec) {
-        return Math.round(num * (Math.pow(10.0, dec)) / (Math.pow(10.0, dec)));
+        DecimalFormat df = new DecimalFormat("0.00");
+        return Float.parseFloat(df.format(num));
     }
 
     private void createReport(boolean patch) {
         if (patch) {
-            Log.d(TAG, "createReport: patching report");
-            Report finalReport = updateReportScores();
-            Call<Void> patchReport = apiCaller.patchReport("Token " + token, reportID, finalReport);
+            updateToFinalReport();
+            Call<Void> patchReport = apiCaller.patchReport("Token " + token, reportID, thisReport);
             patchReport.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
@@ -372,15 +381,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 }
             });
         } else {
-            Log.d(TAG, "createReport: initial report");
             if (tenantType.equals("F&B")) {
-                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
-                        false, getOverallNotes(), null, round(staff_hygiene_score, 2),
+                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
+                        tenantType, false, getOverallNotes(), null, round(staffhygiene_score, 2),
                         round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
                         round(foodhygiene_score, 2));
             } else {
-                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenantType,
-                        false, getOverallNotes(), null, round(staff_hygiene_score, 2),
+                reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
+                        tenantType, false, getOverallNotes(), null, round(staffhygiene_score, 2),
                         round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
             }
             reportCall.enqueue(new Callback<Report>() {
@@ -388,22 +396,13 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 public void onResponse(Call<Report> call, Response<Report> response) {
                     // sometimes, response comes back as null the first time
                     Log.d(TAG, "onResponse: code: "+response.code());
+                    Log.d(TAG, "onResponse: reportID="+reportID);
                     try {
+                        thisReport = response.body();
                         reportID = response.body().getId();
-                        Log.d(TAG, "onResponse: reportID="+reportID);
                         EspressoCountingIdlingResource.decrement();
                     } catch (Exception e) {
-                        Log.d(TAG, "onResponse: error making initial report");
-                        Log.d(TAG, "onResponse: reportID="+reportID);
                         e.printStackTrace();
-                        new android.os.Handler(Looper.getMainLooper()).postDelayed(
-                                new Runnable() {
-                                    public void run() {
-                                        Log.i("tag", "This'll run 300 milliseconds later");
-                                        createReport(false);
-                                    }
-                                },
-                                300);
                     }
                 }
 
@@ -430,7 +429,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private boolean createCases() {
         stopCreatingCases = false;
         photoBitmapHashMap = getAllPhotos();
-        Log.d(TAG, "createCases: len photos: "+photoBitmapHashMap.size());
         for (int i=0; i<checklistAdapterArrayList.size(); i++) { //loop through all the recyclerView adapters
             String non_compliance_type = recyclerViewNameArrayList.get(i); //get the non-compliance type associated with this adapter
             ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases(); //get the cases from the recyclerView associated with this adapter
@@ -450,23 +448,25 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     stopCreatingCases = true;
                     return false;
                 }
+
+                // get date
                 SimpleDateFormat dateFormat = new SimpleDateFormat(
                         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 String datetime = dateFormat.format(new Date());
-                Log.d(TAG, "createCases: datetime: "+datetime);
+
                 caseCall = apiCaller.postCase("Token "+token, reportID, tenantID, question, 0, non_compliance_type,
-                        photoName, comments, datetime);
+                        photoName, comments, datetime, "");
                 caseCall.enqueue(new Callback<Case>() {
                     @Override
                     public void onResponse(@NotNull Call<Case> call, @NotNull Response<Case> response) {
                         Log.d(TAG, "createCases response code: "+response.code());
                         int caseID = response.body().getId();
-                        String question = response.body().getQuestion();
                         synchronized(submittedCaseIDs) { // make sure we don't have undesirable modifications
-                            submittedCaseIDs.add(caseID); //keep track of the caseIDs that have been created
+                            submittedCaseIDs.add(caseID); // keep track of the caseIDs that have been created
                         }
-                        HandleImageOperations.uploadImageToDatabase(photoBitmap, photoName); //upload non-null bitmap to database
+                        //upload non-null bitmap to database
+                        HandleImageOperations.uploadImageToDatabase(photoBitmap, photoName);
                         if (stopCreatingCases) {
                             deleteCase(caseID);
                         }
@@ -535,7 +535,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void reInitScores() {
-        staff_hygiene_score=original_staff_hygiene_score;
+        staffhygiene_score=original_staffhygiene_score;
         housekeeping_score=original_housekeeping_score;
         foodhygiene_score=original_foodhygiene_score;
         healthierchoice_score=original_healthierchoice_score;
@@ -546,59 +546,49 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         numCases = 0;
         reInitScores();
         if (checklistAdapterArrayList.size() != recyclerViewNameArrayList.size()) {
-            Log.d(TAG, "calculateScores: something went wrong when creating recyclerviews");
+            Log.d(TAG, "calculateScores: something went wrong when creating recyclerViews");
             return;
         }
         for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String name = recyclerViewNameArrayList.get(i);
-            Log.d(TAG, "calculateScores: name: "+name);
             int currentChecklistNumCases = checklistAdapterArrayList.get(i).getNumCases();
-            Log.d(TAG, "calculateScores: num cases for this name: "+currentChecklistNumCases);
             numCases += currentChecklistNumCases;
 
             switch (name) {
                 case "Professional & Staff Hygiene":
-                    staff_hygiene_score-=currentChecklistNumCases;
-                    Log.d(TAG, "calculateScores: current staff_hygiene_score: "+staff_hygiene_score);
+                    staffhygiene_score-=currentChecklistNumCases;
                     break;
                 case "Housekeeping & General Cleanliness":
                     housekeeping_score-=currentChecklistNumCases;
-                    Log.d(TAG, "calculateScores: current housekeeping_score: "+housekeeping_score);
                     break;
                 case "Healthier Choice":
                     foodhygiene_score-=currentChecklistNumCases;
-                    Log.d(TAG, "calculateScores: current foodhygiene_score: "+foodhygiene_score);
                     break;
                 case "Food Hygiene":
                     healthierchoice_score-=currentChecklistNumCases;
-                    Log.d(TAG, "calculateScores: current healthierchoice_score: "+healthierchoice_score);
                     break;
                 case "Workplace Safety & Health":
                     safety_score-=currentChecklistNumCases;
-                    Log.d(TAG, "calculateScores: current safety_score: "+safety_score);
                     break;
                 default:
                     throw new IllegalArgumentException();
             }
         }
-        staff_hygiene_score = staff_hygiene_score* staff_hygiene_weightage /original_staff_hygiene_score;
+        // calculate scores
+        staffhygiene_score = staffhygiene_score* staffhygiene_weightage /original_staffhygiene_score;
         housekeeping_score = housekeeping_score* housekeeping_weightage /original_housekeeping_score;
         safety_score = safety_score* safety_weightage /original_safety_score;
         if (tenantType.equals("F&B")) {
             healthierchoice_score = healthierchoice_score * healthierchoice_weightage / original_healthierchoice_score;
             foodhygiene_score = foodhygiene_score * foodhygiene_weightage / original_foodhygiene_score;
         }
-        Log.d(TAG, "calculateScores: final scores: staff_hygiene_score: "+staff_hygiene_score+"\n"+
-                "housekeeping_score: "+housekeeping_score+"\n"+
-                "healthierchoice_score: "+healthierchoice_score+"\n"+
-                "foodhygiene_score: "+foodhygiene_score+"\n"+
-                "safety_score: "+safety_score);
-        if (staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 0.95) {
+
+        // decide whether pass or fail
+        if (staffhygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 0.95) {
             passFail = "Fail";
         } else {
             passFail = "Pass";
         }
-        Log.d(TAG, "calculateScores: final score: "+(staff_hygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score));
     }
 
     private synchronized void init_recyclerView(RecyclerView recyclerView, ArrayList<ChecklistItem> list, String recyclerViewName) {
@@ -715,11 +705,13 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         if (tenantType.equals("F&B")) {
             Log.d(TAG, "onCreateView: setting up for F&B");
             view = inflater.inflate(R.layout.fragment_fb_audit_checklist, container, false);
-            header_files = new String[]{"F&B_food_hygiene.txt", "F&B_healthier_choice.txt", "F&B_professionalism_and_staff_hygiene.txt", "F&B_workplace_safety_and_health.txt", "F&B_housekeeping_and_general_cleanliness.txt"};
+            header_files = new String[]{"F&B_food_hygiene.txt", "F&B_healthier_choice.txt", "F&B_professionalism_and_staff_hygiene.txt",
+                    "F&B_workplace_safety_and_health.txt", "F&B_housekeeping_and_general_cleanliness.txt"};
         } else if (tenantType.equals("Non F&B")) {
             Log.d(TAG, "onCreateView: setting up for Non F&B");
             view = inflater.inflate(R.layout.fragment_nfb_audit_checklist, container, false);
-            header_files = new String[]{"Non_F&B_professionalism_and_staff_hygiene.txt", "Non_F&B_workplace_safety_and_health.txt", "Non_F&B_housekeeping_and_general_cleanliness.txt"};
+            header_files = new String[]{"Non_F&B_professionalism_and_staff_hygiene.txt", "Non_F&B_workplace_safety_and_health.txt",
+                    "Non_F&B_housekeeping_and_general_cleanliness.txt"};
         } else {
             Log.d(TAG, "onCreateView: invalid tenant type: "+tenantType);
             Log.d(TAG, "inflateFragmentLayout: maybe check file names?");
@@ -733,7 +725,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         ArrayList<Thread> threadArrayList = new ArrayList<>();
         // initialize and fill all recyclerViews using text files in assets directory
         for (String pathName : header_files) {
-            Log.d(TAG, "onCreateView: init checklist section for: "+pathName);
             CreateRecyclerViewThread createRecyclerViewThread = new CreateRecyclerViewThread(view, pathName);
             Thread thread = new Thread(createRecyclerViewThread);
             threadArrayList.add(thread);
@@ -755,35 +746,33 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     private void initScoresAndPercentages(String tenantType) {
         if (tenantType.equals("F&B")) {
-            staff_hygiene_score = 13;
+            staffhygiene_score = 13;
             housekeeping_score = 17;
             safety_score = 18;
             healthierchoice_score = 11;
             foodhygiene_score = 37;
-            original_staff_hygiene_score = 13;
+            original_staffhygiene_score = 13;
             original_housekeeping_score = 17;
             original_safety_score = 18;
             original_healthierchoice_score = 11;
             original_foodhygiene_score = 37;
-            staff_hygiene_weightage = 0.10f;
+            staffhygiene_weightage = 0.10f;
             housekeeping_weightage = 0.20f;
             safety_weightage = 0.20f;
             healthierchoice_weightage = 0.15f;
             foodhygiene_weightage = 0.35f;
-            Log.d(TAG, "initScoresAndPercentages: scores set for F&B");
         } else if (tenantType.equals("Non F&B")) {
-            staff_hygiene_score = 6;
+            staffhygiene_score = 6;
             housekeeping_score = 12;
             safety_score = 16;
-            original_staff_hygiene_score = 6;
+            original_staffhygiene_score = 6;
             original_housekeeping_score = 12;
             original_safety_score = 16;
-            staff_hygiene_weightage = 0.20f;
+            staffhygiene_weightage = 0.20f;
             housekeeping_weightage = 0.40f;
             safety_weightage = 0.40f;
-            Log.d(TAG, "initScoresAndPercentages: scores set for Non F&B");
         } else {
-            Log.d(TAG, "initScoresAndPercentages: not set, check tenant type");
+            Log.d(TAG, "initScoresAndPercentages: not set, tenant type: "+tenantType);
         }
     }
 

@@ -11,6 +11,31 @@ public class Report {
         return id;
     }
 
+    @Override
+    public String toString() {
+        return "Report{" +
+                "auditor_id=" + auditor_id +
+                ", tenant_id=" + tenant_id +
+                ", tenant_display_id=" + tenant_display_id +
+                ", staffhygiene_score=" + staffhygiene_score +
+                ", housekeeping_score=" + housekeeping_score +
+                ", safety_score=" + safety_score +
+                ", healthierchoice_score=" + healthierchoice_score +
+                ", foodhygiene_score=" + foodhygiene_score +
+                ", company='" + company + '\'' +
+                ", institution='" + institution + '\'' +
+                ", location='" + location + '\'' +
+                ", outlet_type='" + outlet_type + '\'' +
+                ", report_notes='" + report_notes + '\'' +
+                ", report_date='" + report_date + '\'' +
+                ", report_image='" + report_image + '\'' +
+                ", resolution_notes='" + resolution_notes + '\'' +
+                ", resolution_date='" + resolution_date + '\'' +
+                ", resolution_image='" + resolution_image + '\'' +
+                ", status=" + status +
+                '}';
+    }
+
     public String getInstitution() {
         return institution;
     }

@@ -139,7 +139,7 @@ public interface DatabaseApiCaller {
             @Field("status") boolean status,
             @Field("report_notes") String report_notes,
             @Field("resolution_date") String resolution_date,
-            @Field("staff_hygiene_score") float staff_hygiene_score,
+            @Field("staffhygiene_score") float staffhygiene_score,
             @Field("housekeeping_score") float housekeeping_score,
             @Field("safety_score") float safety_score,
             @Field("healthierchoice_score") float healthierchoice_score,
