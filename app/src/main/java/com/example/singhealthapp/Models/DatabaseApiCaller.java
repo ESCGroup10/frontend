@@ -130,6 +130,7 @@ public interface DatabaseApiCaller {
             @Field("outlet_type") String outlet_type,
             @Field("status") boolean status,
             @Field("report_notes") String report_notes,
+            @Field("report_date") String report_date,
             @Field("resolution_date") String resolution_date,
             @Field("staffhygiene_score") float staffhygiene_score,
             @Field("housekeeping_score") float housekeeping_score,

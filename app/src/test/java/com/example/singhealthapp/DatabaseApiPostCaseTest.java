@@ -27,13 +27,13 @@ import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
 public class DatabaseApiPostCaseTest {
-    public String token, question, non_compliance_type, unresolved_photo, unresolved_comments;
-    public int report_id, expected_response_code;
-    public boolean is_resolved;
+    public String token, question, non_compliance_type, unresolved_photo, unresolved_comments, unresolved_date, rejected_comments;
+    public int report_id, expected_response_code, is_resolved;
 
     // classic constructor
-    public DatabaseApiPostCaseTest(int expected_response_code, int report_id, String question, boolean is_resolved,
-                                   String non_compliance_type, String unresolved_photo, String unresolved_comments) {
+    public DatabaseApiPostCaseTest(int expected_response_code, int report_id, String question, int is_resolved,
+                                   String non_compliance_type, String unresolved_photo, String unresolved_comments,
+                                   String rejected_comments, String unresolved_date) {
         this.report_id = report_id;
         this.question = question;
         this.is_resolved = is_resolved;
@@ -41,6 +41,8 @@ public class DatabaseApiPostCaseTest {
         this.unresolved_photo = unresolved_photo;
         this.unresolved_comments = unresolved_comments;
         this.expected_response_code = expected_response_code;
+        this.rejected_comments = rejected_comments;
+        this.unresolved_date = unresolved_date;
         this.token = "fakeToken";
     }
 
@@ -48,12 +50,22 @@ public class DatabaseApiPostCaseTest {
     public static Collection<Object[]> parameters() {
         // map result to constructor parameters (each inner list corresponds to the inputs to the constructor)
         return Arrays.asList (new Object [][] {
-                // correct base version
-                {200, 123, "question", false, "Professional & Staff Hygiene", "50_1", "This table is dirty."},
+                // correct base version = [expected response code, report ID, question, isResolved, non-compliance type, unresolved photo name,
+                // unresolved comments, unresolved date, rejected comments]
+                {200, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.204000Z", ""},
                 // invalid date formats
-                {405, 123, "question", false, "Professional & Staff Hygiene", "50_1", "This table is dirty."},
-                // invalid non-compliance type
-                {405, 123, "question", false, "Professionalll & Staff Hygiene", "50_1", "This table is dirty."}
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.20400Z", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.204000", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.204080Z", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2020-04-12T18:42:36.204000Z", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-13-12T18:42:36.204000Z", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-13T18:42:36.204000Z", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T25:42:36.204000Z", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:61:36.204000Z", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:61.204000Z", ""},
+                // invalid non-compliance types
+                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygienee", "5_1", "HOW", "2021-04-12T18:42:36.204000Z", ""},
+                {405, 5, "Label caloric count of healthier options.", 0, "Food  Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.204000Z", ""}
         });
     }
 
@@ -62,10 +74,12 @@ public class DatabaseApiPostCaseTest {
 
         MockWebServer server = new MockWebServer();
 
-        String mockTokenJson = "{\"id\":123,\"report_id\":50,\"question\":\"question\",\"is_resolved\":false," +
-                "\"non_compliance_type\":Professional & Staff Hygiene\"\",\"unresolved_photo\":\"50_1\"," +
-                "\"unresolved_comments\":\"This table is dirty.\",\"unresolved_date\":\"2021-03-23T12:19:19.038028Z\"," +
-                "\"resolved_photo\":\"\",\"resolved_comments\":\"\",\"resolved_date\":null}";
+        String mockTokenJson = "{\"id\":2,\"report_id\":5,\"tenant_id\":28,\"question\":\"Label caloric count of healthier options.\"," +
+                "\"is_resolved\":false,\"non_compliance_type\":\"Food Hygiene\",\"unresolved_photo\":\"5_1\",\"unresolved_comments\":\"HOW\"," +
+                "\"unresolved_date\":\"2021-04-12T18:42:36.204000Z\",\"resolved_photo\":\"\",\"resolved_comments\":\"\",\"resolved_date\":null," +
+                "\"rejected_comments\":\"\"}";
+
+
         server.enqueue(new MockResponse()
                 .addHeader("authorization", "Token")
                 .setBody(mockTokenJson)
@@ -77,8 +91,8 @@ public class DatabaseApiPostCaseTest {
                 .build()
                 .create(DatabaseApiCaller.class);
 
-        Call<Case> testCall = mockApiCaller.postCase("Token "+token, report_id,  2, "question", 0, "non_compliance type",
-                unresolved_photo, unresolved_comments, "");
+        Call<Case> testCall = mockApiCaller.postCase("Token "+token, report_id,  28, "question", 0, "non_compliance type",
+                unresolved_photo, unresolved_comments, unresolved_date, rejected_comments);
 
         int actual_response_code = testCall.execute().code();
         System.out.println("Actual response code: "+actual_response_code);

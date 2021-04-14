@@ -65,7 +65,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     FloatingActionButton ProfessionalismAndStaffHygieneFAB, HousekeepingAndGeneralCleanlinessFAB, FoodHygieneFAB, HealthierChoiceFAB,
             WorkplaceSafetyAndHealthFAB;
     TextView ProfessionalismAndStaffHygieneTextView, HousekeepingAndGeneralCleanlinessTextView, FoodHygieneTextView, HealthierChoiceTextView,
-            WorkplaceSafetyAndHealthTextView, nestedScrollView;
+            WorkplaceSafetyAndHealthTextView;
+    NestedScrollView nestedScrollView;
 
     private String[] header_files;
     private ArrayList<ChecklistAdapter> checklistAdapterArrayList = new ArrayList<>();
@@ -213,8 +214,10 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     private void updateToFinalReport() {
         // set all scores
-        thisReport.setFoodhygiene_score(round(foodhygiene_score, 2));
-        thisReport.setHealthierchoice_score(round(healthierchoice_score, 2));
+        if (!tenantType.equals("Non F&B")) {
+            thisReport.setFoodhygiene_score(round(foodhygiene_score, 2));
+            thisReport.setHealthierchoice_score(round(healthierchoice_score, 2));
+        }
         thisReport.setHousekeeping_score(round(housekeeping_score, 2));
         thisReport.setSafety_score(round(safety_score, 2));
         thisReport.setStaffhygiene_score(round(staffhygiene_score, 2));
@@ -305,9 +308,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private String getOverallNotes() {
-        String overallNotes = "";
-        overallNotes = overall_notes_editText.getText().toString();
-        return overallNotes;
+        Log.d(TAG, "getOverallNotes: "+overall_notes_editText.getText().toString());
+        return overall_notes_editText.getText().toString();
     }
 
     private void initApiCaller() {
@@ -344,12 +346,12 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             handler.postDelayed(() -> {
                 if (tenantType.equals("F&B")) {
                     reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
-                            tenantType, false, getOverallNotes(), null, round(staffhygiene_score, 2),
+                            tenantType, false, getOverallNotes(), null, null, round(staffhygiene_score, 2),
                             round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
                             round(foodhygiene_score, 2));
                 } else {
                     reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
-                            tenantType, false, getOverallNotes(), null, round(staffhygiene_score, 2),
+                            tenantType, false, getOverallNotes(), null, null, round(staffhygiene_score, 2),
                             round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
                 }
                 reportCall.enqueue(new Callback<Report>() {
