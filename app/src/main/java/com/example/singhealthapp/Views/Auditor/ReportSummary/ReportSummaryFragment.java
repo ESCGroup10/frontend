@@ -18,6 +18,7 @@ import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
+import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;

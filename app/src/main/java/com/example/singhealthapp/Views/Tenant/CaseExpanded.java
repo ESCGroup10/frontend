@@ -63,15 +63,8 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     private static final String TAG = "CaseExpanded";
 
     // UI stuff
-    TextView companyTextView,
-            institutionTextView,
-            nonComplianceTypeTextView,
-            resolvedStatusTextView,
-            unresolvedImageDateTextView,
-            unresolvedCommentsTextView,
-            resolvedImageDateTextView,
-            resolvedCommentsTextView,
-            unresolvedImageViewPlaceholder,
+    TextView companyTextView, institutionTextView, nonComplianceTypeTextView, resolvedStatusTextView, unresolvedImageDateTextView,
+            unresolvedCommentsTextView, resolvedImageDateTextView, resolvedCommentsTextView, unresolvedImageViewPlaceholder,
             resolvedImageViewPlaceholder;
     ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton;
     Button resolveButton, confirmButton, rejectButton, acceptButton;
@@ -87,16 +80,8 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     // database stuff
     Case thisCase;
     DatabaseApiCaller apiCaller;
-    private String token, userType,
-            company,
-            institution,
-            nonComplianceType,
-            unresolvedComments,
-            resolvedComments,
-            unresolvedImageName,
-            resolvedImageName,
-            unresolvedImageDate,
-            resolvedImageDate;
+    private String token, userType, company, institution, nonComplianceType, unresolvedComments, resolvedComments, unresolvedImageName,
+            resolvedImageName, unresolvedImageDate, resolvedImageDate;
     private int reportID, caseID, reportNumber;
     private Integer caseNumber;
     private boolean resolvedStatus;
