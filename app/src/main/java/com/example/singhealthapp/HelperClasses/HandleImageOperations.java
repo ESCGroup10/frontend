@@ -132,6 +132,9 @@ public class HandleImageOperations {
                 placeholder.setText("Image could not be loaded");
                 System.out.println("Retrieval Failed!");
                 e.printStackTrace();
+            } catch (NoClassDefFoundError e) {
+                placeholder.setText("Image could not be loaded, please come back to this page again.");
+                e.printStackTrace();
             }
         }).start();
     }
