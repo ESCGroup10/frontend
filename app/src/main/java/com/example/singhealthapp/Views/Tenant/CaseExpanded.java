@@ -1,5 +1,6 @@
 package com.example.singhealthapp.Views.Tenant;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +15,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
@@ -55,6 +58,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.app.Activity.RESULT_OK;
+import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.example.singhealthapp.HelperClasses.TextAestheticsAndParsing.convertDatabaseDateToReadableDate;
 import static com.example.singhealthapp.HelperClasses.TextAestheticsAndParsing.setHalfBoldTextViews;
@@ -68,12 +72,9 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
             resolvedImageViewPlaceholder;
     ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton;
     Button resolveButton, confirmButton, rejectButton, acceptButton;
-    LinearLayout resolvingCaseSection;
-    TextView resolvedImageTentativePlaceholder;
+    LinearLayout resolvingCaseSection, auditorButtonsLinearLayout;
     EditText resolvedCommentsEditText;
-    ImageView resolvedImageTentative;
-    TextView tentativeImageTitle;
-    LinearLayout auditorButtonsLinearLayout;
+    CardView resolvedCardView;
 
     private Bundle bundle;
 
@@ -142,6 +143,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         unresolvedImageView = view.findViewById(R.id.unresolvedImageView);
         unresolvedImageDateTextView = view.findViewById(R.id.unresolvedImageDateTextView);
         unresolvedCommentsTextView = view.findViewById(R.id.unresolvedCommentsTextView);
+        resolvedCardView = view.findViewById(R.id.resolvedCardView);
         resolvedImageView = view.findViewById(R.id.resolvedImageView);
         resolvedImageDateTextView = view.findViewById(R.id.resolvedImageDateTextView);
         resolvedCommentsTextView = view.findViewById(R.id.resolvedCommentsTextView);
@@ -158,17 +160,28 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
             uploadButton = view.findViewById(R.id.uploadButton);
             confirmButton = view.findViewById(R.id.confirmButton);
             resolvedCommentsEditText = view.findViewById(R.id.resolvedCommentsEditText);
-            resolvedImageTentative = view.findViewById(R.id.resolvedImageTentative);
-            resolvedImageTentativePlaceholder = view.findViewById(R.id.resolvedImageTentativePlaceholder);
-            tentativeImageTitle = view.findViewById(R.id.tentativeImageTitle);
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setOnClickListeners() {
         if (!userType.equals("Auditor")) {
             resolveButton.setOnClickListener(v -> {
-                resolveButton.setVisibility(View.GONE);
+                resolveButton.setVisibility(GONE);
                 resolvingCaseSection.setVisibility(View.VISIBLE);
+            });
+
+            // to enable scrolling within editText
+            resolvedCommentsEditText.setOnTouchListener((v, event) -> {
+                if (resolvedCommentsEditText.hasFocus()) {
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    switch (event.getAction() & MotionEvent.ACTION_MASK){
+                        case MotionEvent.ACTION_SCROLL:
+                            v.getParent().requestDisallowInterceptTouchEvent(false);
+                            return true;
+                    }
+                }
+                return false;
             });
 
             cameraButton.setOnClickListener(v -> {
@@ -349,27 +362,29 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     }
 
     private void displayResolvedImage() {
-        resolvedImageTentativePlaceholder.setVisibility(View.VISIBLE);
-        resolvedImageTentative.setImageBitmap(tentativeImageBitmap);
-        resolvedImageTentative.setVisibility(View.VISIBLE);
-        tentativeImageTitle.setVisibility(View.VISIBLE);
-        resolvedImageTentativePlaceholder.setVisibility(View.GONE);
+        resolvedCardView.setVisibility(View.VISIBLE);
+        resolvedImageViewPlaceholder.setVisibility(View.VISIBLE);
+        getActivity().runOnUiThread(() -> {
+            resolvedImageView.setImageBitmap(tentativeImageBitmap);
+            resolvedImageViewPlaceholder.setVisibility(GONE);
+            resolvedImageView.setVisibility(View.VISIBLE);
+        });
     }
 
     private void setAllViewsFromBundle() {
         Log.d(TAG, "setAllViews: called");
-        setHalfBoldTextViews(companyTextView, company);
-        setHalfBoldTextViews(institutionTextView, institution);
-        setHalfBoldTextViews(resolvedStatusTextView, (resolvedStatus?"Resolved":"Unresolved"));
+        companyTextView.setText(company);
+        institutionTextView.setText(institution);
+        resolvedStatusTextView.setText((resolvedStatus?"Resolved":"Unresolved"));
     }
 
     private void setAllViewsFromDatabase() {
         Log.d(TAG, "setAllViewsFromDatabase: called");
-        setHalfBoldTextViews(nonComplianceTypeTextView, nonComplianceType);
-        unresolvedImageDateTextView.setText((unresolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(unresolvedImageDate)));
-        unresolvedCommentsTextView.setText((unresolvedCommentsTextView.getText() + unresolvedComments));
+        nonComplianceTypeTextView.setText(nonComplianceType);
+        unresolvedImageDateTextView.setText(convertDatabaseDateToReadableDate(unresolvedImageDate));
+        unresolvedCommentsTextView.setText(unresolvedComments);
         try {
-            HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 300, 300);
+            HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 500, 300);
         } catch (ExceptionInInitializerError e) {
             unresolvedImageViewPlaceholder.setText("Unable to retrieve image from Database");
         }
@@ -379,13 +394,12 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     auditorButtonsLinearLayout.setVisibility(View.VISIBLE);
                 }
             }
-//            unresolvedResolvedSeparator.setVisibility(VISIBLE);
             resolvedImageDateTextView.setVisibility(VISIBLE);
             resolvedCommentsTextView.setVisibility(VISIBLE);
             resolvedImageViewPlaceholder.setVisibility(View.VISIBLE);
             resolvedImageDateTextView.setText((resolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(resolvedImageDate)));
             resolvedCommentsTextView.setText((resolvedCommentsTextView.getText() + resolvedComments));
-            HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 300, 300);
+            HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 500, 300);
         } else {
             if (!userType.equals("Auditor")) {
                 resolveButton.setVisibility(VISIBLE);
@@ -481,6 +495,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     unresolvedImageName = thisCase.getUnresolved_photo();
 
                     // if the case is resolved, get the data, else leave relevant fields as null
+//                    if (thisCase.getResolved_photo().equals("") || thisCase.getResolved_photo() == null) { // if resolved or pending resolution
                     if (resolvedStatus) {
                         resolvedImageName = thisCase.getResolved_photo();
                         resolvedImageDate = thisCase.getResolved_date();
@@ -509,7 +524,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     .replace(R.id.auditor_fragment_container, new MyReportsFragment(), "getReport").commit();
         } else {
             if (resolvingCaseSection.getVisibility() == View.VISIBLE) {
-                resolvingCaseSection.setVisibility(View.GONE);
+                resolvingCaseSection.setVisibility(GONE);
                 resolveButton.setVisibility(View.VISIBLE);
             } else {
                 getParentFragmentManager().beginTransaction()

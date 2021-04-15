@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/resolvingCaseSection"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="20dp"
     android:gravity="center_horizontal"
     android:orientation="vertical"
+    tools:visibility="visible"
     android:visibility="gone">
 
     <TextView
@@ -47,11 +49,15 @@
     <EditText
         android:id="@+id/resolvedCommentsEditText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:layout_margin="10dp"
+        android:gravity="bottom"
         android:hint="Describe the measures you've taken"
-        android:imeOptions="actionDone"
-        android:maxLines="3" />
+        android:overScrollMode="always"
+        android:scrollbarStyle="insideInset"
+        android:scrollbars="vertical"
+        android:inputType="textImeMultiLine|textMultiLine"
+        android:imeOptions="actionDone"/>
 
     <Button
         android:id="@+id/confirmButton"
