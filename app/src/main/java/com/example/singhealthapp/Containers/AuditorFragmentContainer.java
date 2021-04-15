@@ -204,26 +204,29 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         EspressoCountingIdlingResource.increment();
-        switch (item.getItemId()) {
-            case R.id.nav_Auditor_Statistics:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new StatisticsFragment()).commit();
-                break;
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
+        if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
+            switch (item.getItemId()) {
+                case R.id.nav_Auditor_Statistics:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new StatisticsFragment()).commit();
+                    break;
 
-            case R.id.nav_Tenants:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
-                break;
+                case R.id.nav_Tenants:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
+                    break;
 
-            case R.id.nav_Reports:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "getReport").commit();
-                break;
+                case R.id.nav_Reports:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "getReport").commit();
+                    break;
 
-            case R.id.nav_Add_Tenant:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment(), "addTenant").commit();
-                break;
+                case R.id.nav_Add_Tenant:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment(), "addTenant").commit();
+                    break;
 
-            case R.id.nav_Test:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TestFragment()).commit();
-                break;
+                case R.id.nav_Test:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TestFragment()).commit();
+                    break;
+            }
         }
         auditor_drawer.closeDrawer(GravityCompat.START);
         return true;

@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -284,8 +285,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            deleteReport();
-                            deleteRecentlySubmittedCases();
                             getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.auditor_fragment_container, new TenantsPreviewFragment())
                                     .commit();
@@ -295,6 +294,13 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     .show();
         }
         return true;
+    }
+
+    @Override
+    public void onDestroy() {
+        deleteReport();
+        deleteRecentlySubmittedCases();
+        super.onDestroy();
     }
 
     public interface HandlePhotoListener {
