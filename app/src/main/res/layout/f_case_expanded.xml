@@ -233,7 +233,28 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
                     android:textSize="16sp"
+                    android:gravity="center"
                     android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/rejectedCommentsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/red"
+                    android:text="Rejected: "
+                    android:gravity="center"
+                    android:layout_margin="20dp"
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <Button
+                    android:id="@+id/rejectedResolveButton"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:text="Resolve"
+                    android:background="#ffaf7a"
+                    android:layout_gravity="center"
+                    tools:visibility="visible"/>
 
                 <LinearLayout
                     android:id="@+id/auditorButtonsLinearLayout"
@@ -276,6 +297,8 @@
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
+        <include layout="@layout/f_resolving_rejected"/>
 
         <include layout="@layout/f_case_resolution"/>
 

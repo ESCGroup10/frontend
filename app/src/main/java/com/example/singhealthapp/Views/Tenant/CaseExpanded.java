@@ -28,8 +28,10 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
+import com.example.singhealthapp.HelperClasses.TextAestheticsAndParsing;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
@@ -41,11 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,8 +54,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static android.app.Activity.RESULT_OK;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.example.singhealthapp.HelperClasses.TextAestheticsAndParsing.convertDatabaseDateToReadableDate;
-import static com.example.singhealthapp.HelperClasses.TextAestheticsAndParsing.setHalfBoldTextViews;
+import static com.example.singhealthapp.HelperClasses.DateOperations.convertDatabaseDateToReadableDate;
 
 public class CaseExpanded extends Fragment implements IOnBackPressed {
     private static final String TAG = "CaseExpanded";
@@ -65,12 +62,12 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     // UI stuff
     TextView companyTextView, institutionTextView, nonComplianceTypeTextView, resolvedStatusTextView, unresolvedImageDateTextView,
             unresolvedCommentsTextView, resolvedImageDateTextView, resolvedCommentsTextView, unresolvedImageViewPlaceholder,
-            resolvedImageViewPlaceholder;
-    ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton;
-    Button resolveButton, confirmButton, rejectButton, acceptButton;
+            resolvedImageViewPlaceholder, rejectedCommentsTextView, resolvingRejectedImageViewPlaceholder;
+    ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton, resolvingRejectedImageView;
+    Button resolveButton, confirmButton, rejectButton, acceptButton, resolvingRejectedButton;
     LinearLayout resolvingCaseSection, auditorButtonsLinearLayout;
     EditText resolvedCommentsEditText, rejectedCommentsEditText;
-    CardView resolvedCardView;
+    CardView resolvedCardView, resolvingRejectedImageCardView;
 
     private Bundle bundle;
 
@@ -87,10 +84,11 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     Uri mImageURI;
     final int REQUEST_IMAGE_CAPTURE = 0;
     final int REQUEST_IMAGE_FROM_GALLERY = 1;
-    Bitmap tentativeImageBitmap;
+    Bitmap resolutionImageBitmap;
 
     // flags
     private boolean PENDING;
+    private boolean REJECTED = false;
 
     @Nullable
     @Override
@@ -165,6 +163,11 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         uploadButton = view.findViewById(R.id.uploadButton);
         confirmButton = view.findViewById(R.id.confirmButton);
         resolvedCommentsEditText = view.findViewById(R.id.resolvedCommentsEditText);
+        rejectedCommentsTextView = view.findViewById(R.id.rejectedCommentsTextView);
+        resolvingRejectedButton = view.findViewById(R.id.rejectedResolveButton);
+        resolvingRejectedImageCardView = view.findViewById(R.id.resolvingRejectedImageCardView);
+        resolvingRejectedImageView = view.findViewById(R.id.resolvingRejectedImageView);
+        resolvingRejectedImageViewPlaceholder = view.findViewById(R.id.resolvingRejectedImageViewPlaceholder);
     }
 
     private void setInitVisibility() {
@@ -179,6 +182,8 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         resolvedImageView.setVisibility(GONE);
         resolvedImageViewPlaceholder.setVisibility(GONE);
         auditorButtonsLinearLayout.setVisibility(GONE);
+        rejectedCommentsTextView.setVisibility(GONE);
+        resolvingRejectedButton.setVisibility(GONE);
 
         // resolving case section
         resolvingCaseSection.setVisibility(GONE);
@@ -200,6 +205,9 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 resolveButton.setVisibility(VISIBLE);
             }
         }
+
+        // resolving rejected case section
+        resolvingRejectedImageCardView.setVisibility(GONE);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -207,6 +215,11 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         if (!userType.equals("Auditor")) {
             resolveButton.setOnClickListener(v -> {
                 resolveButton.setVisibility(GONE);
+                resolvingCaseSection.setVisibility(View.VISIBLE);
+            });
+
+            resolvingRejectedButton.setOnClickListener(v -> {
+                resolvingRejectedButton.setVisibility(GONE);
                 resolvingCaseSection.setVisibility(View.VISIBLE);
             });
 
@@ -254,35 +267,33 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 startActivityForResult(pickPhoto , REQUEST_IMAGE_FROM_GALLERY);
             });
 
-            confirmButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (tentativeImageBitmap == null) {
-                        CentralisedToast.makeText(getActivity(), "Please set an image before submitting your resolution!", CentralisedToast.LENGTH_SHORT);
-                        return;
-                    }
-                    createUpdatedCase(true);
-                    Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
-
-                patchCall.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                        Log.d(TAG, "patchCall onResponse: " + response);
-                        Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                        TenantSubmit("Case Resolution Submitted", "Thank you!",
-                                "SingHealth staff will review your submission within 3 working days.",
-                                "Return to My Reports");
-                    }
-
-                        @Override
-                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
-                            Log.d(TAG, "patchCall onFailure: " + t.toString());
-                            Toast.makeText(getActivity(), "Failed to update database", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    // upload non-null bitmap to database
-                    HandleImageOperations.uploadImageToDatabase(tentativeImageBitmap, resolvedImageName);
+            confirmButton.setOnClickListener(v -> {
+                if (resolutionImageBitmap == null) {
+                    CentralisedToast.makeText(getActivity(), "Please set an image before submitting your resolution!",
+                            CentralisedToast.LENGTH_SHORT);
+                    return;
                 }
+                createUpdatedCase(true);
+                Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+
+            patchCall.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                    Log.d(TAG, "patchCall onResponse: " + response);
+                    Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                    TenantSubmit("Case Resolution Submitted", "Thank you!",
+                            "SingHealth staff will review your submission within 3 working days.",
+                            "Return to My Reports");
+                }
+
+                    @Override
+                    public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                        Log.d(TAG, "patchCall onFailure: " + t.toString());
+                        Toast.makeText(getActivity(), "Failed to update database", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                // upload non-null bitmap to database
+                HandleImageOperations.uploadImageToDatabase(resolutionImageBitmap, resolvedImageName);
             });
         } else {
             // to enable scrolling, multiline and done button within editText
@@ -348,24 +359,20 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         }
     }
 
-    private void createUpdatedCase (boolean acccept) {
+    private void createUpdatedCase (boolean accept) {
         if (userType.equals("Auditor")) {
-            if (acccept) {
+            if (accept) {
                 thisCase.setIs_resolved(true);
-                return;
             } else {
                 thisCase.setRejected_comments(rejectedCommentsEditText.getText().toString());
-                return;
             }
+            return;
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String datetime = dateFormat.format(new Date());
+        String datetime = DateOperations.getCurrentDatabaseDate();
+        thisCase.setRejected_comments(""); // set this to empty since each new submission is not rejected
         thisCase.setResolved_date(datetime);
         thisCase.setResolved_photo(resolvedImageName);
-        resolvedComments = resolvedCommentsEditText.getText().toString();
-        thisCase.setResolved_comments(resolvedComments);
+        thisCase.setResolved_comments(resolvedCommentsEditText.getText().toString());
     }
 
     private void TenantSubmit(String title, String msg, String additionalMsg, String buttonText) {
@@ -409,17 +416,17 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         /**
          * Usage: Get image bitmap
          * */
-        Bitmap oldBitmap = tentativeImageBitmap;
+        Bitmap oldBitmap = resolutionImageBitmap;
 
         switch (requestCode) {
             case REQUEST_IMAGE_CAPTURE:
-                tentativeImageBitmap = HandleImageOperations.getBitmap(resultCode, getActivity(), mImageURI);
+                resolutionImageBitmap = HandleImageOperations.getBitmap(resultCode, getActivity(), mImageURI);
                 break;
             case REQUEST_IMAGE_FROM_GALLERY:
                 if (resultCode == RESULT_OK && data != null) {
                     Uri selectedImage = data.getData();
                     try {
-                        tentativeImageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
+                        resolutionImageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
                     } catch (FileNotFoundException e) {
                         Log.d(TAG, "onActivityResult: file not found");
                         e.printStackTrace();
@@ -430,7 +437,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 }
                 break;
         }
-        if (tentativeImageBitmap == oldBitmap) {
+        if (resolutionImageBitmap == oldBitmap) {
             Log.d(TAG, "onActivityResult: photo not taken");
         } else {
             Log.d(TAG, "onActivityResult: image bitmap received");
@@ -439,13 +446,23 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     }
 
     private void displayResolvedImage() {
-        resolvedCardView.setVisibility(View.VISIBLE);
-        resolvedImageViewPlaceholder.setVisibility(View.VISIBLE);
-        getActivity().runOnUiThread(() -> {
-            resolvedImageView.setImageBitmap(tentativeImageBitmap);
-            resolvedImageViewPlaceholder.setVisibility(GONE);
-            resolvedImageView.setVisibility(View.VISIBLE);
-        });
+        if (REJECTED) {
+            resolvingRejectedImageCardView.setVisibility(View.VISIBLE);
+            resolvingRejectedImageViewPlaceholder.setVisibility(View.VISIBLE);
+            getActivity().runOnUiThread(() -> {
+                resolvingRejectedImageView.setImageBitmap(resolutionImageBitmap);
+                resolvingRejectedImageViewPlaceholder.setVisibility(GONE);
+                resolvingRejectedImageView.setVisibility(View.VISIBLE);
+            });
+        } else {
+            resolvedCardView.setVisibility(View.VISIBLE);
+            resolvedImageViewPlaceholder.setVisibility(View.VISIBLE);
+            getActivity().runOnUiThread(() -> {
+                resolvedImageView.setImageBitmap(resolutionImageBitmap);
+                resolvedImageViewPlaceholder.setVisibility(GONE);
+                resolvedImageView.setVisibility(View.VISIBLE);
+            });
+        }
     }
 
     private void setAllViewsFromBundle() {
@@ -460,7 +477,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     private void setAllViewsFromDatabase() {
         Log.d(TAG, "setAllViewsFromDatabase: called");
         nonComplianceTypeTextView.setText(nonComplianceType);
-        unresolvedImageDateTextView.setText((resolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(unresolvedImageDate)));
+        unresolvedImageDateTextView.setText((unresolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(unresolvedImageDate)));
         unresolvedCommentsTextView.setText((unresolvedComments.equals("")?unresolvedCommentsTextView.getText():unresolvedComments));
         try {
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 500, 300);
@@ -484,7 +501,22 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 500, 300);
         } else { // if not resolved or pending
             if (!userType.equals("Auditor")) {
-                resolveButton.setVisibility(VISIBLE);
+                Log.d(TAG, "setAllViewsFromDatabase: handling for tenant");
+                if (REJECTED) {
+                    Log.d(TAG, "setAllViewsFromDatabase: rejected!");
+                    resolveButton.setVisibility(View.GONE);
+                    resolvedCardView.setVisibility(View.VISIBLE);
+                    resolvedImageDateTextView.setVisibility(VISIBLE);
+                    resolvedCommentsTextView.setVisibility(VISIBLE);
+                    resolvedImageViewPlaceholder.setVisibility(VISIBLE);
+                    rejectedCommentsTextView.setVisibility(VISIBLE);
+                    resolvingRejectedButton.setVisibility(VISIBLE);
+                    resolvedImageDateTextView.setText((resolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(resolvedImageDate)));
+                    resolvedCommentsTextView.setText((resolvedComments.equals("")?resolvedCommentsTextView.getText():resolvedComments));
+                    HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 500, 300);
+                } else {
+                    resolveButton.setVisibility(VISIBLE);
+                }
             }
         }
     }
@@ -577,10 +609,32 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     unresolvedComments = thisCase.getUnresolved_comments();
                     unresolvedImageDate = thisCase.getUnresolved_date();
                     unresolvedImageName = thisCase.getUnresolved_photo();
+                    if (!thisCase.getRejected_comments().equals("")) { // currently rejected by auditor, if auditor, treat as unresolved, not pending
+                        Log.d(TAG, "onResponse: rejected comments is not empty");
+                        if (userType.equals("Auditor")) {
+                            Log.d(TAG, "onResponse: handling rejected for auditor");
+                            PENDING = false;
+                            RESOLVED = false;
+                            resolvedStatusTextView.setText("Unresolved");
+
+                        } else { // currently rejected by auditor, if tenant, treat as unresolved, REJECTED
+                            Log.d(TAG, "onResponse: handling rejected for tenant");
+                            REJECTED = true;
+                            PENDING = false;
+                            TextAestheticsAndParsing.setHalfBoldTextViews(rejectedCommentsTextView, thisCase.getRejected_comments());
+                            resolvedStatusTextView.setText("Rejected");
+                        }
+                    }
 
                     if (!RESOLVED && !PENDING) { // if unresolved and not pending resolution
                         resolvedImageName = unresolvedImageName + "_resolved";
+                        if (REJECTED) {
+                            resolvedImageName = thisCase.getResolved_photo();
+                            resolvedImageDate = thisCase.getResolved_date();
+                            resolvedComments = thisCase.getResolved_comments();
+                        }
                     } else { // if either pending or resolved
+                        Log.d(TAG, "onResponse: pending: "+PENDING+"\nresolved: "+RESOLVED);
                         resolvedImageName = thisCase.getResolved_photo();
                         resolvedImageDate = thisCase.getResolved_date();
                         resolvedComments = thisCase.getResolved_comments();

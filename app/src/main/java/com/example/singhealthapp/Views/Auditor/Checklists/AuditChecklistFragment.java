@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
@@ -421,10 +422,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 }
 
                 // get date
-                SimpleDateFormat dateFormat = new SimpleDateFormat(
-                        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                String datetime = dateFormat.format(new Date());
+                String datetime = DateOperations.getCurrentDatabaseDate();
 
                 caseCall = apiCaller.postCase("Token "+token, reportID, tenantID, question, 0, non_compliance_type,
                         photoName, comments, datetime, "");

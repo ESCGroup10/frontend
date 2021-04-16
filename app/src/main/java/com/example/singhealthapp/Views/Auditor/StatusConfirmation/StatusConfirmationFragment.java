@@ -47,7 +47,7 @@ public class StatusConfirmationFragment extends Fragment {
 
         loadUserType();
         getActivity().setTitle(title);
-        View view = inflater.inflate(R.layout.fragment_status_confirmation, container, false);
+        View view = inflater.inflate(R.layout.f_status_confirmation, container, false);
 
         Bundle bundle = getArguments();
         try {
@@ -78,11 +78,11 @@ public class StatusConfirmationFragment extends Fragment {
                 EspressoCountingIdlingResource.increment();
                 if (userType.equals("Auditor")) {
                     getParentFragmentManager().beginTransaction()
-                            .replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "getReport")
+                            .replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "viewReport")
                             .commit();
                 } else {
                     getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new MyReportsFragment(), "getReport")
+                            .replace(R.id.fragment_container, new MyReportsFragment(), "viewReport")
                             .commit();
                 }
 
