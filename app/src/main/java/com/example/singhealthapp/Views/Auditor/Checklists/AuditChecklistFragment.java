@@ -1,15 +1,16 @@
 package com.example.singhealthapp.Views.Auditor.Checklists;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.CustomViewSettings;
 import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
@@ -45,13 +47,8 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -71,12 +68,12 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     NestedScrollView nestedScrollView;
 
     private String[] header_files;
-    private ArrayList<ChecklistAdapter> checklistAdapterArrayList = new ArrayList<>();
-    private ArrayList<String> recyclerViewNameArrayList = new ArrayList<>();
+    private final ArrayList<ChecklistAdapter> checklistAdapterArrayList = new ArrayList<>();
+    private final ArrayList<String> recyclerViewNameArrayList = new ArrayList<>();
     private int numCases;
     private String passFail;
-    private boolean endOfView, stopCreatingCases = false;
-    private ArrayList<Integer> submittedCaseIDs = new ArrayList<>();
+    private boolean stopCreatingCases = false;
+    private final ArrayList<Integer> submittedCaseIDs = new ArrayList<>();
 
     private static DatabaseApiCaller apiCaller;
     private Report thisReport;
@@ -91,10 +88,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private float staffhygiene_weightage, housekeeping_weightage, safety_weightage, healthierchoice_weightage, foodhygiene_weightage = 0;
 
     private Call<Report> reportCall;
-    private Call<Case> caseCall;
 
     private HandlePhotoListener mActivityCallback;
-    private HashMap<String, Bitmap> photoBitmapHashMap;
     private int photoNameCounter = 0;
 
     @Override
@@ -150,9 +145,13 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setAllListeners() {
         ProfessionalismAndStaffHygieneFAB.setOnClickListener(v -> focusOnView(ProfessionalismAndStaffHygieneTextView));
         HousekeepingAndGeneralCleanlinessFAB.setOnClickListener(v -> focusOnView(HousekeepingAndGeneralCleanlinessTextView));
+
+        CustomViewSettings.makeScrollable(overall_notes_editText);
+
         if (tenantType.equals("F&B")) {
             FoodHygieneFAB.setOnClickListener(v -> focusOnView(FoodHygieneTextView));
             HealthierChoiceFAB.setOnClickListener(v -> focusOnView(HealthierChoiceTextView));
@@ -181,23 +180,17 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             builder.setTitle("Confirm Submission?")
                     .setMessage("Total non compliance cases: "+numCases+"\nResult: "+passFail)
                     .setCancelable(false)
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            resetPhotoNameCounter();
-                            dialog.dismiss();
-                        }
+                    .setNegativeButton("No", (dialog, which) -> {
+                        resetPhotoNameCounter();
+                        dialog.dismiss();
                     })
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (createCases()) {
-                                submit();
-                                createReport(true);
-                                clearAllPhotosFromContainerActivity();
-                            }
-                            dialog.dismiss();
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        if (createCases()) {
+                            submit();
+                            createReport(true);
+                            clearAllPhotosFromContainerActivity();
                         }
+                        dialog.dismiss();
                     })
                     .show();
         });
@@ -217,23 +210,18 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private void updateToFinalReport() {
         // set all scores
         if (!tenantType.equals("Non F&B")) {
-            thisReport.setFoodhygiene_score(round(foodhygiene_score, 2));
-            thisReport.setHealthierchoice_score(round(healthierchoice_score, 2));
+            thisReport.setFoodhygiene_score(round(foodhygiene_score));
+            thisReport.setHealthierchoice_score(round(healthierchoice_score));
         }
-        thisReport.setHousekeeping_score(round(housekeeping_score, 2));
-        thisReport.setSafety_score(round(safety_score, 2));
-        thisReport.setStaffhygiene_score(round(staffhygiene_score, 2));
+        thisReport.setHousekeeping_score(round(housekeeping_score));
+        thisReport.setSafety_score(round(safety_score));
+        thisReport.setStaffhygiene_score(round(staffhygiene_score));
         // check final report
         Log.d(TAG, "updateToFinalReport: "+thisReport.toString());
     }
 
-    private final void focusOnView(TextView tv){
-        nestedScrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                nestedScrollView.scrollTo(0, tv.getBottom()-200);
-            }
-        });
+    private void focusOnView(TextView tv){
+        nestedScrollView.post(() -> nestedScrollView.scrollTo(0, tv.getBottom()-200));
     }
 
     private void deleteReport() {
@@ -277,20 +265,12 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
             builder.setTitle("Are you sure you want to leave?\nOngoing report will be deleted!")
                     .setCancelable(false)
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.auditor_fragment_container, new TenantsPreviewFragment())
-                                    .commit();
-                            dialog.dismiss();
-                        }
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.auditor_fragment_container, new TenantsPreviewFragment())
+                                .commit();
+                        dialog.dismiss();
                     })
                     .show();
         }
@@ -327,7 +307,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 .create(DatabaseApiCaller.class);
     }
 
-    private float round(double num, int dec) {
+    private float round(double num) {
         DecimalFormat df = new DecimalFormat("0.00");
         return Float.parseFloat(df.format(num));
     }
@@ -353,17 +333,17 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             handler.postDelayed(() -> {
                 if (tenantType.equals("F&B")) {
                     reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
-                            tenantType, false, getOverallNotes(), null, null, round(staffhygiene_score, 2),
-                            round(housekeeping_score, 2), round(safety_score, 2), round(healthierchoice_score, 2),
-                            round(foodhygiene_score, 2));
+                            tenantType, false, getOverallNotes(), null, null, round(staffhygiene_score),
+                            round(housekeeping_score), round(safety_score), round(healthierchoice_score),
+                            round(foodhygiene_score));
                 } else {
                     reportCall = apiCaller.postNewReport("Token " + token, userID, tenantID, tenantCompany, tenantLocation, tenentInstitution,
-                            tenantType, false, getOverallNotes(), null, null, round(staffhygiene_score, 2),
-                            round(housekeeping_score, 2), round(safety_score, 2), -1, -1);
+                            tenantType, false, getOverallNotes(), null, null, round(staffhygiene_score),
+                            round(housekeeping_score), round(safety_score), -1, -1);
                 }
                 reportCall.enqueue(new Callback<Report>() {
                     @Override
-                    public void onResponse(Call<Report> call, Response<Report> response) {
+                    public void onResponse(@NotNull Call<Report> call, @NotNull Response<Report> response) {
                         // sometimes, response comes back as null the first time
                         Log.d(TAG, "onResponse: code: " + response.code());
                         try {
@@ -378,7 +358,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     }
 
                     @Override
-                    public void onFailure(Call<Report> call, Throwable t) {
+                    public void onFailure(@NotNull Call<Report> call, @NotNull Throwable t) {
                         t.printStackTrace();
                         Log.d(TAG, "createReport onFailure: " + t);
                         reportID = -1;
@@ -400,7 +380,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     private boolean createCases() {
         stopCreatingCases = false;
-        photoBitmapHashMap = getAllPhotos();
+        HashMap<String, Bitmap> photoBitmapHashMap = getAllPhotos();
         for (int i=0; i<checklistAdapterArrayList.size(); i++) { //loop through all the recyclerView adapters
             String non_compliance_type = recyclerViewNameArrayList.get(i); //get the non-compliance type associated with this adapter
             ArrayList<String> caseList = checklistAdapterArrayList.get(i).sendCases(); //get the cases from the recyclerView associated with this adapter
@@ -424,7 +404,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                 // get date
                 String datetime = DateOperations.getCurrentDatabaseDate();
 
-                caseCall = apiCaller.postCase("Token "+token, reportID, tenantID, question, 0, non_compliance_type,
+                Call<Case> caseCall = apiCaller.postCase("Token " + token, reportID, tenantID, question, 0, non_compliance_type,
                         photoName, comments, datetime, "");
                 caseCall.enqueue(new Callback<Case>() {
                     @Override
@@ -482,7 +462,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         CentralisedToast.makeText(getContext(), "Please take a photo for all non-compliance cases.", CentralisedToast.LENGTH_LONG);
         deleteRecentlySubmittedCases();
         resetPhotoNameCounter();
-        ArrayList<View> outViews = new ArrayList<View>();
+        ArrayList<View> outViews = new ArrayList<>();
         getView().findViewsWithText(outViews, question, View.FIND_VIEWS_WITH_TEXT);
         if (outViews.size() > 1) {
             Log.d(TAG, "onClick: question may be contained in another question!");
@@ -591,8 +571,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private class CreateRecyclerViewThread implements Runnable {
-        private View view;
-        private String pathName;
+        private final View view;
+        private final String pathName;
         private boolean FIRST_SUB_HEADER = true;
         RecyclerView recyclerView = null;
         String currentRecyclerViewName = null;
@@ -607,11 +587,9 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         @Override
         public void run() {
             QuestionBank qb = new QuestionBank(getActivity());
-            synchronized(qb) {
-                lines = qb.getQuestions(pathName);
-            }
+            lines = qb.getQuestions(pathName);
             for (String line : lines) {
-                if (Character.compare(line.charAt(0), ('-')) == 0) { // it is the name of a sub-header
+                if (line.charAt(0) == ('-')) { // it is the name of a sub-header
                     if (!FIRST_SUB_HEADER) { // initialise the recyclerView with the completed checklist array
                         init_recyclerView(recyclerView, checklistArray, currentRecyclerViewName);
                         checklistArray = new ArrayList<>();
@@ -624,7 +602,7 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                     }
                     FIRST_SUB_HEADER = false;
                 } else { // it is a question
-                    if (Character.compare(line.charAt(0), '>') == 0) {
+                    if (line.charAt(0) == '>') {
                         ChecklistItem item = checklistArray.get(checklistArray.size() - 1);
                         item.setStatement(item.getStatement()+"\n"+line);
                     } else {
@@ -637,9 +615,6 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private RecyclerView getCorrespondingRecyclerView(View view, String subHeader) throws IllegalArgumentException {
-        /**
-        * Returns recyclerView corresponding to the subHeader given
-        * */
         switch (subHeader) {
             case "Professionalism":
                 return view.findViewById(R.id.audit_checklist_recyclerview_professionalism);
@@ -674,11 +649,13 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         if (tenantType.equals("F&B")) {
             Log.d(TAG, "onCreateView: setting up for F&B");
             view = inflater.inflate(R.layout.f_checklist_audit_fb, container, false);
-            header_files = new String[]{"F&B_food_hygiene.txt", "F&B_healthier_choice.txt", "F&B_professionalism_and_staff_hygiene.txt", "F&B_workplace_safety_and_health.txt", "F&B_housekeeping_and_general_cleanliness.txt"};
+            header_files = new String[]{"F&B_food_hygiene.txt", "F&B_healthier_choice.txt", "F&B_professionalism_and_staff_hygiene.txt",
+                    "F&B_workplace_safety_and_health.txt", "F&B_housekeeping_and_general_cleanliness.txt"};
         } else if (tenantType.equals("Non F&B")) {
             Log.d(TAG, "onCreateView: setting up for Non F&B");
             view = inflater.inflate(R.layout.f_checklist_audit_nfb, container, false);
-            header_files = new String[]{"Non_F&B_professionalism_and_staff_hygiene.txt", "Non_F&B_workplace_safety_and_health.txt", "Non_F&B_housekeeping_and_general_cleanliness.txt"};
+            header_files = new String[]{"Non_F&B_professionalism_and_staff_hygiene.txt", "Non_F&B_workplace_safety_and_health.txt",
+                    "Non_F&B_housekeeping_and_general_cleanliness.txt"};
         } else {
             Log.d(TAG, "onCreateView: invalid tenant type: "+tenantType);
             Log.d(TAG, "inflateFragmentLayout: maybe check file names?");
@@ -689,12 +666,10 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     }
 
     private void initRecyclerViews(View view) {
-        ArrayList<Thread> threadArrayList = new ArrayList<>();
         // initialize and fill all recyclerViews using text files in assets directory
         for (String pathName : header_files) {
             CreateRecyclerViewThread createRecyclerViewThread = new CreateRecyclerViewThread(view, pathName);
             Thread thread = new Thread(createRecyclerViewThread);
-            threadArrayList.add(thread);
             thread.start();
         }
     }

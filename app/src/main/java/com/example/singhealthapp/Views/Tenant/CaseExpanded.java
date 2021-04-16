@@ -28,6 +28,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.CustomViewSettings;
 import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
@@ -223,19 +224,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 resolvingCaseSection.setVisibility(View.VISIBLE);
             });
 
-            // to enable scrolling, multiline and done button within editText
-            resolvedCommentsEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
-            resolvedCommentsEditText.setOnTouchListener((v, event) -> {
-                if (resolvedCommentsEditText.hasFocus()) {
-                    v.getParent().requestDisallowInterceptTouchEvent(true);
-                    switch (event.getAction() & MotionEvent.ACTION_MASK){
-                        case MotionEvent.ACTION_SCROLL:
-                            v.getParent().requestDisallowInterceptTouchEvent(false);
-                            return true;
-                    }
-                }
-                return false;
-            });
+            CustomViewSettings.makeScrollable(resolvedCommentsEditText);
 
             cameraButton.setOnClickListener(v -> {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -296,19 +285,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 HandleImageOperations.uploadImageToDatabase(resolutionImageBitmap, resolvedImageName);
             });
         } else {
-            // to enable scrolling, multiline and done button within editText
-            rejectedCommentsEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
-            rejectedCommentsEditText.setOnTouchListener((v, event) -> {
-                if (rejectedCommentsEditText.hasFocus()) {
-                    v.getParent().requestDisallowInterceptTouchEvent(true);
-                    switch (event.getAction() & MotionEvent.ACTION_MASK){
-                        case MotionEvent.ACTION_SCROLL:
-                            v.getParent().requestDisallowInterceptTouchEvent(false);
-                            return true;
-                    }
-                }
-                return false;
-            });
+            CustomViewSettings.makeScrollable(rejectedCommentsEditText);
 
             acceptButton.setOnClickListener(v -> {
                 // TODO: update case to be resolved

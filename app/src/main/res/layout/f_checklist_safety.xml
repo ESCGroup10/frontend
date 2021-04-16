@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Safe Management Measures \nfor Front-of-house"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:gravity="center"
             android:layout_margin="8dp"
             android:textColor="@color/black"
@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Staff Hygiene &amp; \nSafe Management Measures"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:gravity="center"
             android:layout_margin="8dp"
             android:textColor="@color/black"
@@ -45,10 +45,16 @@
             android:layout_height="wrap_content"/>
 
         <EditText
+            android:id="@+id/overallReportNotesSafety"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
+            android:layout_marginVertical="10dp"
             android:hint="Overall Comments"
-            android:layout_marginVertical="10dp"/>
+            android:gravity="bottom"
+            android:overScrollMode="always"
+            android:scrollbarStyle="insideInset"
+            android:scrollbars="vertical"
+            android:imeOptions="actionDone"/>
 
         <Button
             android:id="@+id/start_audit_button"
