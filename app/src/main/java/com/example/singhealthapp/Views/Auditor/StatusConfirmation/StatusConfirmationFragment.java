@@ -26,10 +26,10 @@ import java.util.Arrays;
 public class StatusConfirmationFragment extends Fragment {
 
     private static final String TAG = "StatusConfirmationFrag";
-    private final String TITLE_KEY = "title_key";
-    private final String MSG_KEY = "message_key";
-    private final String ADDITIONAL_MSG_KEY = "additional_message_key";
-    private final String BUTTON_TXT_KEY = "button_text_key";
+    private final String TITLE_KEY = "TITLE_KEY";
+    private final String MSG_KEY = "MSG_KEY";
+    private final String ADDITIONAL_MSG_KEY = "ADDITIONAL_MSG_KEY";
+    private final String BUTTON_TXT_KEY = "BUTTON_TXT_KEY";
 
     private String userType;
 

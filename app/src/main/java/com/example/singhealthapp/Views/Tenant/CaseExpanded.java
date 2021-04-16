@@ -5,14 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,7 +29,6 @@ import androidx.fragment.app.Fragment;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
-import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
@@ -86,7 +80,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
             resolvedImageName, unresolvedImageDate, resolvedImageDate;
     private int reportID, caseID, reportNumber;
     private Integer caseNumber;
-    private boolean resolvedStatus;
+    private boolean RESOLVED;
 
     // Camera stuff
     Uri mImageURI;
@@ -104,6 +98,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         View view = inflater.inflate(R.layout.f_case_expanded, container, false);
         loadUserType();
         findAllViews(view);
+        setInitVisibility();
 
         loadToken();
         initApiCaller();
@@ -113,7 +108,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         company = bundle.getString("COMPANY_KEY");
         reportNumber = bundle.getInt("REPORT_NUMBER_KEY");
         caseNumber = bundle.getInt("CASE_NUMBER_KEY");
-        resolvedStatus = bundle.getBoolean("RESOLVED_STATUS_KEY");
+        RESOLVED = bundle.getBoolean("RESOLVED_STATUS_KEY");
         reportID = bundle.getInt("REPORT_ID_KEY");
         caseID = bundle.getInt("CASE_ID_KEY");
         PENDING = bundle.getBoolean("PENDING_KEY");
@@ -141,6 +136,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
             }
         }
         Log.d(TAG, "findAllViews: called");
+        // for all users
         companyTextView = view.findViewById(R.id.companyTextView);
         institutionTextView = view.findViewById(R.id.institutionTextView);
         nonComplianceTypeTextView = view.findViewById(R.id.nonComplianceTypeTextView);
@@ -154,17 +150,52 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         resolvedCommentsTextView = view.findViewById(R.id.resolvedCommentsTextView);
         unresolvedImageViewPlaceholder = view.findViewById(R.id.unresolvedImageViewPlaceholder);
         resolvedImageViewPlaceholder = view.findViewById(R.id.resolvedImageViewPlaceholder);
+
+        // for auditor
+        acceptButton = view.findViewById(R.id.acceptButton);
+        rejectButton = view.findViewById(R.id.rejectButton);
+        auditorButtonsLinearLayout = view.findViewById(R.id.auditorButtonsLinearLayout);
+
+        // for tenants
+        resolveButton = view.findViewById(R.id.resolveButton);
+        resolvingCaseSection = view.findViewById(R.id.resolvingCaseSection);
+        cameraButton = view.findViewById(R.id.cameraButton);
+        uploadButton = view.findViewById(R.id.uploadButton);
+        confirmButton = view.findViewById(R.id.confirmButton);
+        resolvedCommentsEditText = view.findViewById(R.id.resolvedCommentsEditText);
+    }
+
+    private void setInitVisibility() {
+        // for all users:
+        // unresolved section
+        unresolvedImageView.setVisibility(GONE);
+
+        // resolved section
+        resolveButton.setVisibility(GONE);
+        resolvedCardView.setVisibility(GONE);
+        resolvedImageView.setVisibility(GONE);
+        resolvedImageViewPlaceholder.setVisibility(GONE);
+        auditorButtonsLinearLayout.setVisibility(GONE);
+
+        // resolving case section
+        resolvingCaseSection.setVisibility(GONE);
+
         if (userType.equals("Auditor")) {
-            acceptButton = view.findViewById(R.id.acceptButton);
-            rejectButton = view.findViewById(R.id.rejectButton);
-            auditorButtonsLinearLayout = view.findViewById(R.id.auditorButtonsLinearLayout);
-        } else {
-            resolveButton = view.findViewById(R.id.resolveButton);
-            resolvingCaseSection = view.findViewById(R.id.resolvingCaseSection);
-            cameraButton = view.findViewById(R.id.cameraButton);
-            uploadButton = view.findViewById(R.id.uploadButton);
-            confirmButton = view.findViewById(R.id.confirmButton);
-            resolvedCommentsEditText = view.findViewById(R.id.resolvedCommentsEditText);
+            if (PENDING || RESOLVED) {
+                resolvedCardView.setVisibility(VISIBLE);
+                resolvedImageViewPlaceholder.setVisibility(VISIBLE);
+            }
+            if (PENDING) {
+                auditorButtonsLinearLayout.setVisibility(VISIBLE);
+            }
+        }
+        if (!userType.equals("Auditor")) {
+            if (PENDING || RESOLVED) {
+                resolvedCardView.setVisibility(VISIBLE);
+                resolvedImageViewPlaceholder.setVisibility(VISIBLE);
+            } else {
+                resolveButton.setVisibility(VISIBLE);
+            }
         }
     }
 
@@ -234,7 +265,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
                         Log.d(TAG, "patchCall onResponse: " + response);
                         Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                        submit();
+                        submitResolution();
                     }
 
                         @Override
@@ -257,7 +288,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     @Override
                     public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
                         Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                        CentralisedToast.makeText(getActivity(), "Resolution accepted successfully", CentralisedToast.LENGTH_SHORT);
+                        acceptResolution();
                     }
 
                     @Override
@@ -312,17 +343,28 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         thisCase.setResolved_comments(resolvedComments);
     }
 
-    private void submit() {
+    private void submitResolution() {
         Bundle bundle = new Bundle();
         //keys
-        String TITLE_KEY = "title_key";
-        bundle.putString(TITLE_KEY, "Case Resolution Submitted");
-        String MSG_KEY = "message_key";
-        bundle.putString(MSG_KEY, "Thank you!");
-        String ADDITION_MSG_KEY = "additional_message_key";
-        bundle.putString(ADDITION_MSG_KEY, "SingHealth staff will review your submission within 3 working days.");
-        String BUTTON_TXT_KEY = "button_text_key";
-        bundle.putString(BUTTON_TXT_KEY, "Return to My Reports");
+        bundle.putString("TITLE_KEY", "Case Resolution Submitted");
+        bundle.putString("MSG_KEY", "Thank you!");
+        bundle.putString("ADDITION_MSG_KEY", "SingHealth staff will review your submission within 3 working days.");
+        bundle.putString("BUTTON_TXT_KEY", "Return to My Reports");
+        StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
+        statusConfirmationFragment.setArguments(bundle);
+        CaseExpanded.this.getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, statusConfirmationFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void acceptResolution() {
+        Bundle bundle = new Bundle();
+        //keys
+        bundle.putString("TITLE_KEY", "Case Resolution Accepted");
+        bundle.putString("MSG_KEY", "Thank you!");
+        bundle.putString("BUTTON_TXT_KEY", "Return to case previews");
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
         CaseExpanded.this.getParentFragmentManager()
@@ -380,32 +422,35 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         Log.d(TAG, "setAllViews: called");
         companyTextView.setText(company);
         institutionTextView.setText(institution);
-        resolvedStatusTextView.setText((resolvedStatus?"Resolved":"Unresolved"));
+        String resolvedStatus = RESOLVED ?"Resolved":"Unresolved";
+        resolvedStatus = PENDING?"Pending resolution":resolvedStatus;
+        resolvedStatusTextView.setText(resolvedStatus);
     }
 
     private void setAllViewsFromDatabase() {
         Log.d(TAG, "setAllViewsFromDatabase: called");
         nonComplianceTypeTextView.setText(nonComplianceType);
         unresolvedImageDateTextView.setText((resolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(unresolvedImageDate)));
-        unresolvedCommentsTextView.setText(unresolvedComments);
+        unresolvedCommentsTextView.setText((unresolvedCommentsTextView.getText() + unresolvedComments));
         try {
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 500, 300);
         } catch (ExceptionInInitializerError e) {
             unresolvedImageViewPlaceholder.setText("Unable to retrieve image from Database");
         }
-        if (resolvedStatus || PENDING) {
+        if (RESOLVED || PENDING) {
             if (userType.equals("Auditor")) {
-                if (!resolvedStatus && resolvedImageName!=null) { // resolution pending approval
+                if (!RESOLVED && resolvedImageName!=null) { // resolution pending approval
                     auditorButtonsLinearLayout.setVisibility(View.VISIBLE);
                 }
+            } else {
+                resolveButton.setVisibility(View.GONE);
             }
-            resolveButton.setVisibility(View.GONE);
             resolvedCardView.setVisibility(View.VISIBLE);
             resolvedImageDateTextView.setVisibility(VISIBLE);
             resolvedCommentsTextView.setVisibility(VISIBLE);
             resolvedImageViewPlaceholder.setVisibility(View.VISIBLE);
             resolvedImageDateTextView.setText((resolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(resolvedImageDate)));
-            resolvedCommentsTextView.setText(resolvedComments);
+            resolvedCommentsTextView.setText((resolvedComments.equals("")?resolvedCommentsTextView.getText():resolvedComments));
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 500, 300);
         } else { // if not resolved or pending
             if (!userType.equals("Auditor")) {
@@ -484,7 +529,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         Call<List<Case>> myCaseList;
         Log.d(TAG, "getCase: token: "+token);
         Log.d(TAG, "getCase: reportID: "+reportID);
-        myCaseList = apiCaller.getCasesById("Token " + token, reportID, (resolvedStatus?1:0));
+        myCaseList = apiCaller.getCasesById("Token " + token, reportID, (RESOLVED ?1:0));
         myCaseList.enqueue(new Callback<List<Case>>() {
             @Override
             public void onResponse(@NotNull Call<List<Case>> call, @NotNull Response<List<Case>> response) {
@@ -503,7 +548,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     unresolvedImageDate = thisCase.getUnresolved_date();
                     unresolvedImageName = thisCase.getUnresolved_photo();
 
-                    if (!resolvedStatus && !PENDING) { // if unresolved and not pending resolution
+                    if (!RESOLVED && !PENDING) { // if unresolved and not pending resolution
                         resolvedImageName = unresolvedImageName + "_resolved";
                     } else { // if either pending or resolved
                         resolvedImageName = thisCase.getResolved_photo();

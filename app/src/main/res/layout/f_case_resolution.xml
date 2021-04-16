@@ -7,8 +7,7 @@
     android:layout_marginTop="20dp"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:visibility="visible"
-    android:visibility="gone">
+    tools:visibility="visible">
 
     <TextView
         android:layout_width="wrap_content"
