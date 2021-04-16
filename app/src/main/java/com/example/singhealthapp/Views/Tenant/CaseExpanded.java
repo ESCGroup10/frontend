@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
+import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
@@ -93,6 +94,9 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     final int REQUEST_IMAGE_FROM_GALLERY = 1;
     Bitmap tentativeImageBitmap;
 
+    // flags
+    private boolean PENDING;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -112,6 +116,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         resolvedStatus = bundle.getBoolean("RESOLVED_STATUS_KEY");
         reportID = bundle.getInt("REPORT_ID_KEY");
         caseID = bundle.getInt("CASE_ID_KEY");
+        PENDING = bundle.getBoolean("PENDING_KEY");
 
         getActivity().setTitle("Report "+reportNumber);
         getCase();
@@ -381,26 +386,28 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     private void setAllViewsFromDatabase() {
         Log.d(TAG, "setAllViewsFromDatabase: called");
         nonComplianceTypeTextView.setText(nonComplianceType);
-        unresolvedImageDateTextView.setText(convertDatabaseDateToReadableDate(unresolvedImageDate));
+        unresolvedImageDateTextView.setText((resolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(unresolvedImageDate)));
         unresolvedCommentsTextView.setText(unresolvedComments);
         try {
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 500, 300);
         } catch (ExceptionInInitializerError e) {
             unresolvedImageViewPlaceholder.setText("Unable to retrieve image from Database");
         }
-        if (resolvedStatus) {
+        if (resolvedStatus || PENDING) {
             if (userType.equals("Auditor")) {
                 if (!resolvedStatus && resolvedImageName!=null) { // resolution pending approval
                     auditorButtonsLinearLayout.setVisibility(View.VISIBLE);
                 }
             }
+            resolveButton.setVisibility(View.GONE);
+            resolvedCardView.setVisibility(View.VISIBLE);
             resolvedImageDateTextView.setVisibility(VISIBLE);
             resolvedCommentsTextView.setVisibility(VISIBLE);
             resolvedImageViewPlaceholder.setVisibility(View.VISIBLE);
             resolvedImageDateTextView.setText((resolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(resolvedImageDate)));
-            resolvedCommentsTextView.setText((resolvedCommentsTextView.getText() + resolvedComments));
+            resolvedCommentsTextView.setText(resolvedComments);
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), resolvedImageName, resolvedImageView, resolvedImageViewPlaceholder, 500, 300);
-        } else {
+        } else { // if not resolved or pending
             if (!userType.equals("Auditor")) {
                 resolveButton.setVisibility(VISIBLE);
             }
@@ -488,20 +495,20 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                         thisCase = c;
                     }
                 }
+                Log.d(TAG, "onResponse: resolved photo: "+thisCase.getResolved_photo());
+                Log.d(TAG, "onResponse: resolved date: "+thisCase.getResolved_date());
                 if (thisCase != null) {
                     nonComplianceType = thisCase.getNon_compliance_type();
                     unresolvedComments = thisCase.getUnresolved_comments();
                     unresolvedImageDate = thisCase.getUnresolved_date();
                     unresolvedImageName = thisCase.getUnresolved_photo();
 
-                    // if the case is resolved, get the data, else leave relevant fields as null
-//                    if (thisCase.getResolved_photo().equals("") || thisCase.getResolved_photo() == null) { // if resolved or pending resolution
-                    if (resolvedStatus) {
+                    if (!resolvedStatus && !PENDING) { // if unresolved and not pending resolution
+                        resolvedImageName = unresolvedImageName + "_resolved";
+                    } else { // if either pending or resolved
                         resolvedImageName = thisCase.getResolved_photo();
                         resolvedImageDate = thisCase.getResolved_date();
                         resolvedComments = thisCase.getResolved_comments();
-                    } else {
-                        resolvedImageName = unresolvedImageName + "_resolved";
                     }
                     setAllViewsFromDatabase();
                 } else {

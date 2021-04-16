@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.example.singhealthapp.Views.Tenant.CaseExpanded;
 import java.util.List;
 
 public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
+    private static final String TAG = "CasePreviewAdapter";
     List<Case> cases;
     Report report;
     FragmentActivity parent;
@@ -61,6 +63,7 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
             args.putBoolean("RESOLVED_STATUS_KEY", a.isIs_resolved());
             args.putInt("REPORT_ID_KEY", report.getId());
             args.putInt("CASE_ID_KEY", a.getId());
+            args.putBoolean("PENDING_KEY", ((!a.isIs_resolved()) && (!(a.getResolved_photo().equals("")))));
             CaseExpanded caseExpanded = new CaseExpanded();
             caseExpanded.setArguments(args);
             int fragment_id;
