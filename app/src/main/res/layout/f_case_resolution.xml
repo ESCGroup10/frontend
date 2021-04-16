@@ -55,7 +55,6 @@
         android:overScrollMode="always"
         android:scrollbarStyle="insideInset"
         android:scrollbars="vertical"
-        android:inputType="textImeMultiLine|textMultiLine"
         android:imeOptions="actionDone"/>
 
     <Button

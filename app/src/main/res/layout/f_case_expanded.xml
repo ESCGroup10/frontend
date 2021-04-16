@@ -261,6 +261,18 @@
 
                 </LinearLayout>
 
+                <EditText
+                    android:id="@+id/rejectedCommentsEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="10dp"
+                    android:gravity="bottom"
+                    android:hint="Reasons for rejecting"
+                    android:overScrollMode="always"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbars="vertical"
+                    android:imeOptions="actionDone"/>
+
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>

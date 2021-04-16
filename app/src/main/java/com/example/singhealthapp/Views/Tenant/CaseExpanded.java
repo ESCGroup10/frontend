@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -68,7 +69,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
     ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton;
     Button resolveButton, confirmButton, rejectButton, acceptButton;
     LinearLayout resolvingCaseSection, auditorButtonsLinearLayout;
-    EditText resolvedCommentsEditText;
+    EditText resolvedCommentsEditText, rejectedCommentsEditText;
     CardView resolvedCardView;
 
     private Bundle bundle;
@@ -154,6 +155,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         // for auditor
         acceptButton = view.findViewById(R.id.acceptButton);
         rejectButton = view.findViewById(R.id.rejectButton);
+        rejectedCommentsEditText = view.findViewById(R.id.rejectedCommentsEditText);
         auditorButtonsLinearLayout = view.findViewById(R.id.auditorButtonsLinearLayout);
 
         // for tenants
@@ -169,6 +171,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         // for all users:
         // unresolved section
         unresolvedImageView.setVisibility(GONE);
+        rejectedCommentsEditText.setVisibility(GONE);
 
         // resolved section
         resolveButton.setVisibility(GONE);
@@ -207,7 +210,8 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 resolvingCaseSection.setVisibility(View.VISIBLE);
             });
 
-            // to enable scrolling within editText
+            // to enable scrolling, multiline and done button within editText
+            resolvedCommentsEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
             resolvedCommentsEditText.setOnTouchListener((v, event) -> {
                 if (resolvedCommentsEditText.hasFocus()) {
                     v.getParent().requestDisallowInterceptTouchEvent(true);
@@ -265,7 +269,9 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
                         Log.d(TAG, "patchCall onResponse: " + response);
                         Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                        submitResolution();
+                        TenantSubmit("Case Resolution Submitted", "Thank you!",
+                                "SingHealth staff will review your submission within 3 working days.",
+                                "Return to My Reports");
                     }
 
                         @Override
@@ -279,6 +285,20 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 }
             });
         } else {
+            // to enable scrolling, multiline and done button within editText
+            rejectedCommentsEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+            rejectedCommentsEditText.setOnTouchListener((v, event) -> {
+                if (rejectedCommentsEditText.hasFocus()) {
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    switch (event.getAction() & MotionEvent.ACTION_MASK){
+                        case MotionEvent.ACTION_SCROLL:
+                            v.getParent().requestDisallowInterceptTouchEvent(false);
+                            return true;
+                    }
+                }
+                return false;
+            });
+
             acceptButton.setOnClickListener(v -> {
                 // TODO: update case to be resolved
                 createUpdatedCase(true);
@@ -288,7 +308,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                     @Override
                     public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
                         Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                        acceptResolution();
+                        AuditorSubmit("Case Resolution Accepted", "Thank you!", "", "Return to case previews");
                     }
 
                     @Override
@@ -301,23 +321,29 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
             });
 
             rejectButton.setOnClickListener(v -> {
-                createUpdatedCase(false);
-                Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+                if (rejectButton.getText().equals("Reject")) {
+                    rejectedCommentsEditText.setVisibility(VISIBLE);
+                    acceptButton.setVisibility(GONE);
+                    rejectButton.setText("Confirm reject");
+                } else {
+                    createUpdatedCase(false);
+                    Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
 
-                patchCall.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                        Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                        CentralisedToast.makeText(getActivity(), "Resolution rejected successfully", CentralisedToast.LENGTH_SHORT);
-                    }
+                    patchCall.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                            Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                            AuditorSubmit("Case Resolution Rejected", "Thank you!", "", "Return to case previews");
+                        }
 
-                    @Override
-                    public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
-                        t.printStackTrace();
-                        CentralisedToast.makeText(getActivity(), "Failed to reject resolution, try again.",
-                                CentralisedToast.LENGTH_SHORT);
-                    }
-                });
+                        @Override
+                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                            t.printStackTrace();
+                            CentralisedToast.makeText(getActivity(), "Failed to reject resolution, try again.",
+                                    CentralisedToast.LENGTH_SHORT);
+                        }
+                    });
+                }
             });
         }
     }
@@ -328,8 +354,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 thisCase.setIs_resolved(true);
                 return;
             } else {
-                // TODO: add additional comments to the resolved image
-                // TODO: write another textview for that? maybe a scrollable textview bulletin
+                thisCase.setRejected_comments(rejectedCommentsEditText.getText().toString());
                 return;
             }
         }
@@ -343,13 +368,15 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         thisCase.setResolved_comments(resolvedComments);
     }
 
-    private void submitResolution() {
+    private void TenantSubmit(String title, String msg, String additionalMsg, String buttonText) {
         Bundle bundle = new Bundle();
         //keys
-        bundle.putString("TITLE_KEY", "Case Resolution Submitted");
-        bundle.putString("MSG_KEY", "Thank you!");
-        bundle.putString("ADDITION_MSG_KEY", "SingHealth staff will review your submission within 3 working days.");
-        bundle.putString("BUTTON_TXT_KEY", "Return to My Reports");
+        bundle.putString("TITLE_KEY", title);
+        bundle.putString("MSG_KEY", msg);
+        if (!additionalMsg.equals("")) {
+            bundle.putString("ADDITION_MSG_KEY", additionalMsg);
+        }
+        bundle.putString("BUTTON_TXT_KEY", buttonText);
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
         CaseExpanded.this.getParentFragmentManager()
@@ -359,17 +386,20 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
                 .commit();
     }
 
-    private void acceptResolution() {
+    private void AuditorSubmit(String title, String msg, String additionalMsg, String buttonText) {
         Bundle bundle = new Bundle();
         //keys
-        bundle.putString("TITLE_KEY", "Case Resolution Accepted");
-        bundle.putString("MSG_KEY", "Thank you!");
-        bundle.putString("BUTTON_TXT_KEY", "Return to case previews");
+        bundle.putString("TITLE_KEY", title);
+        bundle.putString("MSG_KEY", msg);
+        if (!additionalMsg.equals("")) {
+            bundle.putString("ADDITION_MSG_KEY", additionalMsg);
+        }
+        bundle.putString("BUTTON_TXT_KEY", buttonText);
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
         CaseExpanded.this.getParentFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, statusConfirmationFragment)
+                .replace(R.id.auditor_fragment_container, statusConfirmationFragment)
                 .addToBackStack(null)
                 .commit();
     }
@@ -431,7 +461,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         Log.d(TAG, "setAllViewsFromDatabase: called");
         nonComplianceTypeTextView.setText(nonComplianceType);
         unresolvedImageDateTextView.setText((resolvedImageDateTextView.getText() + convertDatabaseDateToReadableDate(unresolvedImageDate)));
-        unresolvedCommentsTextView.setText((unresolvedCommentsTextView.getText() + unresolvedComments));
+        unresolvedCommentsTextView.setText((unresolvedComments.equals("")?unresolvedCommentsTextView.getText():unresolvedComments));
         try {
             HandleImageOperations.retrieveImageFromDatabase(getActivity(), unresolvedImageName, unresolvedImageView, unresolvedImageViewPlaceholder, 500, 300);
         } catch (ExceptionInInitializerError e) {
