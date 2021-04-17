@@ -9,37 +9,45 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class EspressoCountingIdlingResource {
     private static final String RESOURCE = "GLOBAL";
     private static boolean activated = false;
-    private static CountingIdlingResource mCountingIdlingResource = new CountingIdlingResource(RESOURCE);
+    private static int count = 0;
+    private static final CountingIdlingResource mCountingIdlingResource = new CountingIdlingResource(RESOURCE);
 
     public static void increment() {
         if (activated) {
-            System.out.println("incrementing");
             mCountingIdlingResource.increment();
+            count++;
         }
     }
 
     public static void increment(int i) {
         if (activated) {
-            System.out.println("incrementing");
             for (int j=0; j<i; j++) {
                 mCountingIdlingResource.increment();
+                count++;
             }
         }
     }
 
     public static void decrement() {
         if (activated) {
-            System.out.println("decrementing");
             mCountingIdlingResource.decrement();
+            count--;
         }
     }
 
-    public static void activate() {
-        activated = true;
+    public static int getCount() {
+        return count;
+    }
+
+    public static void dumpStateToLogs() {
+        mCountingIdlingResource.dumpStateToLogs();
     }
 
     public static IdlingResource getIdlingResource() {
         return mCountingIdlingResource;
     }
 
+    public static void activate() {
+        activated = true;
+    }
 }

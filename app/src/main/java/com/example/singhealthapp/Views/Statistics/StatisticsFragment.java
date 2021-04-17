@@ -47,6 +47,7 @@ public class StatisticsFragment extends CustomFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+//        EspressoCountingIdlingResource.increment();
         getActivity().setTitle("View Statistics");
         View view = inflater.inflate(R.layout.f_stats, container, false);
 
@@ -83,6 +84,11 @@ public class StatisticsFragment extends CustomFragment {
         });
         EspressoCountingIdlingResource.decrement();
         return view;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
     }
 
     private void getTabs() {

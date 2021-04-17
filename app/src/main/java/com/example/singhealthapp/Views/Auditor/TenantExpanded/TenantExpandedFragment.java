@@ -41,9 +41,6 @@ public class TenantExpandedFragment extends CustomFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            EspressoCountingIdlingResource.decrement();
-        }
         getActivity().setTitle("Tenant " + tenant.getId());
 
         view = inflater.inflate(R.layout.f_tenant_expanded, container, false);
@@ -91,7 +88,7 @@ public class TenantExpandedFragment extends CustomFragment {
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteTenant(tenant.getId()))
                     .create().show();
         });
-
+        EspressoCountingIdlingResource.decrement();
         return view;
     }
 

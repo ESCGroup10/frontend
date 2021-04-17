@@ -288,6 +288,7 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
         bundle.putString("BUTTON_TXT_KEY", "Return");
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
+        EspressoCountingIdlingResource.increment();
         AuditChecklistFragment.this.getParentFragmentManager()
                 .beginTransaction()
                 .replace(R.id.auditor_fragment_container, statusConfirmationFragment, statusConfirmationFragment.getClass().getName())
