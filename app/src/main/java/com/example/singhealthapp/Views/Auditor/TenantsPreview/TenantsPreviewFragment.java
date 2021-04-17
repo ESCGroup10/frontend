@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,11 +38,13 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
     TenantsPreviewAdapter adapter;
     private ArrayList<Tenant> tenantPreviews, getTenantPreviews;
     private List<Tenant> tenants, displayTenants;
+    private String token;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        loadToken();
         getActivity().setTitle("Search Tenant");
         View view = inflater.inflate(R.layout.f_tenants_all, container, false);
         return view;
@@ -49,8 +52,15 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
-        queueList(loadToken());
+        queueList(token);
     }
+
+    @Override
+    public void onStart() {
+        EspressoCountingIdlingResource.decrement();
+        super.onStart();
+    }
+
     private void queueList(String token){
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
@@ -58,6 +68,7 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
         call.enqueue(new Callback<List<Tenant>>() {
             @Override
             public void onResponse(Call<List<Tenant>> call, Response<List<Tenant>> response) {
+                EspressoCountingIdlingResource.increment();
                 if (!response.isSuccessful()) {
                     Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                     return;
@@ -72,7 +83,14 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
         });
     }
 
-    private void queueReport(String token, List<Tenant> tenantSearch){
+    private synchronized void queueReport(String token, List<Tenant> tenantSearch){
+        while (token == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
         Call<List<Tenant>> call = apiCaller.getTenant("Token " + token);
@@ -84,18 +102,18 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
                     return ;
                 }
                 System.out.println(response.body().get(0).getId());
-                adapter = new TenantsPreviewAdapter(tenantSearch, response.body(), getActivity(), loadToken(), TenantsPreviewFragment.this);
+                adapter = new TenantsPreviewAdapter(tenantSearch, response.body(), getActivity(), token, TenantsPreviewFragment.this);
                 tenants = response.body();
                 try {
                     RecyclerView view = (RecyclerView) getView().findViewById(R.id.tenantRecycler);
                     view.setLayoutManager(new LinearLayoutManager(getActivity()));
                     view.setItemAnimator(new DefaultItemAnimator());
                     view.setAdapter(adapter);
-                    EspressoCountingIdlingResource.decrement();
                 }
                 catch (Exception e) {
                     System.out.println("recycleView not set");
                 }
+                EspressoCountingIdlingResource.decrement();
             }
             @Override
             public void onFailure(Call<List<Tenant>> call, Throwable t) {
@@ -104,12 +122,11 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
         });
     }
 
-    private String loadToken() {
+    private void loadToken() {
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("TOKEN_KEY", null);
+        token = sharedPreferences.getString("TOKEN_KEY", null);
         int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
         System.out.println("User ID " + userId);
-        return token;
     }
 
     @Override
@@ -125,10 +142,6 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
 
     @Override
     public boolean onBackPressed() {
-        if (getParentFragmentManager().getBackStackEntryCount() == 0) {
-            return false;
-        } else {
-            return super.onBackPressed();
-        }
+        return false;
     }
 }

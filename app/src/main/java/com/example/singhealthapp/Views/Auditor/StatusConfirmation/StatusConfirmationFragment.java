@@ -74,9 +74,10 @@ public class StatusConfirmationFragment extends Fragment implements IOnBackPress
         button.setText(button_text);
 
         button.setOnClickListener(v -> {
+            EspressoCountingIdlingResource.increment();
             getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         });
-
+        EspressoCountingIdlingResource.decrement();
         return view;
     }
 

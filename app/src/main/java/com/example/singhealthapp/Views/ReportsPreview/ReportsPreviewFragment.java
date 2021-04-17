@@ -47,6 +47,7 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+//        EspressoCountingIdlingResource.increment();
         getActivity().setTitle("Reports");
         View view = inflater.inflate(R.layout.f_reports_all, container, false);
         view.findViewById(R.id.reportPreviewSearchButton).setOnClickListener(v -> {
@@ -92,6 +93,7 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
             completed = !completed;
             displayRecycleView(displayPreviews, displayReports);
         });
+        EspressoCountingIdlingResource.decrement();
         return view;
     }
 
@@ -196,7 +198,6 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
             view.setItemAnimator(new DefaultItemAnimator());
             view.setAdapter(adapterCompleted);
-            EspressoCountingIdlingResource.decrement();
         } catch (Exception e) {
             System.out.println("Completed recycleView not set");
         }

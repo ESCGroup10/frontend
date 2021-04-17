@@ -288,6 +288,7 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
         bundle.putString("BUTTON_TXT_KEY", "Return");
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
+        EspressoCountingIdlingResource.increment();
         AuditChecklistFragment.this.getParentFragmentManager()
                 .beginTransaction()
                 .replace(R.id.auditor_fragment_container, statusConfirmationFragment, statusConfirmationFragment.getClass().getName())
@@ -303,12 +304,11 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                     .setCancelable(false)
                     .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                     .setPositiveButton("Yes", (dialog, which) -> {
-                        getActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.auditor_fragment_container, new TenantsPreviewFragment())
-                                .commit();
+                        getParentFragmentManager().popBackStackImmediate();
                         dialog.dismiss();
                     })
                     .show();
+            EspressoCountingIdlingResource.decrement(); // container activity incremented when back pressed was called
         } else {
             return super.onBackPressed();
         }

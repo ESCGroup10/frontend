@@ -10,19 +10,23 @@ import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
+import com.example.singhealthapp.HelperClasses.StandardHelperMethods;
 import com.example.singhealthapp.R;
 
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.swipeUp;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -34,36 +38,8 @@ import static org.hamcrest.Matchers.not;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class AuditorFragmentContainerTest {
-    EspressoCountingIdlingResource idlingResource;
-
-    public static ViewAction clickChildViewWithId(final int id) {
-        return new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return null;
-            }
-
-            @Override
-            public String getDescription() {
-                return "Click on a child view with specified id.";
-            }
-
-            @Override
-            public void perform(UiController uiController, View view) {
-                View v = view.findViewById(id);
-                v.performClick();
-            }
-        };
-    }
-
-    public void sleep(int multiplier) {
-        try {
-            Thread.sleep(100*multiplier);
-        } catch (InterruptedException e) {
-            System.out.println("caught "+e);
-        }
-    }
+public class AuditorProjectLevelTest extends StandardHelperMethods {
+//    EspressoCountingIdlingResource idlingResource;
 
     /**
      * Example for calling method in an Activity:
@@ -78,10 +54,13 @@ public class AuditorFragmentContainerTest {
      *         });
      * */
 
+    @Rule
+    public ActivityScenarioRule<AuditorFragmentContainer> rule = new ActivityScenarioRule<>(AuditorFragmentContainer.class);
+
     @Before
     public void setUp() {
         // register idling resources here
-        ActivityScenario activityScenario = ActivityScenario.launch(AuditorFragmentContainer.class);
+        rule.getScenario().onActivity(AuditorFragmentContainer::activateEspressoIdlingResource);
         IdlingRegistry.getInstance().register(EspressoCountingIdlingResource.getIdlingResource());
     }
 
@@ -109,12 +88,14 @@ public class AuditorFragmentContainerTest {
                 .check(matches(isClosed(Gravity.LEFT)))
                 .perform(DrawerActions.open());
         sleep(2); // click operation is handled in external class so we use sleep instead of idling resource here
+        onView(withId(R.id.nav_Tenants)).perform(click());
         onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
         onView(withId(R.id.tenantRecycler)).check(matches(isDisplayed()));
     }
 
     @Test
     public void NavAuditorContainerToTenantExpandedFragment() {
+        NavAuditorContainerToTenantSearchFragment();
         onView(withId(R.id.tenantRecycler)).perform(
                 RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.cardView)));
         onView(withId(R.id.expandedTenantFragment)).check(matches(isDisplayed()));
@@ -157,9 +138,7 @@ public class AuditorFragmentContainerTest {
     @Test
     public void NavSafetyChecklistToAuditChecklist() {
         NavTenantExpandedToSafetyChecklist();
-        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp());
-        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp());
-        sleep(4);
+        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp()).perform(swipeUp());
         onView(withId(R.id.start_audit_button)).perform(click());
         onView(withId(R.id.auditChecklistFragment)).check(matches(isDisplayed()));
     }
@@ -169,12 +148,9 @@ public class AuditorFragmentContainerTest {
         NavSafetyChecklistToAuditChecklist();
         onView(withId(R.id.WorkplaceSafetyAndHealthFAB)).perform(click()); // clicks the menu fab
         onView(withId(R.id.WorkplaceSafetyAndHealthFAB)).perform(click()); // clicks the workplace fab
-        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
-        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
-        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
-        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp());
-        sleep(1);
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp());
         onView(withId(R.id.submit_audit_button)).perform(click());
+        onView(withText("Set all questions to true and submit")).perform(click());
         onView(withText("Yes")).perform(click());
         onView(withId(R.id.statusConfirmationFragment)).check(matches(isDisplayed()));
     }
@@ -183,9 +159,62 @@ public class AuditorFragmentContainerTest {
     public void NavStatusConfirmationToReportFragment() {
         NavAuditChecklistToStatusConfirmationChecklist();
         onView(withId(R.id.button_return)).check(matches(isDisplayed()));
-        // the below cannot be tested due to problems testing shared pref
-//        onView(withId(R.id.button_return)).perform(click());
-//        onView(withId(R.id.reports)).check(matches(isDisplayed()));
-//        onView(withId(R.id.reportPreviewRecyclerViewUnresolved)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.button_return)).perform(click());
+        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void TestBackPresses() {
+        // check TenantsPreviewFragment
+        pressBack();
+        sleep(1);
+        onView(withText("Cancel")).check(matches(isDisplayed()));
+        onView(withText("Cancel")).perform(click());
+
+        // check StatisticsFragment
+        NavAuditorContainerToTenantStatisticsFragment();
+        pressBack();
+        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+
+        // check TenantExpandedFragment
+        NavAuditorContainerToTenantExpandedFragment();
+        pressBack();
+        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+
+        // check ReportSummaryFragment
+        NavAuditorContainerToReportsFragment();
+        pressBack();
+        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+
+        // check AddTenantFragment
+        NavAuditorContainerToAddTenantFragment();
+        onView(withText("Cancel")).perform(click());
+        pressBack();
+        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+
+        // check SafetyChecklistFragment
+        NavTenantExpandedToSafetyChecklist();
+        pressBack();
+        onView(withId(R.id.expandedTenantFragment)).check(matches(isDisplayed()));
+
+        // check AuditChecklistFragment
+        onView(withId(R.id.startSafetyChecklistButton)).perform(click());
+        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp()).perform(swipeUp());
+        onView(withId(R.id.start_audit_button)).perform(click());
+        pressBack();
+        onView(withText("Are you sure you want to leave?\nOngoing report will be deleted!")).check(matches(isDisplayed()));
+        onView(withText("No")).perform(click());
+
+        // check StatusConfirmationFragment
+        onView(withId(R.id.WorkplaceSafetyAndHealthFAB)).perform(click()); // clicks the menu fab
+        onView(withId(R.id.WorkplaceSafetyAndHealthFAB)).perform(click()); // clicks the workplace fab
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp());
+        onView(withId(R.id.submit_audit_button)).perform(click());
+        onView(withText("Set all questions to true and submit")).perform(click());
+        onView(withText("Yes")).perform(click());
+        onView(withId(R.id.statusConfirmationFragment)).check(matches(isDisplayed()));
+        pressBack();
+        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
     }
 }

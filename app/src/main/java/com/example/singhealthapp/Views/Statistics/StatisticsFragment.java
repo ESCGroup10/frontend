@@ -85,6 +85,11 @@ public class StatisticsFragment extends CustomFragment {
         return view;
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+    }
+
     private void getTabs() {
         final StatsViewPagerAdapter statsViewPagerAdapter = new StatsViewPagerAdapter(getParentFragmentManager());
 
