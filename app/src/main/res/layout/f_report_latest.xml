@@ -40,8 +40,8 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_margin="10dp"
+                    android:layout_height="25dp"
+                    android:layout_margin="5dp"
                     android:textSize="18dp"
                     android:id="@+id/resolvedLatestReport"
                     android:layout_gravity="center" />
@@ -168,6 +168,16 @@
 
             </LinearLayout>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/latestReportViewCases"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:layout_marginBottom="10dp"
+            android:background="#ffb684"
+            android:layout_gravity="center"
+            android:text="view cases" />
 
     </LinearLayout>
 
