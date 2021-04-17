@@ -533,23 +533,29 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
         for (int i=0; i<checklistAdapterArrayList.size(); i++) {
             String name = recyclerViewNameArrayList.get(i);
             int currentChecklistNumCases = checklistAdapterArrayList.get(i).getNumCases();
+            int currentChecklistNumNA = checklistAdapterArrayList.get(i).numNA();
             numCases += currentChecklistNumCases;
 
             switch (name) {
                 case "Professional & Staff Hygiene":
                     staffhygiene_score-=currentChecklistNumCases;
+                    original_staffhygiene_score-=currentChecklistNumNA;
                     break;
                 case "Housekeeping & General Cleanliness":
                     housekeeping_score-=currentChecklistNumCases;
+                    original_housekeeping_score-=currentChecklistNumNA;
                     break;
                 case "Healthier Choice":
                     foodhygiene_score-=currentChecklistNumCases;
+                    original_healthierchoice_score-=currentChecklistNumNA;
                     break;
                 case "Food Hygiene":
                     healthierchoice_score-=currentChecklistNumCases;
+                    original_foodhygiene_score-=currentChecklistNumNA;
                     break;
                 case "Workplace Safety & Health":
                     safety_score-=currentChecklistNumCases;
+                    original_safety_score-=currentChecklistNumNA;
                     break;
                 default:
                     throw new IllegalArgumentException();
@@ -564,6 +570,11 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
             healthierchoice_score = healthierchoice_score * healthierchoice_weightage / original_healthierchoice_score;
             foodhygiene_score = foodhygiene_score * foodhygiene_weightage / original_foodhygiene_score;
         }
+        Log.d(TAG, "calculateScores: "+staffhygiene_score+"\n"+
+                housekeeping_score+"\n"+
+                safety_score+"\n"+
+                healthierchoice_score+"\n"+
+                foodhygiene_score+"\n");
 
         // decide whether pass or fail
         if (staffhygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 0.95) {
@@ -721,28 +732,20 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
 
     private void initScoresAndPercentages(String tenantType) {
         if (tenantType.equals("F&B")) {
-            staffhygiene_score = 13;
-            housekeeping_score = 17;
-            safety_score = 18;
-            healthierchoice_score = 11;
-            foodhygiene_score = 37;
-            original_staffhygiene_score = 13;
-            original_housekeeping_score = 17;
-            original_safety_score = 18;
-            original_healthierchoice_score = 11;
-            original_foodhygiene_score = 37;
+            staffhygiene_score = original_staffhygiene_score = 13;
+            housekeeping_score = original_housekeeping_score = 17;
+            safety_score = original_safety_score = 18;
+            healthierchoice_score = original_healthierchoice_score = 11;
+            foodhygiene_score = original_foodhygiene_score = 37;
             staffhygiene_weightage = 0.10f;
             housekeeping_weightage = 0.20f;
             safety_weightage = 0.20f;
             healthierchoice_weightage = 0.15f;
             foodhygiene_weightage = 0.35f;
         } else if (tenantType.equals("Non F&B")) {
-            staffhygiene_score = 6;
-            housekeeping_score = 12;
-            safety_score = 16;
-            original_staffhygiene_score = 6;
-            original_housekeeping_score = 12;
-            original_safety_score = 16;
+            staffhygiene_score = original_staffhygiene_score = 6;
+            housekeeping_score = original_housekeeping_score = 12;
+            safety_score = original_safety_score = 16;
             staffhygiene_weightage = 0.20f;
             housekeeping_weightage = 0.40f;
             safety_weightage = 0.40f;

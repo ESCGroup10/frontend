@@ -6,7 +6,18 @@ public class ChecklistItem {
 
     private String statement, remarks;
     private Bitmap imageBitmap;
-    private boolean photoTaken, isStatusSet;
+    private boolean photoTaken;
+    private boolean isStatusSet;
+
+    public boolean isNA() {
+        return isNA;
+    }
+
+    public void setNA(boolean NA) {
+        isNA = NA;
+    }
+
+    private boolean isNA;
 
     private boolean isCase = false;
 

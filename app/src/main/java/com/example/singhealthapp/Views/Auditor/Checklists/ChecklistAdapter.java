@@ -130,6 +130,17 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
         return null;
     }
 
+    @Override
+    public int numNA() {
+        int numNA = 0;
+        for (ChecklistItem item : checklist_items_array) {
+            if (item.isNA()) {
+                numNA++;
+            }
+        }
+        return numNA;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView textViewQuestion, textViewTrue, textViewFalse, textViewNA;
@@ -192,6 +203,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == red) { // view has been clicked before
                     if (!checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
                         colourStatusIndicator.setBackgroundColor(black);
+                        checklist_items_array.get(getAdapterPosition()).setCase(false);
                     }
                 } else { // view has not been clicked before
                     Log.d(TAG, "onClick: set false");
@@ -210,10 +222,12 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 cardView.setCardBackgroundColor(white);
                 if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == grey) { // view has been clicked before
                     colourStatusIndicator.setBackgroundColor(black);
+                    checklist_items_array.get(getAdapterPosition()).setNA(false);
                 } else { // view has not been clicked before
                     colourStatusIndicator.setBackgroundColor(grey);
                     checklist_items_array.get(getAdapterPosition()).setCase(false);
                     checklist_items_array.get(getAdapterPosition()).setStatusSet(true);
+                    checklist_items_array.get(getAdapterPosition()).setNA(true);
                 }
                 if (isAudit) {
                     cameraButton.setBackgroundResource(R.drawable.camera);
