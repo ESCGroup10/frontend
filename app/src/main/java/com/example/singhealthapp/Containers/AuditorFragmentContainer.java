@@ -117,6 +117,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                     startActivity(intent);
                 });
                 builder.setNegativeButton("Cancel", (dialog, id) -> dialog.dismiss());
+                EspressoCountingIdlingResource.decrement();
                 builder.show();
             }
         }

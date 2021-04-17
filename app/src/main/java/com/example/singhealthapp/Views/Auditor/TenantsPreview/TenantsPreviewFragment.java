@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,8 +52,13 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
-        EspressoCountingIdlingResource.decrement();
         queueList(token);
+    }
+
+    @Override
+    public void onStart() {
+        EspressoCountingIdlingResource.decrement();
+        super.onStart();
     }
 
     private void queueList(String token){
@@ -62,12 +68,12 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
         call.enqueue(new Callback<List<Tenant>>() {
             @Override
             public void onResponse(Call<List<Tenant>> call, Response<List<Tenant>> response) {
+                EspressoCountingIdlingResource.increment();
                 if (!response.isSuccessful()) {
                     Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                     return;
                 }
                 System.out.println("response " + response.code());
-                EspressoCountingIdlingResource.increment();
                 queueReport(token, response.body());
             }
             @Override
@@ -136,10 +142,6 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
 
     @Override
     public boolean onBackPressed() {
-        if (getParentFragmentManager().getBackStackEntryCount() == 0) {
-            return false;
-        } else {
-            return super.onBackPressed();
-        }
+        return false;
     }
 }

@@ -304,12 +304,11 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                     .setCancelable(false)
                     .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                     .setPositiveButton("Yes", (dialog, which) -> {
-                        getActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.auditor_fragment_container, new TenantsPreviewFragment())
-                                .commit();
+                        getParentFragmentManager().popBackStackImmediate();
                         dialog.dismiss();
                     })
                     .show();
+            EspressoCountingIdlingResource.decrement(); // container activity incremented when back pressed was called
         } else {
             return super.onBackPressed();
         }

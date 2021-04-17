@@ -88,7 +88,6 @@ public class StatusConfirmationFragment extends Fragment implements IOnBackPress
 
     @Override
     public boolean onBackPressed() {
-        EspressoCountingIdlingResource.increment();
         getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         return true;
     }
