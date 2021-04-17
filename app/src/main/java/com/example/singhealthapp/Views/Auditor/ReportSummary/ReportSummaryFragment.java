@@ -3,7 +3,7 @@ package com.example.singhealthapp.Views.Auditor.ReportSummary;
 import android.graphics.Color;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,12 +13,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.singhealthapp.HelperClasses.BackStackInfo;
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
-import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -34,7 +35,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ReportSummaryFragment extends Fragment {
+public class ReportSummaryFragment extends CustomFragment {
     private static final String TAG = "ReportSummaryFragment";
     Report report;
     View view;
@@ -63,6 +64,7 @@ public class ReportSummaryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
         if (report.getTenant_display_id() == null){
             getActivity().setTitle("Report " + report.getId());
         }
@@ -82,9 +84,9 @@ public class ReportSummaryFragment extends Fragment {
         barChartOperation(chart5, 4);
 
         company = view.findViewById(R.id.reportCompany);
-        company.setText("" + report.getCompany());
+        company.setText(("" + report.getCompany()));
         location = view.findViewById(R.id.reportLocation);
-        location.setText("" + report.getLocation());
+        location.setText(("" + report.getLocation()));
 
         resolved = view.findViewById(R.id.auditorReportResolved);
         unresolved = view.findViewById(R.id.auditorReportUnresolved);
@@ -123,11 +125,12 @@ public class ReportSummaryFragment extends Fragment {
                         else unresolved.setText(String.valueOf(response.body().size()));
                         unresolvedCases.addAll(response.body());
                         if ( ! resolved.getText().toString().equals("0") || ! unresolved.getText().toString().equals("0")) {
+                            CasesPreviewFragment casesPreviewFragment = new CasesPreviewFragment(unresolvedCases, resolvedCases,
+                                    report.getId(), report.getCompany(), report.getLocation(), report, token);
                             button.setEnabled(true);
-                            button.setOnClickListener(v -> getActivity().getSupportFragmentManager().beginTransaction()
-                                    .replace(getActivity().getSupportFragmentManager().findFragmentByTag("viewReport").getId()
-                                            , new CasesPreviewFragment(unresolvedCases, resolvedCases, report.getId(), report.getCompany(), report.getLocation(), report, token),
-                                            "viewCase").commit());
+                            button.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, casesPreviewFragment, casesPreviewFragment.getClass().getName())
+                                    .addToBackStack(null).commit());
                         }
                     }
                     @Override

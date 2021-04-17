@@ -10,15 +10,12 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
-import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -62,66 +59,31 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
         return false;
     }
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "onBackPressed: ");
+        Log.d(TAG, "onBackPressed: called");
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else {
-                try {
-                    if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
-                        getSupportFragmentManager().beginTransaction().replace(getSupportFragmentManager().findFragmentByTag("getReport").getId(), new LatestReportFragment()).commit();
-                       return;
-                    }
-                } catch (Exception ignored) {
-                }
-                try {
-                    if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new MyReportsFragment(), "getReport").commit();
-                        return;
-                    }
-                } catch (Exception ignored) {
-                }
-                try {
-                    if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                        CasesPreviewFragment casesPreviewFragment = (CasesPreviewFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                        , new ReportSummaryFragment(casesPreviewFragment.getReport(), casesPreviewFragment.getToken()), "viewReport").commit();
-                        return;
-                    }
-                } catch (Exception ignored) {
-                }
-
-
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
                 builder.setMessage("Do you want to log out? ");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                        clearData(); // clear user type (to avoid auto login) and token (for safety)
-                        Intent intent = new Intent(TenantFragmentContainer.this, LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    }
+                builder.setPositiveButton("OK", (dialog, id) -> {
+                    dialog.dismiss();
+                    clearData(); // clear user type (to avoid auto login) and token (for safety)
+                    Intent intent = new Intent(TenantFragmentContainer.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
+                builder.setNegativeButton("Cancel", (dialog, id) -> dialog.dismiss());
                 builder.show();
             }
 
@@ -133,19 +95,31 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         EspressoCountingIdlingResource.increment();
         switch (item.getItemId()) {
             case R.id.nav_MyReport:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MyReportsFragment(), "getReport").commit();
+                MyReportsFragment myReportsFragment = new MyReportsFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, myReportsFragment, myReportsFragment.getClass().getName())
+                        .addToBackStack(null)
+                        .commit();
                 break;
 
             case R.id.nav_Tenant_Statistics:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new StatisticsFragment()).commit();
+                StatisticsFragment statisticsFragment = new StatisticsFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, statisticsFragment, statisticsFragment.getClass().getName())
+                        .addToBackStack(null)
+                        .commit();
                 break;
 
             case R.id.nav_LatestReport:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LatestReportFragment()).commit();
+                LatestReportFragment latestReportFragment = new LatestReportFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, latestReportFragment.getClass().getName())
+                        .addToBackStack(null)
+                        .commit();
                 break;
 
             case R.id.nav_Test:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new TestFragment()).commit();
+                TestFragment testFragment = new TestFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, testFragment, testFragment.getClass().getName())
+                        .addToBackStack(null)
+                        .commit();
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
@@ -159,7 +133,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         editor.putString("USER_TYPE_KEY", "");
         editor.putString("OUTLET_KEY", "");
         editor.putString("INSTITUTION_KEY", "");
-        editor.commit();
+        editor.apply();
     }
 
     @Override

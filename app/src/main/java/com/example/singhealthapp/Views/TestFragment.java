@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.User;
 import com.example.singhealthapp.R;
@@ -40,7 +41,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class TestFragment extends Fragment {
+public class TestFragment extends CustomFragment {
 
     TextView queryTextView, postTextView, imagesTextView, uploadedImageTextView;
     Button postButton, testButton, listImagesButton, uploadImgButton, retrieveImgButton;

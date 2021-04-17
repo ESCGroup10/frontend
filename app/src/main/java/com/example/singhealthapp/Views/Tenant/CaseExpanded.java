@@ -8,10 +8,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -28,6 +26,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.CustomViewSettings;
 import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
@@ -57,7 +56,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.example.singhealthapp.HelperClasses.DateOperations.convertDatabaseDateToReadableDate;
 
-public class CaseExpanded extends Fragment implements IOnBackPressed {
+public class CaseExpanded extends CustomFragment implements IOnBackPressed {
     private static final String TAG = "CaseExpanded";
 
     // UI stuff
@@ -365,7 +364,7 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
         statusConfirmationFragment.setArguments(bundle);
         CaseExpanded.this.getParentFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, statusConfirmationFragment)
+                .replace(R.id.fragment_container, statusConfirmationFragment, statusConfirmationFragment.getClass().getName())
                 .addToBackStack(null)
                 .commit();
     }
@@ -632,19 +631,14 @@ public class CaseExpanded extends Fragment implements IOnBackPressed {
 
     @Override
     public boolean onBackPressed() {
-        if (userType.equals("Auditor")) {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.auditor_fragment_container, new MyReportsFragment(), "getReport").commit();
+        if (!userType.equals("Auditor") && resolvingCaseSection.getVisibility() == View.VISIBLE) {
+            // undo pressing resolve button
+            resolvingCaseSection.setVisibility(GONE);
+            resolveButton.setVisibility(View.VISIBLE);
+            return true;
         } else {
-            if (resolvingCaseSection.getVisibility() == View.VISIBLE) {
-                resolvingCaseSection.setVisibility(GONE);
-                resolveButton.setVisibility(View.VISIBLE);
-            } else {
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new MyReportsFragment(), "getReport").commit();
-            }
+            return super.onBackPressed();
         }
-        return true;
     }
 
 }

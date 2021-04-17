@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
@@ -27,7 +28,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class TenantExpandedFragment extends Fragment {
+public class TenantExpandedFragment extends CustomFragment {
     private static final String TAG = "TenantExpandedFragment";
     Tenant tenant;
     View view;
@@ -63,24 +64,22 @@ public class TenantExpandedFragment extends Fragment {
         company.setText(tenant.getCompany());
 
         button = view.findViewById(R.id.startSafetyChecklistButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClick: called");
-                Bundle bundle = new Bundle();
-                bundle.putString("TENANT_TYPE_KEY", tenant.getType());
-                bundle.putInt("ID_KEY", tenant.getId());
-                bundle.putString("COMPANY_KEY", tenant.getCompany());
-                bundle.putString("LOCATION_KEY", tenant.getLocation());
-                bundle.putString("INSTITUTION_KEY", tenant.getInstitution());
-                SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
-                safetyChecklistFragment.setArguments(bundle);
+        button.setOnClickListener(v -> {
+            Log.d(TAG, "onClick: called");
+            Bundle bundle = new Bundle();
+            bundle.putString("TENANT_TYPE_KEY", tenant.getType());
+            bundle.putInt("ID_KEY", tenant.getId());
+            bundle.putString("COMPANY_KEY", tenant.getCompany());
+            bundle.putString("LOCATION_KEY", tenant.getLocation());
+            bundle.putString("INSTITUTION_KEY", tenant.getInstitution());
+            SafetyChecklistFragment safetyChecklistFragment = new SafetyChecklistFragment();
+            safetyChecklistFragment.setArguments(bundle);
 
-                EspressoCountingIdlingResource.increment();
-                TenantExpandedFragment.this.getParentFragmentManager().beginTransaction()
-                        .replace(R.id.auditor_fragment_container, safetyChecklistFragment, "safetyChecklist")
-                        .commit();
-            }
+            EspressoCountingIdlingResource.increment();
+            TenantExpandedFragment.this.getParentFragmentManager().beginTransaction()
+                    .replace(R.id.auditor_fragment_container, safetyChecklistFragment, safetyChecklistFragment.getClass().getName())
+                    .addToBackStack(null)
+                    .commit();
         });
 
         deleteButton = view.findViewById(R.id.deleteTenantButton);

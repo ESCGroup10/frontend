@@ -96,7 +96,9 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
         if (savedInstanceState == null) {
             EspressoCountingIdlingResource.increment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment(), "getTenant").commit();
+            TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment,
+                    tenantsPreviewFragment.getClass().getName()).commit();
         }
 
         loadToken();
@@ -114,72 +116,10 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "onBackPressed: ");
+        Log.d(TAG, "onBackPressed: called");
         EspressoCountingIdlingResource.increment();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
         if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("safetyChecklist").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("auditChecklist").isVisible()) {
-                    // TODO: can go to safety fragment if it implements shared pref
-                    ((IOnBackPressed) getSupportFragmentManager().findFragmentByTag("auditChecklist")).onBackPressed();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new ReportsPreviewFragment(), "getReport").commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("tenantsFragment").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("safetyFragment").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                    CasesPreviewFragment casesPreviewFragment = (CasesPreviewFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                    , new ReportSummaryFragment(casesPreviewFragment.getReport(), casesPreviewFragment.getToken()), "viewReport").commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-
             if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
                 auditor_drawer.closeDrawer(GravityCompat.START);
             } else {
@@ -208,23 +148,43 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
             switch (item.getItemId()) {
                 case R.id.nav_Auditor_Statistics:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new StatisticsFragment()).commit();
+                    StatisticsFragment statisticsFragment = new StatisticsFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, statisticsFragment,
+                            statisticsFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
                     break;
 
                 case R.id.nav_Tenants:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TenantsPreviewFragment()).commit();
+                    TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment,
+                            tenantsPreviewFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
                     break;
 
                 case R.id.nav_Reports:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "getReport").commit();
+                    ReportsPreviewFragment reportsPreviewFragment = new ReportsPreviewFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, reportsPreviewFragment,
+                            reportsPreviewFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
                     break;
 
                 case R.id.nav_Add_Tenant:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment(), "addTenant").commit();
+                    AddTenantFragment addTenantFragment = new AddTenantFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, addTenantFragment,
+                            addTenantFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
                     break;
 
                 case R.id.nav_Test:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TestFragment()).commit();
+                    TestFragment testFragment = new TestFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, testFragment,
+                            testFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
                     break;
             }
         }

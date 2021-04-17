@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.CustomViewSettings;
 import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
@@ -57,7 +58,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
+public class AuditChecklistFragment extends CustomFragment implements IOnBackPressed {
     public static final String TAG = "AuditChecklistFragment";
 
     // UI stuff
@@ -282,17 +283,14 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
     private void submit() {
         Bundle bundle = new Bundle();
         //keys
-        String TITLE_KEY = "title_key";
-        bundle.putString(TITLE_KEY, "Confirmation");
-        String MSG_KEY = "message_key";
-        bundle.putString(MSG_KEY, "Audit Successful!");
-        String BUTTON_TXT_KEY = "button_text_key";
-        bundle.putString(BUTTON_TXT_KEY, "Return");
+        bundle.putString("TITLE_KEY", "Confirmation");
+        bundle.putString("MSG_KEY", "Audit Successful!");
+        bundle.putString("BUTTON_TXT_KEY", "Return");
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
         AuditChecklistFragment.this.getParentFragmentManager()
                 .beginTransaction()
-                .replace(R.id.auditor_fragment_container, statusConfirmationFragment)
+                .replace(R.id.auditor_fragment_container, statusConfirmationFragment, statusConfirmationFragment.getClass().getName())
                 .addToBackStack(null)
                 .commit();
     }
@@ -311,6 +309,8 @@ public class AuditChecklistFragment extends Fragment implements IOnBackPressed {
                         dialog.dismiss();
                     })
                     .show();
+        } else {
+            return super.onBackPressed();
         }
         return true;
     }

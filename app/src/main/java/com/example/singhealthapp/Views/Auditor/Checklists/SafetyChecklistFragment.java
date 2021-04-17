@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.CustomViewSettings;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
@@ -22,7 +23,7 @@ import com.example.singhealthapp.R;
 
 import java.util.ArrayList;
 
-public class SafetyChecklistFragment extends Fragment {
+public class SafetyChecklistFragment extends CustomFragment {
     private static final String TAG = "SafetyChecklistFragment";
 
     RecyclerView safetyChecklistRecyclerViewPart1;
@@ -82,7 +83,8 @@ public class SafetyChecklistFragment extends Fragment {
 
             EspressoCountingIdlingResource.increment(12); //12 = number of recyclerViews created + 1 report created
             SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction()
-                    .replace(R.id.auditor_fragment_container, auditChecklistFragment, "auditChecklist")
+                    .replace(R.id.auditor_fragment_container, auditChecklistFragment, auditChecklistFragment.getClass().getName())
+                    .addToBackStack(null)
                     .commit();
         });
 

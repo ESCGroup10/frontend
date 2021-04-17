@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
@@ -33,7 +34,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class LatestReportFragment extends Fragment {
+public class LatestReportFragment extends CustomFragment {
     HorizontalBarChart chart1, chart2, chart3, chart4, chart5;
     ArrayList<BarEntry> barEntries;
     BarData barData;
@@ -92,7 +93,7 @@ public class LatestReportFragment extends Fragment {
                     chart5 = view.findViewById(R.id.reportBarChart5);
                     barChartOperation(chart5, 4);
                     date = view.findViewById(R.id.dateLatestReport);
-                    date.setText(report.getReport_date().substring(0,10) + " " + report.getReport_date().substring(11, 19));
+                    date.setText((report.getReport_date().substring(0,10) + " " + report.getReport_date().substring(11, 19)));
                     resolvedText = view.findViewById(R.id.resolvedLatestReport);
                     if (report.isStatus()) {
                         resolvedText.setText("Completed");
@@ -174,4 +175,11 @@ public class LatestReportFragment extends Fragment {
         chart.invalidate();
     }
 
+    @Override
+    public boolean onBackPressed() {
+        if (getParentFragmentManager().getBackStackEntryCount() == 0) {
+            return false;
+        }
+        return super.onBackPressed();
+    }
 }

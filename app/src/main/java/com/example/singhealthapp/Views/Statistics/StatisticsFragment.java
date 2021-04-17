@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.HelperClasses.Ping;
@@ -28,7 +29,7 @@ import java.util.List;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class StatisticsFragment extends Fragment {
+public class StatisticsFragment extends CustomFragment {
 
     private EditText tenantIdEditText;
     private Button searchButton;
@@ -85,7 +86,7 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void getTabs() {
-        final StatsViewPagerAdapter statsViewPagerAdapter = new StatsViewPagerAdapter(getFragmentManager());
+        final StatsViewPagerAdapter statsViewPagerAdapter = new StatsViewPagerAdapter(getParentFragmentManager());
 
         statsViewPagerAdapter.addFragment(ReportStatsFragment.getInstance(), "REPORT");
         statsViewPagerAdapter.addFragment(TotalScoreStatsFragment.getInstance(), "TOTAL");

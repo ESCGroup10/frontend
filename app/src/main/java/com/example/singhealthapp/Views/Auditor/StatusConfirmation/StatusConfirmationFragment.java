@@ -13,9 +13,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
+import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
@@ -23,7 +25,7 @@ import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
 
 import java.util.Arrays;
 
-public class StatusConfirmationFragment extends Fragment {
+public class StatusConfirmationFragment extends Fragment implements IOnBackPressed {
 
     private static final String TAG = "StatusConfirmationFrag";
     private final String TITLE_KEY = "TITLE_KEY";
@@ -44,9 +46,7 @@ public class StatusConfirmationFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         loadUserType();
-        getActivity().setTitle(title);
         View view = inflater.inflate(R.layout.f_status_confirmation, container, false);
 
         Bundle bundle = getArguments();
@@ -57,6 +57,7 @@ public class StatusConfirmationFragment extends Fragment {
         } catch (Exception e) {
             Log.d(TAG, "onCreateView: "+ Arrays.toString(e.getStackTrace()));
         }
+        getActivity().setTitle(title);
 
         try {
             additional_message_text = bundle.getString(ADDITIONAL_MSG_KEY);
@@ -72,21 +73,8 @@ public class StatusConfirmationFragment extends Fragment {
         messageText.setText(message);
         button.setText(button_text);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EspressoCountingIdlingResource.increment();
-                if (userType.equals("Auditor")) {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.auditor_fragment_container, new ReportsPreviewFragment(), "viewReport")
-                            .commit();
-                } else {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new MyReportsFragment(), "viewReport")
-                            .commit();
-                }
-
-            }
+        button.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         });
 
         return view;
@@ -96,4 +84,11 @@ public class StatusConfirmationFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         userType = sharedPreferences.getString("USER_TYPE_KEY", null);
     }
+
+    @Override
+    public boolean onBackPressed() {
+        getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        return true;
+    }
+
 }

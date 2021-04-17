@@ -18,12 +18,15 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.singhealthapp.HelperClasses.AuditorReportPreviewNavigateListener;
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +37,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ReportsPreviewFragment extends Fragment {
+public class ReportsPreviewFragment extends CustomFragment implements AuditorReportPreviewNavigateListener {
     ReportPreviewAdapter adapterUnresolved, adapterCompleted;
     private ArrayList<ReportPreview> reportPreviews, displayPreviews;
     private ArrayList<Report> reports, displayReports;
@@ -173,7 +176,7 @@ public class ReportsPreviewFragment extends Fragment {
             completedPreview.clear();
             completedReports.clear();
         }
-        adapterUnresolved = new ReportPreviewAdapter(unresolvedPreview, unresolvedReports, getActivity(), loadToken());
+        adapterUnresolved = new ReportPreviewAdapter(unresolvedPreview, unresolvedReports, (AuditorReportPreviewNavigateListener)this, loadToken());
         try {
             RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved);
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -182,7 +185,7 @@ public class ReportsPreviewFragment extends Fragment {
         } catch (Exception e) {
             System.out.println("Unresolved recycleView not set");
         }
-        adapterCompleted = new ReportPreviewAdapter(completedPreview, completedReports, getActivity(), loadToken());
+        adapterCompleted = new ReportPreviewAdapter(completedPreview, completedReports, (AuditorReportPreviewNavigateListener)this, loadToken());
         try {
             RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerView);
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -199,10 +202,18 @@ public class ReportsPreviewFragment extends Fragment {
         try {
             SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
             token = sharedPreferences.getString("TOKEN_KEY", null);
-            int userId = sharedPreferences.getInt("USER_ID_KEY", 0);
         }
         catch (Exception ignored){
         }
         return token;
+    }
+
+    @Override
+    public void navigateFromRecyclerView(Report report, String token) {
+        ReportSummaryFragment reportSummaryFragment = new ReportSummaryFragment(report, token);
+        getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, reportSummaryFragment,
+                reportSummaryFragment.getClass().getName())
+                .addToBackStack(null)
+                .commit();
     }
 }

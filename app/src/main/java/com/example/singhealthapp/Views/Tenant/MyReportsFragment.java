@@ -2,7 +2,6 @@ package com.example.singhealthapp.Views.Tenant;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,12 +17,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.singhealthapp.HelperClasses.BackStackInfo;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
-import com.example.singhealthapp.HelperClasses.Ping;
+import com.example.singhealthapp.HelperClasses.CustomFragment;
+import com.example.singhealthapp.HelperClasses.TenantReportPreviewNavigateListener;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
 import com.example.singhealthapp.Views.ReportsPreview.ReportPreviewTenantAdapter;
 
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MyReportsFragment extends Fragment {
+public class MyReportsFragment extends CustomFragment implements TenantReportPreviewNavigateListener {
     ReportPreviewTenantAdapter adapterUnresolved, adapterCompleted;
     private ArrayList<ReportPreview> reportPreviews, displayPreviews;
     private ArrayList<Report> reports, displayReports;
@@ -45,6 +47,7 @@ public class MyReportsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
         getActivity().setTitle("My Reports");
         View view = inflater.inflate(R.layout.f_reports_my, container, false);
         view.findViewById(R.id.reportPreviewSearchButton).setOnClickListener(v -> {
@@ -187,7 +190,7 @@ public class MyReportsFragment extends Fragment {
             completedPreview.clear();
             completedReports.clear();
         }
-        adapterUnresolved = new ReportPreviewTenantAdapter(unresolvedPreview, unresolvedReports, getActivity(), loadToken());
+        adapterUnresolved = new ReportPreviewTenantAdapter(unresolvedPreview, unresolvedReports, (TenantReportPreviewNavigateListener)this, loadToken());
         try {
             RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved);
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -196,7 +199,7 @@ public class MyReportsFragment extends Fragment {
         } catch (Exception e) {
             System.out.println("Unresolved recycleView not set");
         }
-        adapterCompleted = new ReportPreviewTenantAdapter(completedPreview, completedReports, getActivity(), loadToken());
+        adapterCompleted = new ReportPreviewTenantAdapter(completedPreview, completedReports, (TenantReportPreviewNavigateListener)this, loadToken());
         try {
             RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerView);
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -214,4 +217,12 @@ public class MyReportsFragment extends Fragment {
         userId = sharedPreferences.getInt("USER_ID_KEY", 0);
         return token;
     }
+
+    @Override
+    public void navigateFromRecyclerView(Report report, String token) {
+        ReportSummaryFragment reportSummaryFragment = new ReportSummaryFragment(report, token);
+        getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, reportSummaryFragment, reportSummaryFragment.getClass().getName())
+                .addToBackStack(null).commit();
+    }
+
 }
