@@ -55,4 +55,17 @@ public class ReportUnitTest {
                 .build().create(DatabaseApiCaller.class);
 
     }
+
+    @Test
+    public void getReportTest() throws IOException {
+
+        MockWebServer server = new MockWebServer();
+        server.enqueue(new MockResponse().setResponseCode(201));
+
+        DatabaseApiCaller caller = new Retrofit.Builder()
+                .baseUrl(server.url("").toString())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build().create(DatabaseApiCaller.class);
+
+    }
 }

@@ -62,7 +62,12 @@ public class ReportsFragment extends Fragment {
                         if (String.valueOf(o.getId()).contains(s) || String.valueOf(o.getTenant_id()).contains(s) || o.getReportDate().contains(s)) {
                             if (s.equals(textArray[textArray.length-1])) {
                                 displayPreviews.add(o);
-                                displayReports.add(reports.get(o.getId() - 1));
+                                for (Report r : reports){
+                                    if (r.getId() == o.getId()) {
+                                        displayReports.add(r);
+                                        break;
+                                    }
+                                }
                             }
                         }
                         else break;
