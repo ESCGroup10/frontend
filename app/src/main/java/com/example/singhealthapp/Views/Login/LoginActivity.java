@@ -19,11 +19,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.singhealthapp.Containers.AuditorFragmentContainer;
 import com.example.singhealthapp.Containers.TenantFragmentContainer;
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Token;
 import com.example.singhealthapp.Models.User;
 import com.example.singhealthapp.R;
-import com.google.gson.Gson;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
 
     private EditText textViewEmail, textViewPassword;
-    private Button login_button, auditorBtn, tenantBtn;
+    private Button login_button;
 
     String email, password;
     int resetCount;
@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.a_login);
 
         autoLogin(); // try to login automatically
 
@@ -231,18 +231,6 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 authenticate();
             }
-        });
-
-        auditorBtn = findViewById(R.id.auditorButton);
-        auditorBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, AuditorFragmentContainer.class);
-            startActivity(intent);
-        });
-
-        tenantBtn = findViewById(R.id.tenantButton);
-        tenantBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, TenantFragmentContainer.class);
-            startActivity(intent);
         });
     }
 }

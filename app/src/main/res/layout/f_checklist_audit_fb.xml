@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/auditChecklistFragment"
+    >
+
+    <androidx.core.widget.NestedScrollView
+        android:focusable="true"
+        android:id="@+id/nested_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/ProfessionalismAndStaffHygieneTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Professionalism &amp; Staff Hygiene (20%)"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/professionalism"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
+                    android:textStyle="bold"
+                    android:textSize="18dp"
+                    android:textAllCaps="false"
+                    android:text="Professionalism"
+                    android:gravity="center"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_professionalism"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp" />
+
+                <TextView
+                    android:id="@+id/staff_hygiene"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
+                    android:textStyle="bold"
+                    android:focusable="true"
+                    android:textSize="18dp"
+                    android:textAllCaps="false"
+                    android:text="Staff Hygiene"
+                    android:gravity="center"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_staff_hygiene"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/HousekeepingAndGeneralCleanlinessTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Housekeeping &amp;\n General Cleanliness (40%)"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/general_environment_cleanliness"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
+                    android:textStyle="bold"
+                    android:textSize="18dp"
+                    android:textAllCaps="false"
+                    android:text="General Environment Cleanliness"
+                    android:gravity="center"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_environment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp" />
+
+                <TextView
+                    android:id="@+id/hand_hygiene_facilities"
+                    android:text="Hand Hygiene Facilities"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
+                    android:textStyle="bold"
+                    android:textSize="18dp"
+                    android:textAllCaps="false"
+                    android:gravity="center" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_hand_hygiene"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/FoodHygieneTextView"
+                android:text="Food Hygiene (35%)"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/storage_and_preparation_of_food"
+                    android:text="Storage &amp; Preparation of Food"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_food_prep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp" />
+
+                <TextView
+                    android:id="@+id/storage_of_food_in_fridge_or_warmer"
+                    android:text="Storage of Food in Refrigerator/ Warmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_food_storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/HealthierChoiceTextView"
+                android:text="Healthier Choice (15%)"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/food"
+                    android:text="Food"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_food_hpb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp" />
+
+                <TextView
+                    android:id="@+id/beverage"
+                    android:text="Beverage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_beverage_hpb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/WorkplaceSafetyAndHealthTextView"
+                android:text="Workplace Safety &amp; Health (20%)"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_margin="8dp"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/general_safety"
+                    android:text="General Safety"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_general_safety"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp" />
+
+                <TextView
+                    android:id="@+id/fire_safety"
+                    android:text="Fire &amp; Emergency Safety"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_fire_safety"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp" />
+
+                <TextView
+                    android:id="@+id/electrical_safety"
+                    android:text="Electrical Safety"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    android:layout_margin="8dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/audit_checklist_recyclerview_electricity_safety"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/overallReportNotes"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginVertical="10dp"
+                android:hint="Overall findings/remarks"
+                android:gravity="bottom"
+                android:overScrollMode="always"
+                android:scrollbarStyle="insideInset"
+                android:scrollbars="vertical"
+                android:imeOptions="actionDone"/>
+
+            <Button
+                android:id="@+id/submit_audit_button"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:background="#ffb684"
+                android:text="Submit Audit"
+                android:layout_margin="20dp"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fab_addButtonColorNormal="@color/button_normal"
+        app:fab_addButtonColorPressed="@color/button_pressed"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        app:fab_expandDirection="up"
+        app:fab_labelStyle="@style/menu_labels_style">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/ProfessionalismAndStaffHygieneFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
+            app:fab_colorNormal="@color/button_normal"
+            app:fab_colorPressed="@color/button_pressed"
+            app:fab_size="normal"
+            app:fab_title="Professionalism And Staff Hygiene" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/HousekeepingAndGeneralCleanlinessFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
+            app:fab_colorNormal="@color/button_normal"
+            app:fab_colorPressed="@color/button_pressed"
+            app:fab_size="normal"
+            app:fab_title="Housekeeping And General Cleanliness"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/FoodHygieneFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
+            app:fab_colorNormal="@color/button_normal"
+            app:fab_colorPressed="@color/button_pressed"
+            app:fab_size="normal"
+            app:fab_title="Food Hygiene"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/HealthierChoiceFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
+            app:fab_colorNormal="@color/button_normal"
+            app:fab_colorPressed="@color/button_pressed"
+            app:fab_size="normal"
+            app:fab_title="Healthier Choice"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/WorkplaceSafetyAndHealthFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
+            app:fab_colorNormal="@color/button_normal"
+            app:fab_colorPressed="@color/button_pressed"
+            app:fab_size="normal"
+            app:fab_title="Workplace Safety And Health"/>
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

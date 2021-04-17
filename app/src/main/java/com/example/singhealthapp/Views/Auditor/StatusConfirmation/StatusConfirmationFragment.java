@@ -13,35 +13,41 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
+import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
+import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
 import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
 
 import java.util.Arrays;
 
-public class StatusConfirmationFragment extends Fragment {
+public class StatusConfirmationFragment extends Fragment implements IOnBackPressed {
 
     private static final String TAG = "StatusConfirmationFrag";
-    private final String TITLE_KEY = "title_key";
-    private final String MSG_KEY = "message_key";
-    private final String BUTTON_TXT_KEY = "button_text_key";
+    private final String TITLE_KEY = "TITLE_KEY";
+    private final String MSG_KEY = "MSG_KEY";
+    private final String ADDITIONAL_MSG_KEY = "ADDITIONAL_MSG_KEY";
+    private final String BUTTON_TXT_KEY = "BUTTON_TXT_KEY";
 
     private String userType;
 
     TextView messageText;
+    TextView additionalMessageText;
     Button button;
 
     String title;
     String message;
+    String additional_message_text;
     String button_text;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         loadUserType();
+        View view = inflater.inflate(R.layout.f_status_confirmation, container, false);
 
         Bundle bundle = getArguments();
         try {
@@ -51,29 +57,24 @@ public class StatusConfirmationFragment extends Fragment {
         } catch (Exception e) {
             Log.d(TAG, "onCreateView: "+ Arrays.toString(e.getStackTrace()));
         }
-
         getActivity().setTitle(title);
-        View view = inflater.inflate(R.layout.fragment_status_confirmation, container, false);
+
+        try {
+            additional_message_text = bundle.getString(ADDITIONAL_MSG_KEY);
+            additionalMessageText = view.findViewById(R.id.additional_message_text);
+            additionalMessageText.setText(additional_message_text);
+            additionalMessageText.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            Log.d(TAG, "onCreateView: no additional message detected");
+        }
+
         messageText = view.findViewById(R.id.message_text);
-        button  = view.findViewById(R.id.button_return);
+        button = view.findViewById(R.id.button_return);
         messageText.setText(message);
         button.setText(button_text);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((Ping) requireActivity()).incrementCountingIdlingResource(1);
-                if (userType.equals("Auditor")) {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport")
-                            .commit();
-                } else {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new MyReportsFragment(), "getReport")
-                            .commit();
-                }
-
-            }
+        button.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         });
 
         return view;
@@ -83,4 +84,11 @@ public class StatusConfirmationFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         userType = sharedPreferences.getString("USER_TYPE_KEY", null);
     }
+
+    @Override
+    public boolean onBackPressed() {
+        getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        return true;
+    }
+
 }

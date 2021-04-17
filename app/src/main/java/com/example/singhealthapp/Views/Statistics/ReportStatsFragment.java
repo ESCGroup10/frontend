@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -65,7 +66,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_stats_reports, container, false);
+        View view = inflater.inflate(R.layout.f_stats_reports, container, false);
         mChart = view.findViewById(R.id.reports_chart);
         mExportButton = view.findViewById(R.id.exportcases_button);
 
@@ -85,6 +86,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
     @Override
     public void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller) throws IOException {
+        mExportButton.setEnabled(false);
         Call<List<ReportedCases>> getReportedCases = apiCaller.getReportedCase("Token " + token, Integer.parseInt(tenantId));
         Call<List<ResolvedCases>> getResolvedCases = apiCaller.getResolvedCase("Token " + token, Integer.parseInt(tenantId));
 
@@ -116,12 +118,16 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
                             plotChart();
                         }
                         @Override
-                        public void onFailure(Call<List<ResolvedCases>> call, Throwable t) { }
+                        public void onFailure(Call<List<ResolvedCases>> call, Throwable t) {
+                            Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
+                        }
                     });
                 }
             }
             @Override
-            public void onFailure(Call<List<ReportedCases>> call, Throwable t) { }
+            public void onFailure(Call<List<ReportedCases>> call, Throwable t) {
+                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
+            }
         });
 
         System.out.println("ReportStatsFragment UPDATED!" + tenantId);
@@ -138,27 +144,34 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
 
     private void plotChart() {
-        LineDataSet set1, set2;
-        set1 = new LineDataSet(reportCount, "No. of Reported Cases");
-        set1.setColor(Color.RED);
-        set1.setCircleColor(Color.RED);
 
-        set2 = new LineDataSet(resolveCount, "No. of Resolved Cases");
-        set1.setColor(Color.GREEN);
-        set1.setCircleColor(Color.GREEN);
+        if (!reportCount.isEmpty()) {
+            LineDataSet set1, set2;
+            set1 = new LineDataSet(reportCount, "No. of Reported Cases");
+            set1.setColor(Color.RED);
+            set1.setCircleColor(Color.RED);
 
-        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(set1);
-        dataSets.add(set2);
+            set2 = new LineDataSet(resolveCount, "No. of Resolved Cases");
+            set1.setColor(Color.GREEN);
+            set1.setCircleColor(Color.GREEN);
 
-        LineData data = new LineData(dataSets);
+            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+            dataSets.add(set1);
+            dataSets.add(set2);
 
-        mChart.getAxisLeft().setDrawGridLines(false);
-        mChart.getXAxis().setDrawGridLines(false);
-        mChart.getXAxis().setDrawLabels(false);
-        mChart.setData(data);
-        mChart.notifyDataSetChanged();
-        mChart.invalidate();
+            LineData data = new LineData(dataSets);
+
+            mChart.getAxisLeft().setDrawGridLines(false);
+            mChart.getXAxis().setDrawGridLines(false);
+            mChart.getXAxis().setDrawLabels(false);
+            mChart.setData(data);
+            mChart.notifyDataSetChanged();
+            mChart.invalidate();
+
+            mExportButton.setEnabled(true);
+        } else {
+            Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void exportData() throws IOException {

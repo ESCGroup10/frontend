@@ -1,11 +1,8 @@
 package com.example.singhealthapp.Models;
 
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchMain;
-
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -16,7 +13,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -80,10 +76,6 @@ public interface DatabaseApiCaller {
     Call<List<Tenant>> getTenant(
             @Header("authorization") String token
     );
-    @GET("/api/tenants/")
-    Call<List<SearchMain>> getSearchMain(
-            @Header("authorization") String token
-    );
 
     @GET("/api/filterCases/")
     Call<List<Case>> getCasesById (
@@ -122,7 +114,8 @@ public interface DatabaseApiCaller {
             @Field("non_compliance_type") String non_compliance_type,
             @Field("unresolved_photo") String unresolved_photo,
             @Field("unresolved_comments") String unresolved_comments,
-            @Field("unresolved_date") String unresolved_date
+            @Field("unresolved_date") String unresolved_date,
+            @Field("rejected_comments") String rejected_comments
     );
 
     @FormUrlEncoded
@@ -133,15 +126,17 @@ public interface DatabaseApiCaller {
             @Field("tenant_id") int tenant_id,
             @Field("company") String company,
             @Field("location") String location,
+            @Field("institution") String institution,
             @Field("outlet_type") String outlet_type,
             @Field("status") boolean status,
             @Field("report_notes") String report_notes,
+            @Field("report_date") String report_date,
             @Field("resolution_date") String resolution_date,
-            @Field("staff_hygiene_score") double staff_hygiene_score,
-            @Field("housekeeping_score") double housekeeping_score,
-            @Field("safety_score") double safety_score,
-            @Field("healthierchoice_score") double healthierchoice_score,
-            @Field("foodhygiene_score") double foodhygiene_score
+            @Field("staffhygiene_score") float staffhygiene_score,
+            @Field("housekeeping_score") float housekeeping_score,
+            @Field("safety_score") float safety_score,
+            @Field("healthierchoice_score") float healthierchoice_score,
+            @Field("foodhygiene_score") float foodhygiene_score
     );
 
     @DELETE("/api/users/{id}/")
@@ -161,5 +156,10 @@ public interface DatabaseApiCaller {
     Call<Void> patchCase(@Header("authorization") String token,
                          @Path("id") int caseID,
                          @Body Case mCase);
+
+    @PATCH("/api/report/{id}/")
+    Call<Void> patchReport(@Header("authorization") String token,
+                         @Path("id") int reportID,
+                         @Body Report report);
 
 }

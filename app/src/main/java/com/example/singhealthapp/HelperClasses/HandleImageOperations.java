@@ -11,6 +11,8 @@ import android.media.ImageWriter;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.IntentCompat;
 
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -82,11 +85,11 @@ public class HandleImageOperations {
     }
 
     public static void retrieveImageFromDatabase(Activity activity, String imageName, ImageView imageView, @Nullable TextView placeholder, int reqWidth, int reqHeight) {
-
         // API call needs to be done async or on another thread
         new Thread(() -> {
             try {
                 Storage storage = StorageOptions.getDefaultInstance().getService(); // get the Cloud Storage space
+                System.out.println("Storage has connected");
 
                 // retrieve image in the form of byte array from Cloud Storage
                 // TODO: Make this take less time! (at most 4s)
@@ -114,12 +117,23 @@ public class HandleImageOperations {
                     if (placeholder != null) {
                         placeholder.setVisibility(View.GONE);
                     }
+                    imageView.setVisibility(View.VISIBLE);
                     imageView.setImageBitmap(bitmap);
                 });
 
+            } catch (ExceptionInInitializerError e) {
+                e.printStackTrace();
+                placeholder.setText("Image could not be loaded, please try again later.");
+            } catch (NullPointerException e) {
+                placeholder.setText("Image does not exist");
+                System.out.println("Image does not exist, check backend");
+                e.printStackTrace();
             } catch (Exception e) {
                 placeholder.setText("Image could not be loaded");
                 System.out.println("Retrieval Failed!");
+                e.printStackTrace();
+            } catch (NoClassDefFoundError e) {
+                placeholder.setText("Image could not be loaded, please come back to this page again.");
                 e.printStackTrace();
             }
         }).start();

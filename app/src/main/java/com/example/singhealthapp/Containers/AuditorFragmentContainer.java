@@ -5,25 +5,21 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
@@ -31,17 +27,19 @@ import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
-import com.example.singhealthapp.Views.Auditor.AuditorReport.AuditorReportFragment;
-import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
+import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
+import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
-import com.example.singhealthapp.Views.Auditor.Reports.ReportsFragment;
-import com.example.singhealthapp.Views.Auditor.SearchTenant.SearchTenantFragment;
+import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
+import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
 import com.example.singhealthapp.Views.TestFragment;
 import com.google.android.material.navigation.NavigationView;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +53,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         HandlePhotoInterface, AuditChecklistFragment.HandlePhotoListener, Ping {
 
     private static final String TAG = "AuditorFragmentContain";
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
     ChecklistAdapter mChecklistAdapter;
     int mAdapterPosition;
     String mCurrentQuestion;
@@ -77,7 +74,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +81,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        setContentView(R.layout.activity_auditor_fragment_container);
+        setContentView(R.layout.a_fragmentcontainer_auditor);
 
         Toolbar auditor_toolbar = findViewById(R.id.auditor_toolbar);
         setSupportActionBar(auditor_toolbar);
@@ -100,7 +96,9 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
         if (savedInstanceState == null) {
             EspressoCountingIdlingResource.increment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment(), "getTenant").commit();
+            TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment,
+                    tenantsPreviewFragment.getClass().getName()).commit();
         }
 
         loadToken();
@@ -118,77 +116,13 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "onBackPressed: ");
+        Log.d(TAG, "onBackPressed: called");
         EspressoCountingIdlingResource.increment();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
         if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("safetyChecklist").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("auditChecklist").isVisible()) {
-                    // TODO: can go to safety fragment if it implements shared pref
-                    ((IOnBackPressed) getSupportFragmentManager().findFragmentByTag("auditChecklist")).onBackPressed();
-//                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("addTenant").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("getReport").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("viewReport").isVisible()) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(getSupportFragmentManager().findFragmentByTag("viewReport").getId(), new ReportsFragment(), "getReport").commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("tenantsFragment").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("safetyFragment").isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                if (getSupportFragmentManager().findFragmentByTag("viewCase").isVisible()) {
-                    CaseFragment caseFragment = (CaseFragment) getSupportFragmentManager().findFragmentByTag("viewCase");
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(getSupportFragmentManager().findFragmentByTag("viewCase").getId()
-                                    , new AuditorReportFragment(caseFragment.getReport(), caseFragment.getToken()), "viewReport").commit();
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-
             if (auditor_drawer.isDrawerOpen(GravityCompat.START)) {
                 auditor_drawer.closeDrawer(GravityCompat.START);
             } else {
-                EspressoCountingIdlingResource.decrement();
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
                 builder.setMessage("Do you want to log out? ");
@@ -210,26 +144,49 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         EspressoCountingIdlingResource.increment();
-        switch (item.getItemId()) {
-            case R.id.nav_Auditor_Statistics:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new StatisticsFragment()).commit();
-                break;
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
+        if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
+            switch (item.getItemId()) {
+                case R.id.nav_Auditor_Statistics:
+                    StatisticsFragment statisticsFragment = new StatisticsFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, statisticsFragment,
+                            statisticsFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
+                    break;
 
-            case R.id.nav_Tenants:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new SearchTenantFragment()).commit();
-                break;
+                case R.id.nav_Tenants:
+                    TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment,
+                            tenantsPreviewFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
+                    break;
 
-            case R.id.nav_Reports:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new ReportsFragment(), "getReport").commit();
-                break;
+                case R.id.nav_Reports:
+                    ReportsPreviewFragment reportsPreviewFragment = new ReportsPreviewFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, reportsPreviewFragment,
+                            reportsPreviewFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
+                    break;
 
-            case R.id.nav_Add_Tenant:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new AddTenantFragment(), "addTenant").commit();
-                break;
+                case R.id.nav_Add_Tenant:
+                    AddTenantFragment addTenantFragment = new AddTenantFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, addTenantFragment,
+                            addTenantFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
+                    break;
 
-            case R.id.nav_Test:
-                getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, new TestFragment()).commit();
-                break;
+                case R.id.nav_Test:
+                    TestFragment testFragment = new TestFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, testFragment,
+                            testFragment.getClass().getName())
+                            .addToBackStack(null)
+                            .commit();
+                    break;
+            }
         }
         auditor_drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -252,33 +209,21 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         * - Opens camera app to take photo
         * - Updates global variables mChecklistAdapter and mAdapterPosition
         * */
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = HandleImageOperations.createFile(this);
-            } catch (IOException ex) {
-                Log.d(TAG, "takePhoto: error in creating file for image to go into");
-            }
-            if (photoFile != null) {
-                mCurrentPhotoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentPhotoURI);
-                EspressoCountingIdlingResource.increment();
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                mChecklistAdapter = checklistAdapter;
-                mAdapterPosition = adapterPosition;
-                mCurrentQuestion = question;
-                return true;
-            } else {
-                Log.d(TAG, "takePhoto: error getting uri for file or starting intent");
-                CentralisedToast.makeText(this, "Unable to store or take photo", CentralisedToast.LENGTH_SHORT);
-            }
-        } else {
-            CentralisedToast.makeText(this, "Camera does not exist", CentralisedToast.LENGTH_SHORT);
+        this.getCurrentFocus().clearFocus();
+        // start picker to get image for cropping and then use the image in cropping activity
+        try {
+            mChecklistAdapter = checklistAdapter;
+            mAdapterPosition = adapterPosition;
+            mCurrentQuestion = question;
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .start(this);
+            EspressoCountingIdlingResource.increment();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "takePhoto: ", e);
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -287,9 +232,22 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         * Usage: Get image bitmap
         * */
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                File photoFile = null;
+            try {
+                photoFile = HandleImageOperations.createFile(this);
+            } catch (IOException ex) {
+                Log.e(TAG, "onActivityResult: error in creating file for image to go into", ex);
+                return;
+            }
+            mCurrentPhotoURI = result.getUri();
             mCurrentPhotoBitmap = HandleImageOperations.getBitmap(resultCode, this, mCurrentPhotoURI);
             updatePhotoHashMap();
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
         }
         EspressoCountingIdlingResource.decrement();
     }
@@ -319,20 +277,14 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         mCurrentPhotoBitmap = null;
     }
 
+    @Override
+    @VisibleForTesting
+    public void activateEspressoIdlingResource() {
+        EspressoCountingIdlingResource.activate();
+    }
+
     public interface OnPhotoTakenListener {
         void photoTaken(int position);
-    }
-
-    @Override
-    public void decrementCountingIdlingResource() {
-        EspressoCountingIdlingResource.decrement();
-    }
-
-    @Override
-    public void incrementCountingIdlingResource(int numResources) {
-        for (int i = 0; i < numResources; i++) {
-            EspressoCountingIdlingResource.increment();
-        }
     }
 
 }

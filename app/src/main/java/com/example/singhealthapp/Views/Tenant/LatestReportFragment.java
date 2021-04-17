@@ -8,19 +8,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.CasePreview.CaseFragment;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -36,7 +34,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class LatestReportFragment extends Fragment {
+public class LatestReportFragment extends CustomFragment {
     HorizontalBarChart chart1, chart2, chart3, chart4, chart5;
     ArrayList<BarEntry> barEntries;
     BarData barData;
@@ -52,7 +50,7 @@ public class LatestReportFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("Latest Report");
-        View view = inflater.inflate(R.layout.fragment_latest_report, container, false);
+        View view = inflater.inflate(R.layout.f_report_latest, container, false);
 
         try {
             SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
@@ -95,15 +93,15 @@ public class LatestReportFragment extends Fragment {
                     chart5 = view.findViewById(R.id.reportBarChart5);
                     barChartOperation(chart5, 4);
                     date = view.findViewById(R.id.dateLatestReport);
-                    date.setText(report.getReport_date().substring(0,10) + " " + report.getReport_date().substring(11, 19));
+                    date.setText((report.getReport_date().substring(0,10) + " " + report.getReport_date().substring(11, 19)));
                     resolvedText = view.findViewById(R.id.resolvedLatestReport);
                     if (report.isStatus()) {
-                        resolvedText.setText("COMPLETED");
-                        resolvedText.setTextColor(Color.rgb(159, 221, 88));
+                        resolvedText.setText("Completed");
+                        resolvedText.setTextColor(Color.parseColor("#62bd69"));
                     }
                     else {
-                        resolvedText.setText("UNRESOLVED");
-                        resolvedText.setTextColor(Color.rgb(239, 117, 119));
+                        resolvedText.setText("Unresolved");
+                        resolvedText.setTextColor(Color.parseColor("#ff6961"));
                     }
                     resolved = view.findViewById(R.id.auditorReportResolved);
                     unresolved = view.findViewById(R.id.auditorReportUnresolved);
@@ -177,4 +175,11 @@ public class LatestReportFragment extends Fragment {
         chart.invalidate();
     }
 
+    @Override
+    public boolean onBackPressed() {
+        if (getParentFragmentManager().getBackStackEntryCount() == 0) {
+            return false;
+        }
+        return super.onBackPressed();
+    }
 }

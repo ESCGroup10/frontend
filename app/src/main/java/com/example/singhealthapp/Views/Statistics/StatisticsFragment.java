@@ -13,7 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
+import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
@@ -26,7 +29,7 @@ import java.util.List;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class StatisticsFragment extends Fragment {
+public class StatisticsFragment extends CustomFragment {
 
     private EditText tenantIdEditText;
     private Button searchButton;
@@ -45,7 +48,7 @@ public class StatisticsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getActivity().setTitle("View Statistics");
-        View view = inflater.inflate(R.layout.fragment_statistics, container, false);
+        View view = inflater.inflate(R.layout.f_stats, container, false);
 
         tabLayout = view.findViewById(R.id.stats_tabLayout);
         viewPager = view.findViewById(R.id.stats_viewPager);
@@ -64,20 +67,26 @@ public class StatisticsFragment extends Fragment {
         searchButton = view.findViewById(R.id.searchTenantId_button);
 
         searchButton.setOnClickListener(v -> {
-            tenantId = tenantIdEditText.getText().toString();
-            try {
-                tenantIdUpdate();
-            } catch (IOException e) {
-                e.printStackTrace();
+
+            if (!(tenantIdEditText.length() == 0)) {
+                tenantId = tenantIdEditText.getText().toString();
+                try {
+                    tenantIdUpdate();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(getActivity(), "Please fill in a tenant ID", Toast.LENGTH_SHORT).show();
             }
             System.out.println("Activity context: " + getContext());
+
         });
-        ((Ping)requireActivity()).decrementCountingIdlingResource();
+        EspressoCountingIdlingResource.decrement();
         return view;
     }
 
     private void getTabs() {
-        final StatsViewPagerAdapter statsViewPagerAdapter = new StatsViewPagerAdapter(getFragmentManager());
+        final StatsViewPagerAdapter statsViewPagerAdapter = new StatsViewPagerAdapter(getParentFragmentManager());
 
         statsViewPagerAdapter.addFragment(ReportStatsFragment.getInstance(), "REPORT");
         statsViewPagerAdapter.addFragment(TotalScoreStatsFragment.getInstance(), "TOTAL");

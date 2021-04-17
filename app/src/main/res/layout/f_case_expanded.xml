@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_expanded_case">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="10dp"
+        android:paddingHorizontal="10dp"
+        android:paddingBottom="10dp"
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="5dp"
+            app:cardCornerRadius="3dp"
+            app:cardElevation="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="15dp"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="Case Information"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:id="@+id/companyTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="15dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:layout_gravity="center" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+
+                    android:layout_marginRight="40dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="Type"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginRight="10dp" />
+
+                    <TextView
+                        android:id="@+id/nonComplianceTypeTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:gravity="end"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="Status"
+                        />
+
+                    <TextView
+                        android:id="@+id/resolvedStatusTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:gravity="end"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="Institution"
+                        />
+
+                    <TextView
+                        android:id="@+id/institutionTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:gravity="right"
+                        />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/unresolvedImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/imageview_border"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="20dp"
+                    android:contentDescription="@string/unresolved_image"/>
+
+                <TextView
+                    android:id="@+id/unresolvedImageViewPlaceholder"
+                    android:layout_width="325dp"
+                    android:layout_height="200dp"
+                    android:background="#fff5ed"
+                    android:elevation="3dp"
+                    android:gravity="center"
+                    android:layout_margin="20dp"
+                    android:text="Loading image..."
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/unresolvedImageDateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Captured on: "
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/unresolvedCommentsTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:text="No comments"
+                    android:layout_margin="20dp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <Button
+                    android:id="@+id/resolveButton"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:text="Resolve"
+                    android:background="#ffaf7a"
+                    android:layout_gravity="center"
+                    tools:visibility="visible"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/resolvedCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingHorizontal="5dp"
+            app:cardCornerRadius="3dp"
+            app:cardElevation="5dp"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="30dp"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:id="@+id/resolvedImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/imageview_border"
+                    android:adjustViewBounds="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@string/resolved_image"
+                    tools:visibility="visible"/>
+
+                <TextView
+                    android:id="@+id/resolvedImageViewPlaceholder"
+                    android:layout_width="325dp"
+                    android:layout_height="200dp"
+                    android:elevation="3dp"
+                    android:text="Loading image..."
+                    android:gravity="center"
+                    android:layout_margin="20dp"
+                    android:textSize="20sp"
+                    android:background="#fff5ed"/>
+
+                <TextView
+                    android:id="@+id/resolvedImageDateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Captured on: "
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/resolvedCommentsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/rejectedCommentsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/red"
+                    android:text="Rejected: "
+                    android:gravity="center"
+                    android:layout_margin="20dp"
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"/>
+
+                <Button
+                    android:id="@+id/rejectedResolveButton"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:text="Resolve"
+                    android:background="#ffaf7a"
+                    android:layout_gravity="center"
+                    tools:visibility="visible"/>
+
+                <LinearLayout
+                    android:id="@+id/auditorButtonsLinearLayout"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    tools:visibility="visible">
+
+                    <Button
+                        android:id="@+id/rejectButton"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="Reject"
+                        android:background="#fff5ed"
+                        android:layout_margin="20dp"/>
+
+                    <Button
+                        android:id="@+id/acceptButton"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="Accept"
+                        android:background="#ffaf7a"
+                        android:layout_margin="20dp"/>
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/rejectedCommentsEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="10dp"
+                    android:gravity="bottom"
+                    android:hint="Reasons for rejecting"
+                    android:overScrollMode="always"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbars="vertical"
+                    android:imeOptions="actionDone"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <include layout="@layout/f_resolving_rejected"/>
+
+        <include layout="@layout/f_case_resolution"/>
+
+    </LinearLayout>
+
+</ScrollView>
