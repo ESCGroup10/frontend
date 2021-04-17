@@ -18,5 +18,7 @@
     <color name="header_green">#FF98F888</color>
     <color name="button_normal">#FFFFB684</color>
     <color name="button_pressed">#FFFFA161</color>
+    <color name="red_highlight">#88DD3930</color>
+    <color name="orange_highlight">#88FFA161</color>
 
 </resources>

@@ -4,10 +4,9 @@ import android.graphics.Bitmap;
 
 public class ChecklistItem {
 
-    private String statement;
-    private String remarks;
+    private String statement, remarks;
     private Bitmap imageBitmap;
-    private boolean photoTaken;
+    private boolean photoTaken, isStatusSet;
 
     private boolean isCase = false;
 
@@ -15,7 +14,15 @@ public class ChecklistItem {
         this.statement = statement;
         this.remarks = remarks;
         this.imageBitmap = null;
-        this.photoTaken = false;
+        this.photoTaken = this.isStatusSet = false;
+    }
+
+    public boolean isStatusSet() {
+        return isStatusSet;
+    }
+
+    public void setStatusSet(boolean statusSet) {
+        isStatusSet = statusSet;
     }
 
     public boolean isPhotoTaken() {
@@ -30,8 +37,8 @@ public class ChecklistItem {
         return isCase;
     }
 
-    public void setCase(boolean aCase) {
-        isCase = aCase;
+    public void setCase(boolean set) {
+        isCase = set;
     }
 
     public String getStatement() {

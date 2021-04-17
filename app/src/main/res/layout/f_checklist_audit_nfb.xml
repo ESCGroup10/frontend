@@ -170,8 +170,8 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:fab_colorNormal="#ffb684"
-        app:fab_colorPressed="#ffa161"
+        app:fab_addButtonColorNormal="@color/button_normal"
+        app:fab_addButtonColorPressed="@color/button_pressed"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
         app:fab_expandDirection="up"
@@ -182,8 +182,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
-            app:fab_colorNormal="#ffb684"
-            app:fab_colorPressed="#ffa161"
+            app:fab_colorNormal="@color/button_normal"
+            app:fab_colorPressed="@color/button_pressed"
             app:fab_size="normal"
             app:fab_title="Professionalism And Staff Hygiene" />
 
@@ -192,8 +192,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
-            app:fab_colorNormal="#ffb684"
-            app:fab_colorPressed="#ffa161"
+            app:fab_colorNormal="@color/button_normal"
+            app:fab_colorPressed="@color/button_pressed"
             app:fab_size="normal"
             app:fab_title="Housekeeping And General Cleanliness"/>
 
@@ -202,8 +202,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_icon="@drawable/ic_baseline_keyboard_arrow_down_24"
-            app:fab_colorNormal="#ffb684"
-            app:fab_colorPressed="#ffa161"
+            app:fab_colorNormal="@color/button_normal"
+            app:fab_colorPressed="@color/button_pressed"
             app:fab_size="normal"
             app:fab_title="Workplace Safety And Health"/>
 

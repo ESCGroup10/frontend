@@ -17,6 +17,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.Containers.AuditorFragmentContainer;
+import com.example.singhealthapp.HelperClasses.CheckStatusInterface;
 import com.example.singhealthapp.Models.ChecklistItem;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
@@ -24,7 +25,7 @@ import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
 import java.util.ArrayList;
 
 public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.ViewHolder>
-        implements AuditChecklistFragment.OnAuditSubmitListener, AuditorFragmentContainer.OnPhotoTakenListener {
+        implements AuditChecklistFragment.OnAuditSubmitListener, AuditorFragmentContainer.OnPhotoTakenListener, CheckStatusInterface {
 
     private static final String TAG = "ChecklistAdapter";
 
@@ -119,6 +120,16 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
         notifyItemChanged(position);
     }
 
+    @Override
+    public String allStatusSet() {
+        for (ChecklistItem item : checklist_items_array) {
+            if (!item.isStatusSet()) {
+                return item.getStatement();
+            }
+        }
+        return null;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView textViewQuestion, textViewTrue, textViewFalse, textViewNA;
@@ -170,6 +181,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 } else { // view has not been clicked before
                     colourStatusIndicator.setBackgroundColor(green);
                     checklist_items_array.get(getAdapterPosition()).setCase(false);
+                    checklist_items_array.get(getAdapterPosition()).setStatusSet(true);
                 }
                 if (isAudit) {
                     cameraButton.setBackgroundResource(R.drawable.camera);
@@ -185,6 +197,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                     Log.d(TAG, "onClick: set false");
                     colourStatusIndicator.setBackgroundColor(red);
                     checklist_items_array.get(getAdapterPosition()).setCase(true);
+                    checklist_items_array.get(getAdapterPosition()).setStatusSet(true);
                 }
                 if (checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
                     if (isAudit) {
@@ -200,6 +213,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 } else { // view has not been clicked before
                     colourStatusIndicator.setBackgroundColor(grey);
                     checklist_items_array.get(getAdapterPosition()).setCase(false);
+                    checklist_items_array.get(getAdapterPosition()).setStatusSet(true);
                 }
                 if (isAudit) {
                     cameraButton.setBackgroundResource(R.drawable.camera);
