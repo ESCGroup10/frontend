@@ -121,7 +121,7 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
                     Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                     return ;
                 }
-                System.out.println("response " + response.code());
+                if (response.body().isEmpty() || response.body() == null) return;
                 for ( ReportPreview r : response.body()){
                     if (r.getTenant_id() == userId) {
                         reportPreviews.add(r);

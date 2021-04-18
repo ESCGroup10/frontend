@@ -97,7 +97,8 @@ public class CasesPreviewFragment extends CustomFragment implements CasePreviewN
         }
         Bundle args = new Bundle();
         args.putString("COMPANY_KEY", report.getCompany());
-        args.putInt("REPORT_NUMBER_KEY", report.getTenant_display_id());
+        if (report.getTenant_display_id() != null) args.putInt("REPORT_NUMBER_KEY", report.getTenant_display_id());
+        else args.putInt("REPORT_NUMBER_KEY", report.getId());
         args.putInt("CASE_NUMBER_KEY", thisCase.getId());
         args.putBoolean("RESOLVED_STATUS_KEY", thisCase.isIs_resolved());
         args.putInt("REPORT_ID_KEY", report.getId());

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -41,10 +43,11 @@ public class LatestReportFragment extends CustomFragment {
     BarDataSet barDataSet;
     float[][] data;
     int[] colors;
-    TextView resolved, unresolved, date, resolvedText;
+    TextView resolved, unresolved, date, resolvedText, pending;
     private String token;
     private int userId;
     Report report;
+    List<Case> resolvedCases, unresolvedCases, pendingCases;
 
     @Nullable
     @Override
@@ -75,7 +78,12 @@ public class LatestReportFragment extends CustomFragment {
                 for (Report r : response.body()){
                     if (r.getTenant_id() == finalUserId) reports.add(r);
                 }
-                if (reports.size() > 0) {
+                if (reports.isEmpty()){
+                    view.findViewById(R.id.latestReportNotAvailable).setVisibility(View.VISIBLE);
+                    reports = null;
+                }
+                else {
+                    view.findViewById(R.id.latestReportDefault).setVisibility(View.VISIBLE);
                     report = reports.get(reports.size()-1);
                     data = new float[][]{new float[]{report.getStaffhygiene_score()*100f, 100f - report.getStaffhygiene_score()*100f},
                             new float[]{report.getHousekeeping_score()*100f, 100f - report.getHousekeeping_score()*100f},
@@ -105,28 +113,57 @@ public class LatestReportFragment extends CustomFragment {
                     }
                     resolved = view.findViewById(R.id.auditorReportResolved);
                     unresolved = view.findViewById(R.id.auditorReportUnresolved);
+                    pending = view.findViewById(R.id.auditorReportNull);
+                    resolvedCases = new ArrayList<>();
+                    unresolvedCases = new ArrayList<>();
+                    pendingCases = new ArrayList<>();
                     Call<List<Case>> caseCall = apiCaller.getCasesById("Token " + token, report.getId(), 1);
                     caseCall.enqueue(new Callback<List<Case>>(){
                         @Override
                         public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
                             resolved.setText(String.valueOf(response.body().size()));
+                            resolvedCases.addAll(response.body());
                             Call<List<Case>> caseCall = apiCaller.getCasesById("Token " + token, report.getId(), 0);
                             caseCall.enqueue(new Callback<List<Case>>(){
                                 @Override
                                 public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
                                     unresolved.setText(String.valueOf(response.body().size()));
+                                    unresolvedCases.addAll(response.body());
+                                    call = apiCaller.getCasesById("Token " + token, report.getId(), null);
+                                    call.enqueue(new Callback<List<Case>>(){
+                                        @Override
+                                        public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
+                                            pending.setText(String.valueOf(response.body().size()));
+                                            pendingCases.addAll(response.body());
+                                            Button button = view.findViewById(R.id.latestReportViewCases);
+                                            if (!resolved.getText().toString().equals("0") || !unresolved.getText().toString().equals("0") || !pending.getText().toString().equals("0")) {
+                                                CasesPreviewFragment casesPreviewFragment = new CasesPreviewFragment(unresolvedCases, resolvedCases,
+                                                        report.getId(), report.getCompany(), report.getLocation(), report, token);
+                                                button.setEnabled(true);
+                                                button.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
+                                                        .replace(R.id.fragment_container, casesPreviewFragment, casesPreviewFragment.getClass().getName())
+                                                        .addToBackStack(null).commit());
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<List<Case>> call, Throwable t) {
+                                            pending.setText("error");
+                                        }
+                                    });
                                 }
                                 @Override
                                 public void onFailure(Call<List<Case>> call, Throwable t) {
+                                    unresolved.setText("error");
                                 }
                             });
                         }
                         @Override
                         public void onFailure(Call<List<Case>> call, Throwable t) {
+                            resolved.setText("error");
                         }
                     });
                 }
-                else report = null;
             }
             @Override
             public void onFailure(Call<List<Report>> call, Throwable t) {
