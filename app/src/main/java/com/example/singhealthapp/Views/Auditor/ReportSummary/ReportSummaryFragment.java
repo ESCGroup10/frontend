@@ -74,7 +74,7 @@ public class ReportSummaryFragment extends CustomFragment {
             getActivity().setTitle("Report " + report.getId());
         }
         else getActivity().setTitle("Report " + report.getTenant_display_id());
-
+        System.out.println(report.getTenant_display_id());
         view = inflater.inflate(R.layout.f_report_summary, container, false);
 
         chart1 = view.findViewById(R.id.reportBarChart1);

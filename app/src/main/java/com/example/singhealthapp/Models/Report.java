@@ -9,6 +9,7 @@ public class Report implements Parcelable {
     private float staffhygiene_score, housekeeping_score, safety_score, healthierchoice_score, foodhygiene_score;
     private String company, institution, location, outlet_type, report_notes, report_date, report_image, resolution_notes, resolution_date, resolution_image;
     private boolean status;
+    public boolean tenant = false;
 
     protected Report(Parcel in) {
         id = in.readInt();
