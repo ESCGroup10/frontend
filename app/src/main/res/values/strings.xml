@@ -24,5 +24,8 @@
     <string name="resolved_image">resolved image</string>
     <string name="confirm">Confirm</string>
     <string name="describe_how_you_resolved_the_problem">Describe how you resolved the \nproblem:</string>
+    <string name="channel_name">Channel 1</string>
+    <string name="channel_description">Notify Tenants of unresolved case</string>
+    <string name="channel_id">1</string>
 
 </resources>
