@@ -106,14 +106,17 @@ public class CasesPreviewFragment extends CustomFragment implements CasePreviewN
         CaseExpanded caseExpanded = new CaseExpanded();
         caseExpanded.setArguments(args);
 
+        System.out.println("userType: "+userType);
+        System.out.println((userType.equals("Auditor")?R.id.auditor_fragment_container:R.id.fragment_container));
         getParentFragmentManager().beginTransaction()
                 .replace((userType.equals("Auditor")?R.id.auditor_fragment_container:R.id.fragment_container), caseExpanded,
                         caseExpanded.getClass().getName())
                 .addToBackStack(null).commit();
     }
 
-    private void loadUserType() {
+    private synchronized void loadUserType() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         userType = sharedPreferences.getString("USER_TYPE_KEY", null);
+        notifyAll();
     }
 }
