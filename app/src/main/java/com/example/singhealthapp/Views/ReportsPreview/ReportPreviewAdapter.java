@@ -61,8 +61,6 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
         Report report = reports.get(position);
         if (report.tenant)report.setTenant_display_id(position + 1);
         else report.setTenant_display_id(null);
-        System.out.println(report.tenant);
-        System.out.println(report.getTenant_display_id());
         holder.reportName.setText(list.get(position).getReportName());
         holder.reportDate.setText(("Created on: "));
         setHalfBoldTextViews(holder.reportDate, list.get(position).getReportDate());
