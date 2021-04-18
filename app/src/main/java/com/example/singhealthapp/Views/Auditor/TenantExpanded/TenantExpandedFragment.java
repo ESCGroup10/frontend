@@ -129,28 +129,13 @@ public class TenantExpandedFragment extends CustomFragment {
                             for (Report r: response.body()) {
                                 deleteReport(r.getId(), token);
                             }
-                            System.out.println("done");
-                            synchronized (lock) {
-                                deleteStatus++;
-                                lock.notifyAll();
-                            }
                         }
                         @Override
                         public void onFailure(Call<List<Report>> call, Throwable t) {
                         }
                     });
-                    synchronized (lock) {
-                        while (deleteStatus != 1) {
-                            try {
-                                lock.wait(200);
-                                System.out.println("here");
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        Toast.makeText(getActivity(), "Tenant \"" + tenant.getCompany() + "\" deleted", Toast.LENGTH_LONG).show();
-                        requireActivity().onBackPressed();
-                    }
+                    Toast.makeText(getActivity(), "Tenant \"" + tenant.getCompany() + "\" deleted", Toast.LENGTH_LONG).show();
+                    requireActivity().onBackPressed();
                 }
                 else Toast.makeText(getActivity(), "Deletion failed.\nPlease try again.", Toast.LENGTH_LONG).show();
             }
