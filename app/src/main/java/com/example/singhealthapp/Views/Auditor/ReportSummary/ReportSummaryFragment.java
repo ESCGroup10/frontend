@@ -1,5 +1,7 @@
 package com.example.singhealthapp.Views.Auditor.ReportSummary;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -47,6 +49,8 @@ public class ReportSummaryFragment extends CustomFragment {
     float[][] data;
     int[] colors;
     private final String token;
+    private String userType;
+    private Object userTypeLock = new Object();
     List<Case> resolvedCases, unresolvedCases;
 
     public ReportSummaryFragment(Report report, String token) {
@@ -64,6 +68,7 @@ public class ReportSummaryFragment extends CustomFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        loadUserType();
         BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
         if (report.getTenant_display_id() == null){
             getActivity().setTitle("Report " + report.getId());
@@ -100,44 +105,54 @@ public class ReportSummaryFragment extends CustomFragment {
             public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
                 if (!response.isSuccessful()) {
                     Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
-                    return ;
+                    return;
                 }
                 if (response.body().isEmpty()) resolved.setText("0");
                 else resolved.setText(String.valueOf(response.body().size()));
-                Log.d(TAG, "onResponse: "+"size of response body: "+response.body().size());
-                Log.d(TAG, "onResponse: "+"response body: "+response.body());
-                System.out.println("size of response body: "+response.body().size());
-                System.out.println("response body: "+response.body());
+                Log.d(TAG, "onResponse: " + "size of response body: " + response.body().size());
+                Log.d(TAG, "onResponse: " + "response body: " + response.body());
+                System.out.println("size of response body: " + response.body().size());
+                System.out.println("response body: " + response.body());
                 resolvedCases.addAll(response.body());
                 call = apiCaller.getCasesById("Token " + token, report.getId(), 0);
-                call.enqueue(new Callback<List<Case>>() {
-                    @Override
-                    public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
-                        if (!response.isSuccessful()) {
-                            Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
-                            return ;
-                        }
-                        Log.d(TAG, "onResponse: "+"size of response body: "+response.body().size());
-                        Log.d(TAG, "onResponse: "+"response body: "+response.body());
-                        System.out.println("size of response body: "+response.body().size());
-                        System.out.println("response body: "+response.body());
-                        if (response.body().isEmpty()) unresolved.setText("0");
-                        else unresolved.setText(String.valueOf(response.body().size()));
-                        unresolvedCases.addAll(response.body());
-                        if ( ! resolved.getText().toString().equals("0") || ! unresolved.getText().toString().equals("0")) {
-                            CasesPreviewFragment casesPreviewFragment = new CasesPreviewFragment(unresolvedCases, resolvedCases,
-                                    report.getId(), report.getCompany(), report.getLocation(), report, token);
-                            button.setEnabled(true);
-                            button.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
-                                    .replace(R.id.fragment_container, casesPreviewFragment, casesPreviewFragment.getClass().getName())
-                                    .addToBackStack(null).commit());
+                synchronized (userTypeLock) {
+                    while (userType == null) {
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
-                    @Override
-                    public void onFailure(Call<List<Case>> call, Throwable t) {
-                        unresolved.setText("error");
-                    }
-                });
+                    call.enqueue(new Callback<List<Case>>() {
+                        @Override
+                        public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
+                            if (!response.isSuccessful()) {
+                                Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            Log.d(TAG, "onResponse: " + "size of response body: " + response.body().size());
+                            Log.d(TAG, "onResponse: " + "response body: " + response.body());
+                            System.out.println("size of response body: " + response.body().size());
+                            System.out.println("response body: " + response.body());
+                            if (response.body().isEmpty()) unresolved.setText("0");
+                            else unresolved.setText(String.valueOf(response.body().size()));
+                            unresolvedCases.addAll(response.body());
+                            if (!resolved.getText().toString().equals("0") || !unresolved.getText().toString().equals("0")) {
+                                CasesPreviewFragment casesPreviewFragment = new CasesPreviewFragment(unresolvedCases, resolvedCases,
+                                        report.getId(), report.getCompany(), report.getLocation(), report, token);
+                                button.setEnabled(true);
+                                button.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
+                                        .replace((userType.equals("Auditor") ? R.id.auditor_fragment_container : R.id.fragment_container), casesPreviewFragment, casesPreviewFragment.getClass().getName())
+                                        .addToBackStack(null).commit());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Case>> call, Throwable t) {
+                            unresolved.setText("error");
+                        }
+                    });
+                }
             }
             @Override
             public void onFailure(Call<List<Case>> call, Throwable t) {
@@ -183,6 +198,12 @@ public class ReportSummaryFragment extends CustomFragment {
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);
         chart.invalidate();
+    }
+
+    private synchronized void loadUserType() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        userType = sharedPreferences.getString("USER_TYPE_KEY", null);
+        notifyAll();
     }
 
 }
