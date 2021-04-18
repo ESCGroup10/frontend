@@ -59,7 +59,6 @@ public class AddTenantFragment extends CustomFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        EspressoCountingIdlingResource.increment();
         getActivity().setTitle("Add New Tenant");
         View view = inflater.inflate(R.layout.f_add_tenant, container, false);
 
