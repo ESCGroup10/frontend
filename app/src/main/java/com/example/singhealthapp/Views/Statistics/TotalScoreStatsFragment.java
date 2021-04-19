@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -91,23 +92,20 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     @Override
     public void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller) {
         mExportButton.setEnabled(false);
-
         Call<List<Report>> getScores = apiCaller.getScoresById("Token " + token, Integer.parseInt(tenantId));
 
         getScores.enqueue(new Callback<List<Report>>() {
             @Override
             public void onResponse(Call<List<Report>> call, Response<List<Report>> response) {
+                List<Report> responseBody = response.body();
+
                 if (response.code() == 200) {
-                    List<Report> responseBody = response.body();
-
-                    resetArray(responseBody);
-
-                    for (Report r : responseBody) {
-                        aggregateData(r);
-                        count++;
-                    }
-                    plotChart();
-
+                    new Thread(() -> {
+                        clearArray(responseBody);
+                        createArray(responseBody);
+                        loopData(responseBody);
+                        plotChart();
+                    }).start();
                 }
             }
 
@@ -121,61 +119,60 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
 
     private void plotChart() {
 
-        if (!scores.isEmpty()) {
-            LineDataSet set, set1, set2, set3, set4, set5, set6;
-            set1 = new LineDataSet(scores, "Total");
-            set1.setColor(Color.GREEN);
-            set1.setCircleColor(Color.GREEN);
+        getActivity().runOnUiThread(() -> {
+            if (!scores.isEmpty()) {
+                LineDataSet set, set1, set2, set3, set4, set5, set6;
+                set1 = new LineDataSet(scores, "Total");
+                set1.setColor(Color.GREEN);
+                set1.setCircleColor(Color.GREEN);
 
-            set2 = new LineDataSet(houseKeeping, "Housekeeping & General Cleanliness");
-            set2.setColor(Color.RED);
-            set2.setCircleColor(Color.RED);
+                set2 = new LineDataSet(houseKeeping, "Housekeeping & General Cleanliness");
+                set2.setColor(Color.RED);
+                set2.setCircleColor(Color.RED);
 
-            set3 = new LineDataSet(safety, "Workplace Safety & Health");
-            set3.setColor(Color.GRAY);
-            set3.setCircleColor(Color.GRAY);
+                set3 = new LineDataSet(safety, "Workplace Safety & Health");
+                set3.setColor(Color.GRAY);
+                set3.setCircleColor(Color.GRAY);
 
 
-            set4 = new LineDataSet(staffHygiene, "Professionalism & Staff Hygiene");
-            set4.setColor(Color.YELLOW);
-            set4.setCircleColor(Color.YELLOW);
+                set4 = new LineDataSet(staffHygiene, "Professionalism & Staff Hygiene");
+                set4.setColor(Color.YELLOW);
+                set4.setCircleColor(Color.YELLOW);
 
-            set5 = new LineDataSet(foodHygiene, "Food Hygiene");
-            set5.setColor(Color.BLUE);
-            set5.setCircleColor(Color.BLUE);
+                set5 = new LineDataSet(foodHygiene, "Food Hygiene");
+                set5.setColor(Color.BLUE);
+                set5.setCircleColor(Color.BLUE);
 
-            set6 = new LineDataSet(healthierChoice, "Healthier Choice");
-            set6.setColor(Color.MAGENTA);
-            set6.setCircleColor(Color.MAGENTA);
+                set6 = new LineDataSet(healthierChoice, "Healthier Choice");
+                set6.setColor(Color.MAGENTA);
+                set6.setCircleColor(Color.MAGENTA);
 
-            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+                ArrayList<ILineDataSet> dataSets = new ArrayList<>();
 
-            dataSets.add(set1);
-            dataSets.add(set2);
-            dataSets.add(set3);
-            dataSets.add(set4);
-            dataSets.add(set5);
-            dataSets.add(set6);
+                dataSets.add(set1);
+                dataSets.add(set2);
+                dataSets.add(set3);
+                dataSets.add(set4);
+                dataSets.add(set5);
+                dataSets.add(set6);
 
-            LineData data = new LineData(dataSets);
+                LineData data = new LineData(dataSets);
 
-            mChart.getAxisLeft().setDrawGridLines(false);
-            mChart.getXAxis().setDrawGridLines(false);
-            mChart.getXAxis().setDrawLabels(false);
-            mChart.setData(data);
-            mChart.notifyDataSetChanged();
-            mChart.invalidate();
+                mChart.getAxisLeft().setDrawGridLines(false);
+                mChart.getXAxis().setDrawGridLines(false);
+                mChart.getXAxis().setDrawLabels(false);
+                mChart.setData(data);
+                mChart.notifyDataSetChanged();
+                mChart.invalidate();
 
-            mExportButton.setEnabled(true);
-        } else {
-            Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
-        }
-
+                mExportButton.setEnabled(true);
+            } else {
+                Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void resetArray(List<Report> responseBody){
-
-        count = 0;
+    private void clearArray(List<Report> responseBody){
 
         scores.clear();
         foodHygiene.clear();
@@ -185,7 +182,9 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
         safety.clear();
 
         System.out.println("Response body size: " + responseBody.size() );
+    }
 
+    private void createArray(List<Report> responseBody) {
         mScores = new String[responseBody.size()];
         mFoodHygiene = new String[responseBody.size()];
         mSafety = new String[responseBody.size()];
@@ -193,6 +192,14 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
         mHealthierChoice = new String[responseBody.size()];
         mStaffHygiene = new String[responseBody.size()];
         mSafety = new String[responseBody.size()];
+    }
+
+    private void loopData(List<Report> responseBody) {
+        count = 0;
+        for (Report r : responseBody) {
+            aggregateData(r);
+            count++;
+        }
     }
 
     private void aggregateData(Report r) {
@@ -220,12 +227,13 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
         }
 
         try{
-            //saving the file into device
+
+            // saving the file into device
             FileOutputStream out = getActivity().getApplicationContext().openFileOutput("datafile.csv", Context.MODE_PRIVATE);
             out.write((data.toString()).getBytes());
             out.close();
 
-            //exporting
+            // exporting
             Context context = getActivity().getApplicationContext();
             File filelocation = new File(getActivity().getApplicationContext().getFilesDir(), "datafile.csv");
             Uri path = FileProvider.getUriForFile(context, "com.example.android.fileprovider", filelocation);

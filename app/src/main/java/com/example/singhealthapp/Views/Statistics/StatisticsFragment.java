@@ -25,6 +25,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -36,7 +37,7 @@ public class StatisticsFragment extends CustomFragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    private String tenantId, token;
+    private String tenantId, token, userType;
 
     private static List<TenantIdUpdateListener> listenerList = new ArrayList<>();
 
@@ -54,7 +55,7 @@ public class StatisticsFragment extends CustomFragment {
         viewPager = view.findViewById(R.id.stats_viewPager);
 
         getTabs();
-        loadToken();
+        loadData();
 
         // create an api caller to the webserver
         apiCaller = new Retrofit.Builder()
@@ -66,7 +67,20 @@ public class StatisticsFragment extends CustomFragment {
         tenantIdEditText = view.findViewById(R.id.tenantId_edittext);
         searchButton = view.findViewById(R.id.searchTenantId_button);
 
-        searchButton.setOnClickListener(v -> {
+        if (!userType.equals("Auditor")) {
+            tenantIdEditText.setVisibility(View.GONE);
+            searchButton.setVisibility(View.GONE);
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                    tenantIdUpdate();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+        } else { searchButton.setOnClickListener(v -> {
 
             if (!(tenantIdEditText.length() == 0)) {
                 tenantId = tenantIdEditText.getText().toString();
@@ -80,7 +94,8 @@ public class StatisticsFragment extends CustomFragment {
             }
             System.out.println("Activity context: " + getContext());
 
-        });
+        }); }
+
         EspressoCountingIdlingResource.decrement();
         return view;
     }
@@ -119,9 +134,11 @@ public class StatisticsFragment extends CustomFragment {
         }
     }
 
-    private void loadToken() {
+    private void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN_KEY", null);
+        userType = sharedPreferences.getString("USER_TYPE_KEY", null);
+        tenantId = String.valueOf(sharedPreferences.getInt("USER_ID_KEY", 0));
     }
 
 }

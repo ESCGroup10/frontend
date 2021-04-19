@@ -315,12 +315,6 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
         return true;
     }
 
-    @Override
-    public void onDestroy() {
-        deleteReport();
-        deleteRecentlySubmittedCases();
-        super.onDestroy();
-    }
 
     public interface HandlePhotoListener {
         HashMap<String, Bitmap> getPhotoBitmaps();

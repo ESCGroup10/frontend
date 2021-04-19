@@ -52,8 +52,6 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        System.out.println("Context Report attach");
-
         StatisticsFragment.registerTenantIdUpdateListener(this);
     }
 
@@ -67,17 +65,15 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.f_stats_reports, container, false);
+
         mChart = view.findViewById(R.id.reports_chart);
         mExportButton = view.findViewById(R.id.exportcases_button);
 
-        mExportButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    exportData();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        mExportButton.setOnClickListener(v -> {
+            try {
+                exportData();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
 
@@ -85,96 +81,107 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
     }
 
     @Override
-    public void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller) throws IOException {
-        mExportButton.setEnabled(false);
+    public void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller) {
         Call<List<ReportedCases>> getReportedCases = apiCaller.getReportedCase("Token " + token, Integer.parseInt(tenantId));
         Call<List<ResolvedCases>> getResolvedCases = apiCaller.getResolvedCase("Token " + token, Integer.parseInt(tenantId));
 
         getReportedCases.enqueue(new Callback<List<ReportedCases>>() {
             @Override
             public void onResponse(Call<List<ReportedCases>> call, Response<List<ReportedCases>> response) {
+                List<ReportedCases> responseBody = response.body();
 
-                if (response.code() == 200) {
-                    List<ReportedCases> responseBody = response.body();
-
-                    resetArray(responseBody);
-
-                    for (int i=0; i<responseBody.size(); i++) {
-                        reportCount.add(new Entry(i, responseBody.get(i).getCount()));
-                        reportCases[i] = String.valueOf(responseBody.get(i).getCount());
+                new Thread(() -> {
+                    if (response.code() == 200) {
+                        resetArray(responseBody);
+                        parseReportedCases(responseBody);
+                        getResolvedCases(getResolvedCases);
                     }
-
-                    getResolvedCases.enqueue(new Callback<List<ResolvedCases>>() {
-                        @Override
-                        public void onResponse(Call<List<ResolvedCases>> call, Response<List<ResolvedCases>> response) {
-
-                            if (response.code() == 200) {
-                                List<ResolvedCases> responseBody = response.body();
-                                for (int i = 0; i < responseBody.size(); i++) {
-                                    resolveCount.add(new Entry(i, responseBody.get(i).getCount()));
-                                    resolvedCases[i] = String.valueOf(responseBody.get(i).getCount());
-                                }
-                            }
-                            plotChart();
-                        }
-                        @Override
-                        public void onFailure(Call<List<ResolvedCases>> call, Throwable t) {
-                            Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                }).start();
             }
             @Override
             public void onFailure(Call<List<ReportedCases>> call, Throwable t) {
                 Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
             }
         });
-
         System.out.println("ReportStatsFragment UPDATED!" + tenantId);
+    }
+
+    private void parseReportedCases(List<ReportedCases> responseBody) {
+        for (int i=0; i<responseBody.size(); i++) {
+            reportCount.add(new Entry(i, responseBody.get(i).getCount()));
+            reportCases[i] = String.valueOf(responseBody.get(i).getCount());
+        }
+    }
+
+    private void getResolvedCases(Call<List<ResolvedCases>> getResolvedCases) {
+        getResolvedCases.enqueue(new Callback<List<ResolvedCases>>() {
+            @Override
+            public void onResponse(Call<List<ResolvedCases>> call, Response<List<ResolvedCases>> response) {
+                new Thread(() -> {
+                    if (response.code() == 200) {
+                        parseResolvedCases(response);
+                        plotChart();
+                    }
+                }).start();
+            }
+            @Override
+            public void onFailure(Call<List<ResolvedCases>> call, Throwable t) {
+                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void parseResolvedCases(Response<List<ResolvedCases>> response) {
+        List<ResolvedCases> responseBody = response.body();
+        for (int i = 0; i < responseBody.size(); i++) {
+            resolveCount.add(new Entry(i, responseBody.get(i).getCount()));
+            resolvedCases[i] = String.valueOf(responseBody.get(i).getCount());
+        }
     }
 
     private void resetArray(List<ReportedCases> responseBody) {
         reportCount.clear();
         resolveCount.clear();
-
         reportCases = new String[responseBody.size()];
         resolvedCases = new String[responseBody.size()];
     }
 
-
-
     private void plotChart() {
+        getActivity().runOnUiThread(() -> {
+            if (!reportCount.isEmpty()) {
+                LineDataSet set1, set2;
+                set1 = new LineDataSet(reportCount, "No. of Reported Cases");
+                set1.setColor(Color.RED);
+                set1.setCircleColor(Color.RED);
 
-        if (!reportCount.isEmpty()) {
-            LineDataSet set1, set2;
-            set1 = new LineDataSet(reportCount, "No. of Reported Cases");
-            set1.setColor(Color.RED);
-            set1.setCircleColor(Color.RED);
+                set2 = new LineDataSet(resolveCount, "No. of Resolved Cases");
+                set1.setColor(Color.GREEN);
+                set1.setCircleColor(Color.GREEN);
 
-            set2 = new LineDataSet(resolveCount, "No. of Resolved Cases");
-            set1.setColor(Color.GREEN);
-            set1.setCircleColor(Color.GREEN);
+                ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+                dataSets.add(set1);
+                dataSets.add(set2);
 
-            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-            dataSets.add(set1);
-            dataSets.add(set2);
+                LineData data = new LineData(dataSets);
 
-            LineData data = new LineData(dataSets);
+                mChart.getAxisLeft().setDrawGridLines(false);
+                mChart.getXAxis().setDrawGridLines(false);
+                mChart.getXAxis().setDrawLabels(false);
+                mChart.setData(data);
+                mChart.notifyDataSetChanged();
+                mChart.invalidate();
 
-            mChart.getAxisLeft().setDrawGridLines(false);
-            mChart.getXAxis().setDrawGridLines(false);
-            mChart.getXAxis().setDrawLabels(false);
-            mChart.setData(data);
-            mChart.notifyDataSetChanged();
-            mChart.invalidate();
+                mExportButton.setEnabled(true);
+            } else {
+                Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-            mExportButton.setEnabled(true);
-        } else {
-            Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
-        }
+
     }
 
     private void exportData() throws IOException {
+
         //generate data
         StringBuilder data = new StringBuilder();
         data.append("ReportedCases,ResolvedCases");

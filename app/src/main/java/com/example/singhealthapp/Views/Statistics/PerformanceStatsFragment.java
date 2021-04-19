@@ -45,7 +45,6 @@ public class PerformanceStatsFragment extends Fragment implements StatisticsFrag
     @Override
     public void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller) {
 
-
         System.out.println("PerformanceStatsFragment UPDATED!" + tenantId);
     }
 }
