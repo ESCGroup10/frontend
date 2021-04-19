@@ -41,8 +41,6 @@ public class StatisticsFragment extends CustomFragment {
 
     private static List<TenantIdUpdateListener> listenerList = new ArrayList<>();
 
-    private final String TOKEN_KEY = "TOKEN_KEY";
-
     private DatabaseApiCaller apiCaller;
 
     @Nullable
@@ -105,8 +103,24 @@ public class StatisticsFragment extends CustomFragment {
         super.onAttach(context);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!userType.equals("Auditor")) {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                    tenantIdUpdate();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+
     private void getTabs() {
-        final StatsViewPagerAdapter statsViewPagerAdapter = new StatsViewPagerAdapter(getParentFragmentManager());
+        final StatsViewPagerAdapter statsViewPagerAdapter = new StatsViewPagerAdapter(getChildFragmentManager());
 
         statsViewPagerAdapter.addFragment(ReportStatsFragment.getInstance(), "REPORT");
         statsViewPagerAdapter.addFragment(TotalScoreStatsFragment.getInstance(), "TOTAL");
