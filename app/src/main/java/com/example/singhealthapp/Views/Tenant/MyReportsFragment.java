@@ -222,9 +222,13 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
     }
 
     private String loadToken() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("TOKEN_KEY", null);
-        userId = sharedPreferences.getInt("USER_ID_KEY", 0);
+        String token = null;
+        try {
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+            token = sharedPreferences.getString("TOKEN_KEY", null);
+            userId = sharedPreferences.getInt("USER_ID_KEY", 0);
+        }
+        catch (Exception ignored){}
         return token;
     }
 

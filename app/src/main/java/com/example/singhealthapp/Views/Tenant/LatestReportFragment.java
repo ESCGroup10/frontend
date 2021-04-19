@@ -19,8 +19,10 @@ import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
+import com.example.singhealthapp.Models.User;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -28,6 +30,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,14 +40,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LatestReportFragment extends CustomFragment {
-    HorizontalBarChart chart1, chart2, chart3, chart4, chart5;
+    HorizontalBarChart chart1, chart2, chart3, chart4, chart5, chart6;
     ArrayList<BarEntry> barEntries;
     BarData barData;
     BarDataSet barDataSet;
     float[][] data;
     int[] colors;
     TextView resolved, unresolved, date, resolvedText, rejected;
-    private String token;
+    private String token, reportUserType;
     private int userId;
     Report report;
     List<Case> resolvedCases, unresolvedCases, rejectedCases;
@@ -59,6 +62,7 @@ public class LatestReportFragment extends CustomFragment {
             SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
             token = sharedPreferences.getString("TOKEN_KEY", null);
             userId = sharedPreferences.getInt("USER_ID_KEY", 0);
+            reportUserType = sharedPreferences.getString("USER_TYPE_KEY", "Non F&B");;
         }
         catch (Exception ignored){
         }
@@ -80,7 +84,6 @@ public class LatestReportFragment extends CustomFragment {
                 }
                 if (reports.isEmpty()){
                     view.findViewById(R.id.latestReportNotAvailable).setVisibility(View.VISIBLE);
-                    reports = null;
                 }
                 else {
                     view.findViewById(R.id.latestReportDefault).setVisibility(View.VISIBLE);
@@ -111,6 +114,43 @@ public class LatestReportFragment extends CustomFragment {
                         resolvedText.setText("Unresolved");
                         resolvedText.setTextColor(Color.parseColor("#ff6961"));
                     }
+                    if ( reportUserType.equals("Non F&B")) {
+                        TextView textView1 = view.findViewById(R.id.chart1Text);
+                        TextView textView2 = view.findViewById(R.id.chart2Text);
+                        TextView textView5 = view.findViewById(R.id.chart5Text);
+                        textView1.setText("Professionalism and Staff Hygiene (20%)");
+                        textView2.setText("Housekeeping & General Cleanliness (40%)");
+                        textView5.setText("Workplace Safety & Health (40%)");
+                    }
+                    else {
+                        chart3.setVisibility(View.VISIBLE);
+                        chart4.setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.chart3Text).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.chart4Text).setVisibility(View.VISIBLE);
+                        barChartOperation(chart3, 2);
+                        barChartOperation(chart4, 3);
+                    }
+                    chart6 = view.findViewById(R.id.reportBarChart6);
+                    barEntries = new ArrayList<>();
+                    float[] dataFloat = getTotalScore(report);
+                    barEntries.add(new BarEntry(0, dataFloat));
+                    System.out.println("score: " + Arrays.toString(dataFloat));
+                    barDataSet = new BarDataSet(barEntries, "");
+                    if (dataFloat[0] >= 95) colors = new int[]{Color.rgb(159, 221, 88), Color.rgb(170, 170, 170)};
+                    else colors = new int[]{Color.rgb(221, 57, 48), Color.rgb(170, 170, 170)};
+                    barDataSet.setColors(colors);
+                    barDataSet.setValueTextSize(10);
+                    barDataSet.setValueFormatter(new ValueFormatter() {
+                        @Override
+                        public String getBarStackedLabel(float value, BarEntry stackedEntry) {
+                            if ( value == dataFloat[0] ) return String.valueOf((int) value);
+                            return "";
+                        }
+                    });
+                    barData = new BarData(barDataSet);
+                    chart6.setData(barData);
+                    reportSetBarData(chart6);
+
                     resolved = view.findViewById(R.id.auditorReportResolved);
                     unresolved = view.findViewById(R.id.auditorReportUnresolved);
                     rejected = view.findViewById(R.id.auditorReportNull);
@@ -189,8 +229,10 @@ public class LatestReportFragment extends CustomFragment {
             }
         });
         barData = new BarData(barDataSet);
-
         chart.setData(barData);
+        reportSetBarData(chart);
+    }
+    void reportSetBarData(BarChart chart){
         chart.animateXY(800, 1300);
         chart.setPinchZoom(false);
         chart.setClickable(false);
@@ -216,5 +258,14 @@ public class LatestReportFragment extends CustomFragment {
             return false;
         }
         return super.onBackPressed();
+    }
+
+    float[] getTotalScore(Report report){
+        float total;
+        if (reportUserType.equals("F&B"))
+            total =  (float) (report.getStaffhygiene_score()*0.1f + report.getHousekeeping_score()*0.2f + report.getSafety_score()*0.2f
+                    + report.getHealthierchoice_score()*0.15f + report.getFoodhygiene_score()*0.35f);
+        else total =  (float) (report.getStaffhygiene_score()*0.2f + report.getHousekeeping_score()*0.4f + report.getSafety_score()*0.4f);
+        return new float[]{total*100f, 100f-total*100f};
     }
 }
