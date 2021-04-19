@@ -94,7 +94,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
             @Override
             public void onResponse(Call<List<ReportedCases>> call, Response<List<ReportedCases>> response) {
 
-                if (response.code() == 200) {
+                if (response.isSuccessful()) {
                     List<ReportedCases> responseBody = response.body();
 
                     resetArray(responseBody);
@@ -108,7 +108,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
                         @Override
                         public void onResponse(Call<List<ResolvedCases>> call, Response<List<ResolvedCases>> response) {
 
-                            if (response.code() == 200) {
+                            if (response.isSuccessful()) {
                                 List<ResolvedCases> responseBody = response.body();
                                 for (int i = 0; i < responseBody.size(); i++) {
                                     resolveCount.add(new Entry(i, responseBody.get(i).getCount()));
