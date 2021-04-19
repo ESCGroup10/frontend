@@ -50,6 +50,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         super.onCreate(savedInstanceState);
         setContentView(R.layout.a_fragmentcontainer_tenant);
         loadFromSharedPref();
+        startBackgroundNotificationProcess();
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -105,6 +106,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Do you want to log out? ");
                 builder.setPositiveButton("OK", (dialog, id) -> {
+                    stopBackgroundNotificationProcess();
                     dialog.dismiss();
                     clearData(); // clear user type (to avoid auto login) and token (for safety)
                     Intent intent = new Intent(TenantFragmentContainer.this, LoginActivity.class);
@@ -162,6 +164,22 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         editor.putString("OUTLET_KEY", "");
         editor.putString("INSTITUTION_KEY", "");
         editor.apply();
+    }
+
+    private void stopBackgroundNotificationProcess() {
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putBoolean("STOP_NOTIFICATIONS", true);
+        editor.apply();
+        ProcessMainClass.stopBackgroundService((Context)this);
+    }
+
+    private void startBackgroundNotificationProcess() {
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putBoolean("STOP_NOTIFICATIONS", false);
+        editor.apply();
+        ProcessMainClass.stopBackgroundService((Context)this);
     }
 
     private void loadFromSharedPref() {

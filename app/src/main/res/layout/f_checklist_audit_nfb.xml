@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Professionalism &amp; Staff Hygiene (20%)"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:gravity="center"
                 android:layout_margin="8dp"
                 android:textColor="@color/black"
@@ -35,7 +35,7 @@
                     android:layout_height="match_parent"
                     android:padding="6dp"
                     android:textStyle="bold"
-                    android:textSize="18dp"
+                    android:textSize="18sp"
                     android:textAllCaps="false"
                     android:text="Professionalism"
                     android:gravity="center" />
@@ -51,7 +51,7 @@
                     android:layout_height="match_parent"
                     android:padding="6dp"
                     android:textStyle="bold"
-                    android:textSize="18dp"
+                    android:textSize="18sp"
                     android:textAllCaps="false"
                     android:text="Staff Hygiene"
                     android:gravity="center"/>
@@ -148,9 +148,14 @@
             <EditText
                 android:id="@+id/overallReportNotes"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="100dp"
+                android:layout_marginVertical="10dp"
                 android:hint="Overall findings/remarks"
-                android:layout_marginVertical="10dp"/>
+                android:gravity="bottom"
+                android:overScrollMode="always"
+                android:scrollbarStyle="insideInset"
+                android:scrollbars="vertical"
+                android:imeOptions="actionDone"/>
 
             <Button
                 android:id="@+id/submit_audit_button"

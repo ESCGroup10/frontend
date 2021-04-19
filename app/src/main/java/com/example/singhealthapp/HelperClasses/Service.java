@@ -3,7 +3,11 @@ package com.example.singhealthapp.HelperClasses;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,10 +50,11 @@ public class Service extends android.app.Service {
     private boolean newReport;
     private int savedSize = -1;
 
+    SharedPreferences sharedPreferences;
+
     public Service() {
         super();
     }
-
 
     @Override
     public void onCreate() {
@@ -122,6 +127,11 @@ public class Service extends android.app.Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy: check if we should shut down the process");
+        System.out.println("shut down: "+checkShutDown());
+        if (checkShutDown()) {
+            return;
+        }
         Log.i(TAG, "onDestroy called");
         // restart the never ending service
         Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
@@ -192,6 +202,11 @@ public class Service extends android.app.Service {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void startChecking() {
+        System.out.println("shut down: "+checkShutDown());
+        if (checkShutDown()) {
+            stopSelf();
+            return;
+        }
         // create apiCaller
         apiCaller = new Retrofit.Builder()
                 .baseUrl("https://esc10-303807.et.r.appspot.com/")
@@ -257,6 +272,11 @@ public class Service extends android.app.Service {
                 startChecking();
             }
         };
+    }
+
+    private boolean checkShutDown() {
+        SharedPreferences sharedPreferences = this.getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("STOP_NOTIFICATIONS", false);
     }
 
 }

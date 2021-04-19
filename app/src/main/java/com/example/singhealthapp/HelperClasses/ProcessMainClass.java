@@ -24,6 +24,15 @@ public class ProcessMainClass {
             serviceIntent.putExtra("TOKEN_KEY", token);
         }
     }
+
+    public static void stopBackgroundService(Context context) {
+        try {
+            context.stopService(serviceIntent);
+        } catch (Exception e) {
+            System.out.println("serviceIntent ont initialized yet");
+        }
+    }
+
     /**
      * launching the service
      */
@@ -33,8 +42,8 @@ public class ProcessMainClass {
             token = ((SendInfoToPMC)tenantFragmentContainer).sendToken();
             tenantID = ((SendInfoToPMC)tenantFragmentContainer).sendID();
             Log.d(TAG, "launchService: \nreceived token: "+token+"\ntenantID: "+tenantID);
-            Log.d(TAG, "launchService: static token: "+TenantFragmentContainer.token);
-            Log.d(TAG, "launchService: static token: "+TenantFragmentContainer.tenantID);
+//            Log.d(TAG, "launchService: static token: "+TenantFragmentContainer.token);
+//            Log.d(TAG, "launchService: static token: "+TenantFragmentContainer.tenantID);
         }
         if (context == null) {
             return;
