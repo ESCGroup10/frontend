@@ -158,6 +158,7 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
 
                 LineData data = new LineData(dataSets);
 
+                mChart.getDescription().setEnabled(false);
                 mChart.getAxisLeft().setDrawGridLines(false);
                 mChart.getXAxis().setDrawGridLines(false);
                 mChart.getXAxis().setDrawLabels(false);

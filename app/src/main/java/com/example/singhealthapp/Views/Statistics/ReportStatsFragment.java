@@ -164,6 +164,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
                 LineData data = new LineData(dataSets);
 
+                mChart.getDescription().setEnabled(false);
                 mChart.getAxisLeft().setDrawGridLines(false);
                 mChart.getXAxis().setDrawGridLines(false);
                 mChart.getXAxis().setDrawLabels(false);
