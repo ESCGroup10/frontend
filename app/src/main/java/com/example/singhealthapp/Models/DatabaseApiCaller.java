@@ -81,7 +81,7 @@ public interface DatabaseApiCaller {
     Call<List<Case>> getCasesById (
             @Header("authorization") String token,
             @Query("report_id") int report_id,
-            @Query("is_resolved") int is_resolved
+            @Query("is_resolved") Integer is_resolved
     );
 
     @GET("/api/score/")

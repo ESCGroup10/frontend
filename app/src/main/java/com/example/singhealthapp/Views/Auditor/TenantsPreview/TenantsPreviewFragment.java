@@ -101,10 +101,7 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
                     Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                     return ;
                 }
-                if (response.body() == null || response.body().isEmpty()) {
-                    return;
-                }
-                System.out.println(response.body().get(0).getId());
+                if (response.body().isEmpty() || response.body() == null) return;
                 adapter = new TenantsPreviewAdapter(tenantSearch, response.body(), getActivity(), token, TenantsPreviewFragment.this);
                 tenants = response.body();
                 try {

@@ -13,6 +13,13 @@
         android:layout_marginTop="10dp"
         android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/latestReportDefault"
+        android:visibility="gone">
+
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,8 +47,8 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_margin="10dp"
+                    android:layout_height="25dp"
+                    android:layout_margin="5dp"
                     android:textSize="18dp"
                     android:id="@+id/resolvedLatestReport"
                     android:layout_gravity="center" />
@@ -55,6 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
                     android:textSize="12dp"
+                    android:id="@+id/chart1Text"
                     android:text="Professionalism and Staff Hygiene (10%)"
                     android:layout_gravity="center" />
 
@@ -67,12 +75,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
                     android:textSize="12dp"
+                    android:id="@+id/chart2Text"
                     android:text="Housekeeping &amp; General Cleanliness (20%)"
                     android:layout_gravity="center" />
 
                 <com.github.mikephil.charting.charts.HorizontalBarChart
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
+                    android:visibility="gone"
                     android:id="@+id/reportBarChart3" />
 
                 <TextView
@@ -80,17 +90,22 @@
                     android:layout_height="20dp"
                     android:textSize="12dp"
                     android:text="Food Hygiene (35%)"
+                    android:visibility="gone"
+                    android:id="@+id/chart3Text"
                     android:layout_gravity="center" />
 
                 <com.github.mikephil.charting.charts.HorizontalBarChart
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
+                    android:visibility="gone"
                     android:id="@+id/reportBarChart4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
                     android:textSize="12dp"
+                    android:id="@+id/chart4Text"
+                    android:visibility="gone"
                     android:text="Healthier Choice (15%)"
                     android:layout_gravity="center" />
 
@@ -103,8 +118,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
                     android:textSize="12dp"
+                    android:id="@+id/chart5Text"
                     android:text="Workplace Safety &amp; Health (20%)"
                     android:layout_gravity="center" />
+
+                <com.github.mikephil.charting.charts.HorizontalBarChart
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_height="60dp"
+                    android:id="@+id/reportBarChart6" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:textSize="15dp"
+                    android:text="Total Score"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center_horizontal|top"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -113,7 +143,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:layout_marginBottom="50dp"
+
             android:orientation="horizontal">
 
             <LinearLayout
@@ -168,6 +198,66 @@
 
             </LinearLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Rejected Cases: "
+                android:textColor="@color/black"
+                android:textSize="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:textSize="16dp"
+                android:text="~"
+                android:textColor="@color/grey"
+                android:id="@+id/auditorReportNull"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/latestReportViewCases"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:layout_marginBottom="10dp"
+            android:background="#ffb684"
+            android:layout_gravity="center"
+            android:text="view cases" />
+
+        </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/latestReportNotAvailable"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:text="No Reports"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:layout_gravity="center" />
+
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 

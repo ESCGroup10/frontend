@@ -24,8 +24,8 @@ import com.example.singhealthapp.Views.Tenant.CaseExpanded;
 import java.util.List;
 
 public class CasesPreviewFragment extends CustomFragment implements CasePreviewNavigateListener {
-    CasePreviewAdapter unresolvedAdapter, resolvedAdapter;
-    List<Case> unresolvedCases, resolvedCases;
+    CasePreviewAdapter unresolvedAdapter, resolvedAdapter, rejectedAdapter;
+    List<Case> unresolvedCases, resolvedCases, rejectedCases;
     int id;
     TextView companyView, locationView;
     String company, location;
@@ -33,9 +33,10 @@ public class CasesPreviewFragment extends CustomFragment implements CasePreviewN
     private Report report;
     private String token, userType;
 
-    public CasesPreviewFragment(List<Case> unresolvedCases, List<Case> resolvedCases, int id, String company, String location, Report report, String token){
+    public CasesPreviewFragment(List<Case> unresolvedCases, List<Case> resolvedCases, List<Case> rejectedCases, int id, String company, String location, Report report, String token){
         this.unresolvedCases = unresolvedCases;
         this.resolvedCases = resolvedCases;
+        this.rejectedCases =  rejectedCases;
         this.id = id;
         this.company = company;
         this.location = location;
@@ -72,6 +73,16 @@ public class CasesPreviewFragment extends CustomFragment implements CasePreviewN
             System.out.println("resolved recycleView not set");
         }
 
+        rejectedAdapter = new CasePreviewAdapter(rejectedCases, report, (CasePreviewNavigateListener)this);
+        try {
+            RecyclerView view3 = (RecyclerView) view.findViewById(R.id.casePreviewRecyclerViewRejected);
+            view3.setLayoutManager(new LinearLayoutManager(getActivity()));
+            view3.setItemAnimator(new DefaultItemAnimator());
+            view3.setAdapter(rejectedAdapter);
+        } catch (Exception e) {
+            System.out.println("rejected recycleView not set");
+        }
+
         companyView = view.findViewById(R.id.reportCaseCompany);
         locationView = view.findViewById(R.id.reportCaseLocation);
         TextAestheticsAndParsing.setHalfBoldTextViews(companyView, "Company: ", company);
@@ -97,7 +108,8 @@ public class CasesPreviewFragment extends CustomFragment implements CasePreviewN
         }
         Bundle args = new Bundle();
         args.putString("COMPANY_KEY", report.getCompany());
-        args.putInt("REPORT_NUMBER_KEY", report.getTenant_display_id());
+        if (report.getTenant_display_id() != null) args.putInt("REPORT_NUMBER_KEY", report.getTenant_display_id());
+        else args.putInt("REPORT_NUMBER_KEY", report.getId());
         args.putInt("CASE_NUMBER_KEY", thisCase.getId());
         args.putBoolean("RESOLVED_STATUS_KEY", thisCase.isIs_resolved());
         args.putInt("REPORT_ID_KEY", report.getId());

@@ -15,7 +15,6 @@
         <EditText
             android:id="@+id/reportPreviewSearch"
             android:layout_gravity="center"
-            android:inputType="number"
             android:layout_width="220dp"
             android:backgroundTint="@color/black"
             android:layout_height="wrap_content"

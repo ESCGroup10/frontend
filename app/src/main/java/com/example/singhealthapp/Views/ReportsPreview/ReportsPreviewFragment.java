@@ -52,6 +52,7 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
         view.findViewById(R.id.reportPreviewSearchButton).setOnClickListener(v -> {
             if ( reportPreviews.isEmpty() ) return;
             TextView textView = view.findViewById(R.id.reportPreviewSearch);
+            textView.setMaxLines(1);
             String text = textView.getText().toString();
             if ( text.isEmpty() ) {
                 displayPreviews = new ArrayList<>(reportPreviews);
@@ -80,7 +81,6 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
             }
             displayRecycleView(displayPreviews, displayReports);
         });
-
         view.findViewById(R.id.reportPreviewUnresolvedButton).setOnClickListener(v -> {
             if ( reportPreviews.isEmpty() ) return;
             unresolved = !unresolved;
@@ -149,6 +149,8 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
                 unresolved = true;
                 completed = true;
                 displayRecycleView(displayPreviews, response.body());
+                TextView textView = (TextView) getView().findViewById(R.id.reportPreviewSearch);
+                if(!textView.getText().toString().isEmpty()) getView().findViewById(R.id.reportPreviewSearchButton).performClick();
             }
             @Override
             public void onFailure(Call<List<Report>> call, Throwable t) {
@@ -162,13 +164,19 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
         ArrayList<Report> unresolvedReports = new ArrayList<>();
         ArrayList<ReportPreview> completedPreview = new ArrayList<>();
         ArrayList<Report> completedReports = new ArrayList<>();
+        ArrayList<Integer> Invalid = new ArrayList<>();
         for ( Report o : reports ){
+            if (! isDataValid(o)) {
+                Invalid.add(o.getId());
+                continue;
+            }
             if ( ! o.isStatus() ) {
                 unresolvedReports.add(o);
             }
             else completedReports.add(o);
         }
         for ( ReportPreview o : reportPreviews ){
+            if (Invalid.contains(o.getId())) continue;
             if ( ! o.isStatus() ) {
                 unresolvedPreview.add(o);
             }
@@ -220,5 +228,14 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
                 reportSummaryFragment.getClass().getName())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    boolean isDataValid(Report r){
+        if (r.getFoodhygiene_score() > 1 || r.getFoodhygiene_score() < 0) return false;
+        if (r.getHealthierchoice_score() > 1 || r.getHealthierchoice_score() < 0) return false;
+        if (r.getHousekeeping_score() > 1 || r.getHousekeeping_score() < 0) return false;
+        if (r.getStaffhygiene_score() > 1 || r.getStaffhygiene_score() < 0) return false;
+        if (r.getSafety_score() > 1 || r.getSafety_score() < 0) return false;
+        return true;
     }
 }

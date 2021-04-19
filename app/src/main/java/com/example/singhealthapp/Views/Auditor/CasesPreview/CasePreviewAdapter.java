@@ -43,17 +43,23 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull CasePreviewHolder holder, int position) {
-        if (cases.get(position).isIs_resolved()) {
+        Case thisCase = cases.get(position);
+        if (thisCase.isIs_resolved()) {
             holder.is_resolved.setText("Resolved");
             holder.is_resolved.setTextColor(Color.parseColor("#62bd69"));
         }
         else {
-            holder.is_resolved.setText("Unresolved");
-            holder.is_resolved.setTextColor(Color.parseColor("#ff6961"));
+            if (thisCase.getRejected_comments().isEmpty()) {
+                holder.is_resolved.setText("Unresolved");
+                holder.is_resolved.setTextColor(Color.parseColor("#ff6961"));
+            }
+            else {
+                holder.is_resolved.setText("Rejected");
+                holder.is_resolved.setTextColor(Color.BLACK);
+            }
         }
         holder.type.setText(cases.get(position).getNon_compliance_type());
         holder.id.setText(("Case " + cases.get(position).getId()));
-        Case thisCase = cases.get(position);
         holder.cardView.setOnClickListener(v -> {
             parent.navigateFromRecyclerView(report, thisCase);
         });
