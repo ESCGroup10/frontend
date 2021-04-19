@@ -77,7 +77,7 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
     private final ArrayList<String> recyclerViewNameArrayList = new ArrayList<>();
     private final ArrayList<Integer> submittedCaseIDs = new ArrayList<>();
     private int numCases;
-    private boolean stopCreatingCases = false;
+    private boolean stopCreatingCases, submissionConfirmed = false;
 
     // API stuff
     private static DatabaseApiCaller apiCaller;
@@ -187,7 +187,6 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                         })
                         .setNegativeButton("Set all questions to true and submit", (dialog, which) -> {
                             // proceed as per normal
-//                            showConfirmSubmissionDialog();
                             dialog.dismiss();
                             showConfirmSubmissionDialog();
                         })
@@ -213,6 +212,7 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                     confirmSubmissionDialog.dismiss();
                 })
                 .setPositiveButton("Yes", (confirmSubmissionDialog, which) -> {
+                    submissionConfirmed = true;
                     if (createCases()) {
                         submit();
                         createReport(true);
@@ -317,8 +317,10 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
 
     @Override
     public void onDestroy() {
-        deleteReport();
-        deleteRecentlySubmittedCases();
+        if (!submissionConfirmed) {
+            deleteReport();
+            deleteRecentlySubmittedCases();
+        }
         super.onDestroy();
     }
 
@@ -563,12 +565,12 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
         }
 
         // calculate scores
-        staffhygiene_score = staffhygiene_score* staffhygiene_weightage /original_staffhygiene_score;
-        housekeeping_score = housekeeping_score* housekeeping_weightage /original_housekeeping_score;
-        safety_score = safety_score* safety_weightage /original_safety_score;
+        staffhygiene_score = staffhygiene_score /original_staffhygiene_score * 100f;
+        housekeeping_score = housekeeping_score /original_housekeeping_score * 100f;
+        safety_score = safety_score /original_safety_score * 100f;
         if (tenantType.equals("F&B")) {
-            healthierchoice_score = healthierchoice_score * healthierchoice_weightage / original_healthierchoice_score;
-            foodhygiene_score = foodhygiene_score * foodhygiene_weightage / original_foodhygiene_score;
+            healthierchoice_score = healthierchoice_score / original_healthierchoice_score * 100f;
+            foodhygiene_score = foodhygiene_score / original_foodhygiene_score * 100f;
         }
         Log.d(TAG, "calculateScores: "+staffhygiene_score+"\n"+
                 housekeeping_score+"\n"+
@@ -577,7 +579,11 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                 foodhygiene_score+"\n");
 
         // decide whether pass or fail
-        if (staffhygiene_score+housekeeping_score+safety_score+healthierchoice_score+foodhygiene_score < 0.95) {
+        System.out.println("total score: ");
+        System.out.println((staffhygiene_score*staffhygiene_weightage+housekeeping_score*housekeeping_weightage+safety_score*safety_weightage+
+                healthierchoice_score*healthierchoice_weightage+foodhygiene_score*foodhygiene_weightage));
+        if (staffhygiene_score*staffhygiene_weightage+housekeeping_score*housekeeping_weightage+safety_score*safety_weightage+
+                healthierchoice_score*healthierchoice_weightage+foodhygiene_score*foodhygiene_weightage < 95) {
             passFail = "Fail";
         } else {
             passFail = "Pass";

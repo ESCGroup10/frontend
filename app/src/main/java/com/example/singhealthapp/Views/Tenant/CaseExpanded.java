@@ -62,7 +62,7 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
     // UI stuff
     TextView companyTextView, institutionTextView, nonComplianceTypeTextView, resolvedStatusTextView, unresolvedImageDateTextView,
             unresolvedCommentsTextView, resolvedImageDateTextView, resolvedCommentsTextView, unresolvedImageViewPlaceholder,
-            resolvedImageViewPlaceholder, rejectedCommentsTextView, resolvingRejectedImageViewPlaceholder;
+            resolvedImageViewPlaceholder, rejectedCommentsTextView, resolvingRejectedImageViewPlaceholder, questionTextView;
     ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton, resolvingRejectedImageView;
     Button resolveButton, confirmButton, rejectButton, acceptButton, resolvingRejectedButton;
     LinearLayout resolvingCaseSection, auditorButtonsLinearLayout;
@@ -149,6 +149,7 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
         resolvedCommentsTextView = view.findViewById(R.id.resolvedCommentsTextView);
         unresolvedImageViewPlaceholder = view.findViewById(R.id.unresolvedImageViewPlaceholder);
         resolvedImageViewPlaceholder = view.findViewById(R.id.resolvedImageViewPlaceholder);
+        questionTextView = view.findViewById(R.id.questionTextView);
 
         // for auditor
         acceptButton = view.findViewById(R.id.acceptButton);
@@ -585,6 +586,7 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
                     unresolvedComments = thisCase.getUnresolved_comments();
                     unresolvedImageDate = thisCase.getUnresolved_date();
                     unresolvedImageName = thisCase.getUnresolved_photo();
+                    questionTextView.setText(thisCase.getQuestion());
                     if (!thisCase.getRejected_comments().equals("")) { // currently rejected by auditor, if auditor, treat as unresolved, not pending
                         Log.d(TAG, "onResponse: rejected comments is not empty");
                         if (userType.equals("Auditor")) {
