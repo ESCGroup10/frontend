@@ -43,11 +43,11 @@ public class LatestReportFragment extends CustomFragment {
     BarDataSet barDataSet;
     float[][] data;
     int[] colors;
-    TextView resolved, unresolved, date, resolvedText, pending;
+    TextView resolved, unresolved, date, resolvedText, rejected;
     private String token;
     private int userId;
     Report report;
-    List<Case> resolvedCases, unresolvedCases, pendingCases;
+    List<Case> resolvedCases, unresolvedCases, rejectedCases;
 
     @Nullable
     @Override
@@ -113,10 +113,10 @@ public class LatestReportFragment extends CustomFragment {
                     }
                     resolved = view.findViewById(R.id.auditorReportResolved);
                     unresolved = view.findViewById(R.id.auditorReportUnresolved);
-                    pending = view.findViewById(R.id.auditorReportNull);
+                    rejected = view.findViewById(R.id.auditorReportNull);
                     resolvedCases = new ArrayList<>();
                     unresolvedCases = new ArrayList<>();
-                    pendingCases = new ArrayList<>();
+                    rejectedCases = new ArrayList<>();
                     Call<List<Case>> caseCall = apiCaller.getCasesById("Token " + token, report.getId(), 1);
                     caseCall.enqueue(new Callback<List<Case>>(){
                         @Override
@@ -127,34 +127,32 @@ public class LatestReportFragment extends CustomFragment {
                             caseCall.enqueue(new Callback<List<Case>>(){
                                 @Override
                                 public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
-                                    unresolved.setText(String.valueOf(response.body().size()));
-                                    unresolvedCases.addAll(response.body());
-                                    call = apiCaller.getCasesById("Token " + token, report.getId(), null);
-                                    call.enqueue(new Callback<List<Case>>(){
-                                        @Override
-                                        public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
-                                            pending.setText(String.valueOf(response.body().size()));
-                                            pendingCases.addAll(response.body());
-                                            Button button = view.findViewById(R.id.latestReportViewCases);
-                                            if (!resolved.getText().toString().equals("0") || !unresolved.getText().toString().equals("0") || !pending.getText().toString().equals("0")) {
-                                                CasesPreviewFragment casesPreviewFragment = new CasesPreviewFragment(unresolvedCases, resolvedCases,
-                                                        report.getId(), report.getCompany(), report.getLocation(), report, token);
-                                                button.setEnabled(true);
-                                                button.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
-                                                        .replace(R.id.fragment_container, casesPreviewFragment, casesPreviewFragment.getClass().getName())
-                                                        .addToBackStack(null).commit());
-                                            }
+                                    if (response.body().isEmpty()) {
+                                        unresolved.setText("0");
+                                        rejected.setText("0");
+                                    }
+                                    else {
+                                        for (Case c : response.body()) {
+                                            if (c.getRejected_comments().isEmpty()) unresolvedCases.add(c);
+                                            else rejectedCases.add(c);
                                         }
-
-                                        @Override
-                                        public void onFailure(Call<List<Case>> call, Throwable t) {
-                                            pending.setText("error");
-                                        }
-                                    });
+                                        unresolved.setText(String.valueOf(unresolvedCases.size()));
+                                        rejected.setText(String.valueOf(rejectedCases.size()));
+                                    }
+                                    if (!resolved.getText().toString().equals("0") || !unresolved.getText().toString().equals("0") || !rejected.getText().toString().equals("0")) {
+                                        CasesPreviewFragment casesPreviewFragment = new CasesPreviewFragment(unresolvedCases, resolvedCases, rejectedCases,
+                                                report.getId(), report.getCompany(), report.getLocation(), report, token);
+                                        Button button = view.findViewById(R.id.latestReportViewCases);
+                                        button.setEnabled(true);
+                                        button.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
+                                                .replace(R.id.fragment_container, casesPreviewFragment, casesPreviewFragment.getClass().getName())
+                                                .addToBackStack(null).commit());
+                                    }
                                 }
                                 @Override
                                 public void onFailure(Call<List<Case>> call, Throwable t) {
                                     unresolved.setText("error");
+                                    rejected.setText("error");
                                 }
                             });
                         }

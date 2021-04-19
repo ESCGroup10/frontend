@@ -190,7 +190,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="Pending: "
+                android:text="Rejected Cases: "
                 android:textColor="@color/black"
                 android:textSize="16dp" />
 
@@ -229,7 +229,7 @@
                 android:layout_margin="20dp"
                 android:textSize="20dp"
                 android:textStyle="bold"
-                android:text="Report Not Available"
+                android:text="No Reports"
                 android:textColor="@color/black"
                 android:gravity="center"
                 android:layout_gravity="center" />
