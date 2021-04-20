@@ -124,32 +124,64 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         EspressoCountingIdlingResource.increment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        String currentTag;
+        String newTag;
+        if (fragmentManager.getBackStackEntryCount() == 0) {
+            currentTag = "";
+        } else {
+            currentTag = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1).getName();
+        }
         switch (item.getItemId()) {
             case R.id.nav_MyReport:
                 MyReportsFragment myReportsFragment = new MyReportsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, myReportsFragment, myReportsFragment.getClass().getName())
-                        .addToBackStack(null)
+                newTag = myReportsFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
+                    break;
+                }
+                fragmentManager.beginTransaction().replace(R.id.fragment_container, myReportsFragment, newTag)
+                        .addToBackStack(newTag)
                         .commit();
                 break;
 
             case R.id.nav_Tenant_Statistics:
                 StatisticsFragment statisticsFragment = new StatisticsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, statisticsFragment, statisticsFragment.getClass().getName())
-                        .addToBackStack(null)
+                newTag = statisticsFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
+                    break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, statisticsFragment, newTag)
+                        .addToBackStack(newTag)
                         .commit();
                 break;
 
             case R.id.nav_LatestReport:
                 LatestReportFragment latestReportFragment = new LatestReportFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, latestReportFragment.getClass().getName())
-                        .addToBackStack(null)
+                newTag = latestReportFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
+                    break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, newTag)
+                        .addToBackStack(newTag)
                         .commit();
                 break;
 
             case R.id.nav_Test:
                 TestFragment testFragment = new TestFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, testFragment, testFragment.getClass().getName())
-                        .addToBackStack(null)
+                newTag = testFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
+                    break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, testFragment, newTag)
+                        .addToBackStack(newTag)
                         .commit();
                 break;
         }

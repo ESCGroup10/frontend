@@ -16,7 +16,7 @@ public class CustomFragment extends Fragment implements IOnBackPressed{
 
         if (!fragmentPopped){ //fragment not in back stack, create it.
             manager.beginTransaction().replace(R.id.fragment_container, this, tagName)
-                    .addToBackStack(null)
+                    .addToBackStack(tagName)
                     .commit();
         }
         return true;
