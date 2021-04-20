@@ -65,7 +65,11 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LatestReportFragment()).commit();
+            LatestReportFragment latestReportFragment = new LatestReportFragment();
+            String tag = latestReportFragment.getClass().getName();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, tag)
+                    .addToBackStack(tag)
+                    .commit();
         }
     }
 
@@ -78,8 +82,9 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 EspressoCountingIdlingResource.increment();
                 System.out.println("going to my reports");
                 MyReportsFragment myReportsFragment = new MyReportsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, myReportsFragment, myReportsFragment.getClass().getName())
-                        .addToBackStack(null)
+                String tag = myReportsFragment.getClass().getName();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, myReportsFragment, tag)
+                        .addToBackStack(tag)
                         .commit();
             }
         } else {
