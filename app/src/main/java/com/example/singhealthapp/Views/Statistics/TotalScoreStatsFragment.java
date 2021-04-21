@@ -52,7 +52,7 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     Call<List<User>> getUserCall;
     String token, tenantId, userType;
 
-    ArrayList<String> timeline = new ArrayList<>();
+    ArrayList<String> reportIds = new ArrayList<>();
     ArrayList<Entry> scores = new ArrayList<>();
     ArrayList<Entry> foodHygiene = new ArrayList<>();
     ArrayList<Entry> healthierChoice = new ArrayList<>();
@@ -79,12 +79,8 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
         mExportButton = view.findViewById(R.id.exportscore_button);
 
         mExportButton.setOnClickListener(v -> new Thread(() -> {
-            try {
-                generateScores();
-                exportData();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            generateScores();
+            exportData();
         }).start());
 
         return view;
@@ -93,7 +89,6 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        System.out.println("Context Score attach");
         StatisticsFragment.registerTenantIdUpdateListener(this);
     }
 
@@ -118,19 +113,9 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
             public void onResponse(Call<List<Report>> call, Response<List<Report>> response) {
                 List<Report> responseBody = response.body();
 
-
-
                 if (response.code() == 200) {
                     new Thread(() -> {
-                        try {
-                            getUserType();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        clearArray(responseBody);
-                        createArray(responseBody);
-                        loopData(responseBody);
+                        getUserType(responseBody);
                     }).start();
                 }
             }
@@ -140,27 +125,26 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
                 Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
             }
         });
-        System.out.println("TotalScoreStatsFragment UPDATED!" + tenantId);
     }
 
-    private void plotChart() throws IOException {
+    private void plotChart() {
         getActivity().runOnUiThread(() -> {
 
             if (!scores.isEmpty()) {
                 LineDataSet set, set1, set2, set3, set4, set5, set6;
-                set1 = new LineDataSet(scores, "Total");
+                set1 = new LineDataSet(scores, "Total Score ");
                 set1.setColor(Color.GREEN);
                 set1.setCircleColor(Color.GREEN);
 
-                set2 = new LineDataSet(houseKeeping, "Housekeeping & General Cleanliness");
+                set2 = new LineDataSet(houseKeeping, "Housekeeping & General Cleanliness ");
                 set2.setColor(Color.RED);
                 set2.setCircleColor(Color.RED);
 
-                set3 = new LineDataSet(safety, "Workplace Safety & Health");
+                set3 = new LineDataSet(safety, "Workplace Safety & Health ");
                 set3.setColor(Color.GRAY);
                 set3.setCircleColor(Color.GRAY);
 
-                set4 = new LineDataSet(staffHygiene, "Professionalism & Staff Hygiene");
+                set4 = new LineDataSet(staffHygiene, "Professionalism & Staff Hygiene ");
                 set4.setColor(Color.YELLOW);
                 set4.setCircleColor(Color.YELLOW);
 
@@ -172,8 +156,7 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
                 dataSets.add(set4);
 
                 if (userType.equals("F&B")) {
-                    System.out.println("It's an F&B tenant!");
-                    set5 = new LineDataSet(foodHygiene, "Food Hygiene");
+                    set5 = new LineDataSet(foodHygiene, "Food Hygiene ");
                     set5.setColor(Color.BLUE);
                     set5.setCircleColor(Color.BLUE);
 
@@ -194,7 +177,7 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
                 mChart.getAxisLeft().setDrawGridLines(false);
                 mChart.getXAxis().setGranularityEnabled(true);
                 mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
-                mChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(timeline));
+                mChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(reportIds));
                 mChart.getXAxis().setDrawGridLines(false);
                 mChart.setData(data);
 
@@ -208,16 +191,14 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
 
     }
 
-    private void clearArray(List<Report> responseBody) {
-        timeline.clear();
+    private void clearArray() {
+        reportIds.clear();
         scores.clear();
         foodHygiene.clear();
         healthierChoice.clear();
         houseKeeping.clear();
         staffHygiene.clear();
         safety.clear();
-
-        System.out.println("Response body size: " + responseBody.size() );
     }
 
     private void createArray(List<Report> responseBody) {
@@ -239,7 +220,7 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     }
 
     private void aggregateData(Report r) {
-        timeline.add("Report " + r.getId());
+        reportIds.add("Report " + r.getId());
 
         if (userType.equals("F&B")) {
             foodHygiene.add(new Entry (count, r.getFoodhygiene_score()));
@@ -263,14 +244,27 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
 
     }
 
-    private void getUserType() throws IOException {
+    private void getUserType(List<Report> responseBody) {
         getUserCall = apiCaller.getSingleUserById("Token " + token, tenantId);
-        List<User> user = getUserCall.execute().body();
-        userType = user.get(0).getType();
-        plotChart();
+        getUserCall.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                System.out.println("Response code: " + response.code());
+                userType = response.body().get(0).getType();
+
+                clearArray();
+                createArray(responseBody);
+                loopData(responseBody);
+                plotChart();
+            }
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                System.out.println("FAILEEEED");
+            }
+        });
     }
 
-    private void exportData() throws IOException {
+    private void exportData() {
         try {
             saveData();
             exportFile();
@@ -280,19 +274,15 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     }
 
     private void generateScores() {
-        System.out.println(mScores);
         if (userType.equals("F&B")) {
-            data.append("Total Scores,Food Hygiene,Healthier Choice,Housekeeping & General Cleanliness,Professionalism & Staff Hygiene,Workplace Safety & Health");
-            for(int i = 0; i< mScores.length; i++){
-                System.out.println(mScores[i]);
-                data.append("\n"+mScores[i]+","+mFoodHygiene[i]+","+mHealthierChoice[i]+","+mHouseKeeping[i]+","+mStaffHygiene[i]+","+mSafety[i]);
+            data.append("Report,Total Scores,Food Hygiene,Healthier Choice,Housekeeping & General Cleanliness,Professionalism & Staff Hygiene,Workplace Safety & Health");
+            for (int i = 0; i<mScores.length; i++){
+                data.append("\n"+reportIds.get(i)+","+mScores[i]+","+mFoodHygiene[i]+","+mHealthierChoice[i]+","+mHouseKeeping[i]+","+mStaffHygiene[i]+","+mSafety[i]);
             }
         } else {
-            data.append("Total Scores,Housekeeping & General Cleanliness,Professionalism & Staff Hygiene,Workplace Safety & Health");
+            data.append("Report,Total Scores,Housekeeping & General Cleanliness,Professionalism & Staff Hygiene,Workplace Safety & Health");
             for (int i = 0; i< mScores.length; i++){
-                System.out.println(mScores[i]);
-
-                data.append("\n"+mScores[i]+","+mHouseKeeping[i]+","+mStaffHygiene[i]+","+mSafety[i]);
+                data.append("\n"+reportIds.get(i)+","+mScores[i]+","+mHouseKeeping[i]+","+mStaffHygiene[i]+","+mSafety[i]);
             }
         }
     }
@@ -309,7 +299,7 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
         Uri path = FileProvider.getUriForFile(context, "com.example.android.fileprovider", filelocation);
         Intent fileIntent = new Intent(Intent.ACTION_SEND);
         fileIntent.setType("text/csv");
-        fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Audit Scores");
+        fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Tenant" + tenantId + "_AuditScores");
         fileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         fileIntent.putExtra(Intent.EXTRA_STREAM, path);
         startActivity(Intent.createChooser(fileIntent, "Send mail"));

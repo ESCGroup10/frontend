@@ -50,7 +50,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
     ArrayList<Entry> resolveCount = new ArrayList<>();
 
     String[] reportCases, resolvedCases;
-
+    String tenantId;
     StringBuilder data;
 
     public static ReportStatsFragment getInstance() {
@@ -83,6 +83,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
     @Override
     public void onTenantIdUpdate(String tenantId, String token, DatabaseApiCaller apiCaller) {
+        this.tenantId = tenantId;
         Call<List<ReportedCases>> getReportedCases = apiCaller.getReportedCase("Token " + token, Integer.parseInt(tenantId));
         Call<List<ResolvedCases>> getResolvedCases = apiCaller.getResolvedCase("Token " + token, Integer.parseInt(tenantId));
 
@@ -154,7 +155,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
             if (!reportCount.isEmpty()) {
             LineDataSet set1, set2;
-            set1 = new LineDataSet(reportCount, "No. of Reported Cases");
+            set1 = new LineDataSet(reportCount, "No. of Reported Cases ");
             set1.setColor(Color.RED);
             set1.setCircleColor(Color.RED);
 
@@ -203,9 +204,9 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
     private void generateData() {
         data = new StringBuilder();
-        data.append("ReportedCases,ResolvedCases");
+        data.append("Date,ReportedCases,ResolvedCases");
         for (int i = 0; i < reportCases.length; i++) {
-            data.append("\n" + reportCases[i] + "," + resolvedCases[i]);
+            data.append("\n" + timeline.get(i) + ","+ reportCases[i] + "," + resolvedCases[i]);
         }
     }
 
@@ -221,7 +222,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
         Uri path = FileProvider.getUriForFile(context, "com.example.android.fileprovider", filelocation);
         Intent fileIntent = new Intent(Intent.ACTION_SEND);
         fileIntent.setType("text/csv");
-        fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Reported & Resolved Cases");
+        fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Tenant" + tenantId + "_NonComplianceFreq");
         fileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         fileIntent.putExtra(Intent.EXTRA_STREAM, path);
         startActivity(Intent.createChooser(fileIntent, "Send mail"));
