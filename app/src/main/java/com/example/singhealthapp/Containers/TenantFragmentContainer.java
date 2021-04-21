@@ -9,9 +9,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -19,6 +22,9 @@ import android.view.MenuItem;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.Ping;
+import com.example.singhealthapp.HelperClasses.ProcessMainClass;
+import com.example.singhealthapp.HelperClasses.RestartServiceBroadcastReceiver;
+import com.example.singhealthapp.HelperClasses.SendInfoToPMC;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.TestFragment;
 import com.example.singhealthapp.Views.Tenant.LatestReportFragment;
@@ -27,12 +33,16 @@ import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
 import com.google.android.material.navigation.NavigationView;
 
-public class TenantFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Ping {
+public class TenantFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Ping,
+        SendInfoToPMC {
 
     private static final String TAG = "TenantFragmentContainer";
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    public static int tenantID = -2;
+    public static String token = null;
+    private static Intent serviceIntent = null;
 
     DrawerLayout drawer;
 
@@ -40,6 +50,8 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.a_fragmentcontainer_tenant);
+        loadFromSharedPref();
+        startBackgroundNotificationProcess();
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -53,7 +65,30 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LatestReportFragment()).commit();
+            LatestReportFragment latestReportFragment = new LatestReportFragment();
+            String tag = latestReportFragment.getClass().getName();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, tag)
+                    .addToBackStack(tag)
+                    .commit();
+        }
+    }
+
+    public void handleIntentFromNotification() {
+        if (getIntent().getExtras() != null) {
+            boolean fromNotification = getIntent().getBooleanExtra("FROM_NOTIFICATION", false);
+            System.out.println("got fromNotification: "+fromNotification);
+
+            if (fromNotification) {
+                EspressoCountingIdlingResource.increment();
+                System.out.println("going to my reports");
+                MyReportsFragment myReportsFragment = new MyReportsFragment();
+                String tag = myReportsFragment.getClass().getName();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, myReportsFragment, tag)
+                        .addToBackStack(tag)
+                        .commit();
+            }
+        } else {
+            System.out.println("no extras were found");
         }
     }
 
@@ -77,6 +112,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Do you want to log out? ");
                 builder.setPositiveButton("OK", (dialog, id) -> {
+                    stopBackgroundNotificationProcess();
                     dialog.dismiss();
                     clearData(); // clear user type (to avoid auto login) and token (for safety)
                     Intent intent = new Intent(TenantFragmentContainer.this, LoginActivity.class);
@@ -93,32 +129,64 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         EspressoCountingIdlingResource.increment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        String currentTag;
+        String newTag;
+        if (fragmentManager.getBackStackEntryCount() == 0) {
+            currentTag = "";
+        } else {
+            currentTag = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1).getName();
+        }
         switch (item.getItemId()) {
             case R.id.nav_MyReport:
                 MyReportsFragment myReportsFragment = new MyReportsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, myReportsFragment, myReportsFragment.getClass().getName())
-                        .addToBackStack(null)
+                newTag = myReportsFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
+                    break;
+                }
+                fragmentManager.beginTransaction().replace(R.id.fragment_container, myReportsFragment, newTag)
+                        .addToBackStack(newTag)
                         .commit();
                 break;
 
             case R.id.nav_Tenant_Statistics:
                 StatisticsFragment statisticsFragment = new StatisticsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, statisticsFragment, statisticsFragment.getClass().getName())
-                        .addToBackStack(null)
+                newTag = statisticsFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
+                    break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, statisticsFragment, newTag)
+                        .addToBackStack(newTag)
                         .commit();
                 break;
 
             case R.id.nav_LatestReport:
                 LatestReportFragment latestReportFragment = new LatestReportFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, latestReportFragment.getClass().getName())
-                        .addToBackStack(null)
+                newTag = latestReportFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
+                    break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, newTag)
+                        .addToBackStack(newTag)
                         .commit();
                 break;
 
             case R.id.nav_Test:
                 TestFragment testFragment = new TestFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, testFragment, testFragment.getClass().getName())
-                        .addToBackStack(null)
+                newTag = testFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
+                    break;
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, testFragment, newTag)
+                        .addToBackStack(newTag)
                         .commit();
                 break;
         }
@@ -136,9 +204,76 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         editor.apply();
     }
 
+    private void stopBackgroundNotificationProcess() {
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putBoolean("STOP_NOTIFICATIONS", true);
+        editor.apply();
+        ProcessMainClass.stopBackgroundService((Context)this);
+    }
+
+    private void startBackgroundNotificationProcess() {
+        sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putBoolean("STOP_NOTIFICATIONS", false);
+        editor.apply();
+        ProcessMainClass.stopBackgroundService((Context)this);
+    }
+
+    private void loadFromSharedPref() {
+        SharedPreferences sharedPreferences = this.getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        tenantID = sharedPreferences.getInt("USER_ID_KEY", -1);
+        token = sharedPreferences.getString("TOKEN_KEY", null);
+    }
+
+//    private boolean isMyServiceRunning(Class<?> serviceClass) {
+//        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+//        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//            if (serviceClass.getName().equals(service.service.getClassName())) {
+//                Log.i ("=== isMyServiceRunning?", true+"");
+//                return true;
+//            }
+//        }
+//        Log.i ("=== isMyServiceRunning?", false+"");
+//        return false;
+//    }
+
+//    public void constantlyCheckService() {
+//        TimerTask timerTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                isMyServiceRunning(NotificationFromBackground.class);
+//            }
+//        };
+//        Timer timer = new Timer();
+//        timer.scheduleAtFixedRate(timerTask, 0, 5000);
+//    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            RestartServiceBroadcastReceiver.scheduleJob(getApplicationContext());
+        } else {
+            ProcessMainClass bck = new ProcessMainClass();
+            bck.launchService(getApplicationContext());
+        }
+        handleIntentFromNotification();
+    }
+
     @Override
     @VisibleForTesting
     public void activateEspressoIdlingResource() {
         EspressoCountingIdlingResource.activate();
+    }
+
+    @Override
+    public String sendToken() {
+        return token;
+    }
+
+    @Override
+    public int sendID() {
+        return tenantID;
     }
 }

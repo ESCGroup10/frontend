@@ -1,7 +1,6 @@
 package com.example.singhealthapp.Containers;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -86,6 +85,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                     tenantsPreviewFragment.getClass().getName()).commit();
         }
         EspressoCountingIdlingResource.decrement();
+
     }
 
     @Override
@@ -187,7 +187,11 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     }
 
     public boolean takePhoto(ChecklistAdapter checklistAdapter, int adapterPosition, String question) {
-        this.getCurrentFocus().clearFocus();
+        try {
+            this.getCurrentFocus().clearFocus();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // start picker to get image for cropping and then use the image in cropping activity
         try {
             mChecklistAdapter = checklistAdapter;

@@ -129,6 +129,25 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/darker_red"
+                    android:text="Failed:"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/questionTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:layout_marginHorizontal="45dp"/>
+
                 <ImageView
                     android:id="@+id/unresolvedImageView"
                     android:layout_width="wrap_content"

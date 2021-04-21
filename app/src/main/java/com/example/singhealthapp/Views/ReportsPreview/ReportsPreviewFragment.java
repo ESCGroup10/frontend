@@ -47,7 +47,6 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        EspressoCountingIdlingResource.increment();
         getActivity().setTitle("Reports");
         View view = inflater.inflate(R.layout.f_reports_all, container, false);
         view.findViewById(R.id.reportPreviewSearchButton).setOnClickListener(v -> {

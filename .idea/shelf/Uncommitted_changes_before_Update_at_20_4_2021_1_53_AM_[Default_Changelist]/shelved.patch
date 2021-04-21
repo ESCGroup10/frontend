@@ -1,0 +1,10 @@
+Index: .idea/.name
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/.name	(date 1618767387989)
++++ .idea/.name	(date 1618767387989)
+@@ -0,0 +1,1 @@
++SinghealthApp
+\ No newline at end of file
