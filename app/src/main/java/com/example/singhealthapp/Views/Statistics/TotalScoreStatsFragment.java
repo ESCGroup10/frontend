@@ -21,9 +21,11 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.io.File;
@@ -41,6 +43,8 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
 
     LineChart mChart;
     Button mExportButton;
+
+    ArrayList<String> timeline = new ArrayList<>();
     ArrayList<Entry> scores = new ArrayList<>();
     ArrayList<Entry> foodHygiene = new ArrayList<>();
     ArrayList<Entry> healthierChoice = new ArrayList<>();
@@ -160,8 +164,10 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
 
                 mChart.getDescription().setEnabled(false);
                 mChart.getAxisLeft().setDrawGridLines(false);
+                mChart.getXAxis().setGranularityEnabled(true);
+                mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+                mChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(timeline));
                 mChart.getXAxis().setDrawGridLines(false);
-                mChart.getXAxis().setDrawLabels(false);
                 mChart.setData(data);
                 mChart.notifyDataSetChanged();
                 mChart.invalidate();
@@ -175,6 +181,7 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
 
     private void clearArray(List<Report> responseBody){
 
+        timeline.clear();
         scores.clear();
         foodHygiene.clear();
         healthierChoice.clear();
@@ -204,6 +211,8 @@ public class TotalScoreStatsFragment extends Fragment implements StatisticsFragm
     }
 
     private void aggregateData(Report r) {
+        timeline.add("Report " + r.getId());
+
         scores.add(new Entry(count, (r.getFoodhygiene_score()+r.getHealthierchoice_score()+r.getHousekeeping_score()+r.getStaffhygiene_score()+r.getSafety_score())/5));
         foodHygiene.add(new Entry (count, r.getFoodhygiene_score()));
         healthierChoice.add(new Entry (count, r.getHealthierchoice_score()));

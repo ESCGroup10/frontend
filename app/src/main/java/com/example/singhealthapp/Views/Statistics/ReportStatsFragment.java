@@ -21,9 +21,11 @@ import com.example.singhealthapp.Models.ReportedCases;
 import com.example.singhealthapp.Models.ResolvedCases;
 import com.example.singhealthapp.R;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.io.File;
@@ -40,6 +42,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
     LineChart mChart;
     Button mExportButton;
+    ArrayList<String> timeline = new ArrayList<>();
     ArrayList<Entry> reportCount = new ArrayList<>();
     ArrayList<Entry> resolveCount = new ArrayList<>();
 
@@ -136,12 +139,17 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
         for (int i = 0; i < responseBody.size(); i++) {
             resolveCount.add(new Entry(i, responseBody.get(i).getCount()));
             resolvedCases[i] = String.valueOf(responseBody.get(i).getCount());
+            timeline.add(responseBody.get(i).getMonth().substring(0,10));
+            System.out.println("TESTING");
         }
+        System.out.println("timeline " + timeline.toString());
+
     }
 
     private void resetArray(List<ReportedCases> responseBody) {
         reportCount.clear();
         resolveCount.clear();
+        timeline.clear();
         reportCases = new String[responseBody.size()];
         resolvedCases = new String[responseBody.size()];
     }
@@ -164,13 +172,20 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
                 LineData data = new LineData(dataSets);
 
+
+                System.out.println("timeline " + timeline.toString());
+
                 mChart.getDescription().setEnabled(false);
                 mChart.getAxisLeft().setDrawGridLines(false);
+                mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+                mChart.getXAxis().setGranularityEnabled(true);
+                mChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(timeline));
                 mChart.getXAxis().setDrawGridLines(false);
-                mChart.getXAxis().setDrawLabels(false);
                 mChart.setData(data);
                 mChart.notifyDataSetChanged();
                 mChart.invalidate();
+
+
 
                 mExportButton.setEnabled(true);
             } else {

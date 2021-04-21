@@ -196,8 +196,8 @@ public class StatisticsFragment extends CustomFragment {
 
         final StatsViewPagerAdapter statsViewPagerAdapter = new StatsViewPagerAdapter(getChildFragmentManager());
 
-        statsViewPagerAdapter.addFragment(ReportStatsFragment.getInstance(), "REPORT");
-        statsViewPagerAdapter.addFragment(TotalScoreStatsFragment.getInstance(), "TOTAL");
+        statsViewPagerAdapter.addFragment(ReportStatsFragment.getInstance(), "Non-compliance Frequencies");
+        statsViewPagerAdapter.addFragment(TotalScoreStatsFragment.getInstance(), "Audit Scores");
 
         viewPager.setAdapter(statsViewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
