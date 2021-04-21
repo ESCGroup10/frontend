@@ -235,8 +235,10 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
     @Override
     public void navigateFromRecyclerView(Report report, String token) {
         ReportSummaryFragment reportSummaryFragment = new ReportSummaryFragment(report, token);
-        getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, reportSummaryFragment, reportSummaryFragment.getClass().getName())
-                .addToBackStack(null).commit();
+        String tag = reportSummaryFragment.getClass().getName();
+        getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, reportSummaryFragment, tag)
+                .addToBackStack(tag)
+                .commit();
     }
 
     boolean isDataValid(Report r){

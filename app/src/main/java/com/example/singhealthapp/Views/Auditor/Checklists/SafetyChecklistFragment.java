@@ -82,9 +82,10 @@ public class SafetyChecklistFragment extends CustomFragment {
             auditChecklistFragment.setArguments(bundle1);
 
             EspressoCountingIdlingResource.increment(12); //12 = number of recyclerViews created + 1 report created
+            String tag = auditChecklistFragment.getClass().getName();
             SafetyChecklistFragment.this.getParentFragmentManager().beginTransaction()
-                    .replace(R.id.auditor_fragment_container, auditChecklistFragment, auditChecklistFragment.getClass().getName())
-                    .addToBackStack(null)
+                    .replace(R.id.auditor_fragment_container, auditChecklistFragment, tag)
+                    .addToBackStack(tag)
                     .commit();
         });
 

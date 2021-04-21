@@ -363,10 +363,11 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
         bundle.putString("BUTTON_TXT_KEY", buttonText);
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
+        String tag = statusConfirmationFragment.getClass().getName();
         CaseExpanded.this.getParentFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, statusConfirmationFragment, statusConfirmationFragment.getClass().getName())
-                .addToBackStack(null)
+                .replace(R.id.fragment_container, statusConfirmationFragment, tag)
+                .addToBackStack(tag)
                 .commit();
     }
 
@@ -381,10 +382,11 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
         bundle.putString("BUTTON_TXT_KEY", buttonText);
         StatusConfirmationFragment statusConfirmationFragment = new StatusConfirmationFragment();
         statusConfirmationFragment.setArguments(bundle);
+        String tag = statusConfirmationFragment.getClass().getName();
         CaseExpanded.this.getParentFragmentManager()
                 .beginTransaction()
-                .replace(R.id.auditor_fragment_container, statusConfirmationFragment)
-                .addToBackStack(null)
+                .replace(R.id.auditor_fragment_container, statusConfirmationFragment, tag)
+                .addToBackStack(tag)
                 .commit();
     }
 

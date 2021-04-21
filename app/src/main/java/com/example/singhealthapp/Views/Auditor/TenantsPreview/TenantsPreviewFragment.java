@@ -133,10 +133,11 @@ public class TenantsPreviewFragment extends CustomFragment implements TenantsPre
     public void navigate(int position) {
         EspressoCountingIdlingResource.increment();
         TenantExpandedFragment tenantExpandedFragment = new TenantExpandedFragment(tenants.get(position));
+        String tag = tenantExpandedFragment.getClass().getName();
         TenantsPreviewFragment.this.getParentFragmentManager()
                 .beginTransaction()
-                .replace(R.id.auditor_fragment_container, tenantExpandedFragment, tenantExpandedFragment.getClass().getName())
-                .addToBackStack(null)
+                .replace(R.id.auditor_fragment_container, tenantExpandedFragment, tag)
+                .addToBackStack(tag)
                 .commit();
     }
 

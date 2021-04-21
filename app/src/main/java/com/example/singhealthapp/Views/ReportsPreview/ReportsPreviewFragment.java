@@ -224,9 +224,9 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
     @Override
     public void navigateFromRecyclerView(Report report, String token) {
         ReportSummaryFragment reportSummaryFragment = new ReportSummaryFragment(report, token);
-        getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, reportSummaryFragment,
-                reportSummaryFragment.getClass().getName())
-                .addToBackStack(null)
+        String tag = reportSummaryFragment.getClass().getName();
+        getParentFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, reportSummaryFragment, tag)
+                .addToBackStack(tag)
                 .commit();
     }
 

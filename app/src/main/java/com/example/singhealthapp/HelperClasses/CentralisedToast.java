@@ -12,8 +12,12 @@ public class CentralisedToast {
 
     public static void makeText(Context context, String text, int duration) {
         Toast toast = Toast.makeText(context, text, duration);
-        TextView toastView = (TextView) toast.getView().findViewById(android.R.id.message);
-        if( toastView != null) toastView.setGravity(Gravity.CENTER);
+        try {
+            TextView toastView = toast.getView().findViewById(android.R.id.message);
+            if (toastView != null) toastView.setGravity(Gravity.CENTER);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         toast.show();
     }
 }

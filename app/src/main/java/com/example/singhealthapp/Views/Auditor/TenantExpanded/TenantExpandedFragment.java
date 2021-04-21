@@ -82,9 +82,10 @@ public class TenantExpandedFragment extends CustomFragment {
             safetyChecklistFragment.setArguments(bundle);
 
             EspressoCountingIdlingResource.increment();
+            String tag = safetyChecklistFragment.getClass().getName();
             TenantExpandedFragment.this.getParentFragmentManager().beginTransaction()
-                    .replace(R.id.auditor_fragment_container, safetyChecklistFragment, safetyChecklistFragment.getClass().getName())
-                    .addToBackStack(null)
+                    .replace(R.id.auditor_fragment_container, safetyChecklistFragment, tag)
+                    .addToBackStack(tag)
                     .commit();
         });
 

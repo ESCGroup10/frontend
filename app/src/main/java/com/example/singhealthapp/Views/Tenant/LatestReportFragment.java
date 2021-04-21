@@ -186,7 +186,8 @@ public class LatestReportFragment extends CustomFragment {
                                         button.setEnabled(true);
                                         button.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
                                                 .replace(R.id.fragment_container, casesPreviewFragment, casesPreviewFragment.getClass().getName())
-                                                .addToBackStack(null).commit());
+                                                .addToBackStack(casesPreviewFragment.getClass().getName())
+                                                .commit());
                                     }
                                 }
                                 @Override

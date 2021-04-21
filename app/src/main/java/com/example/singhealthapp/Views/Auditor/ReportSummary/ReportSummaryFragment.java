@@ -203,7 +203,8 @@ public class ReportSummaryFragment extends CustomFragment {
                                 button.setEnabled(true);
                                 button.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
                                         .replace((userType.equals("Auditor") ? R.id.auditor_fragment_container : R.id.fragment_container), casesPreviewFragment, casesPreviewFragment.getClass().getName())
-                                        .addToBackStack(null).commit());
+                                        .addToBackStack(casesPreviewFragment.getClass().getName())
+                                        .commit());
                             }
                         }
                         @Override

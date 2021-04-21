@@ -120,10 +120,11 @@ public class CasesPreviewFragment extends CustomFragment implements CasePreviewN
 
         System.out.println("userType: "+userType);
         System.out.println((userType.equals("Auditor")?R.id.auditor_fragment_container:R.id.fragment_container));
+        String tag = caseExpanded.getClass().getName();
         getParentFragmentManager().beginTransaction()
-                .replace((userType.equals("Auditor")?R.id.auditor_fragment_container:R.id.fragment_container), caseExpanded,
-                        caseExpanded.getClass().getName())
-                .addToBackStack(null).commit();
+                .replace((userType.equals("Auditor")?R.id.auditor_fragment_container:R.id.fragment_container), caseExpanded, tag)
+                .addToBackStack(tag)
+                .commit();
     }
 
     private synchronized void loadUserType() {

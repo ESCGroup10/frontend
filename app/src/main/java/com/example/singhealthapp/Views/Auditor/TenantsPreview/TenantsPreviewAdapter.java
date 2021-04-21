@@ -51,9 +51,6 @@ public class TenantsPreviewAdapter extends RecyclerView.Adapter<TenantsPreviewHo
                 underlyingFragment.navigate(position);
             }
         });
-//        holder.view.setOnClickListener(v -> parent.getSupportFragmentManager().beginTransaction()
-//                .replace(parent.getSupportFragmentManager().findFragmentByTag("getTenant").getId()
-//                        , new TenantExpandedFragment(tenants.get(position)), "viewTenant").commit());
     }
 
     @Override

@@ -24,17 +24,6 @@ public class TenantsPreviewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         view = itemView;
         cardView = view.findViewById(R.id.cardView);
-//        cardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG, "view onClick: called");
-//                parent.getSupportFragmentManager().beginTransaction()
-//                        .replace(parent.getSupportFragmentManager().findFragmentByTag("getTenant").getId()
-//                                , new TenantExpandedFragment(tenants.get(getAdapterPosition())), "viewTenant").commit();
-//            }
-//        });
-
-
         tenantType = view.findViewById(R.id.tenantCardType);
         tenantCompany = view.findViewById(R.id.tenantCardCompany);
         tenantInstitution = view.findViewById(R.id.tenantCardInstitution);

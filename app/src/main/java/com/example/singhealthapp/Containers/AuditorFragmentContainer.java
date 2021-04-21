@@ -3,6 +3,7 @@ package com.example.singhealthapp.Containers;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
@@ -61,6 +63,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         EspressoCountingIdlingResource.increment();
 
         getWindow().setSoftInputMode(
@@ -81,8 +84,10 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
 
         if (savedInstanceState == null) {
             TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment,
-                    tenantsPreviewFragment.getClass().getName()).commit();
+            String tag = tenantsPreviewFragment.getClass().getName();
+            getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment, tag)
+                    .addToBackStack(tag)
+                    .commit();
         }
         EspressoCountingIdlingResource.decrement();
 
@@ -127,49 +132,79 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         EspressoCountingIdlingResource.increment();
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.auditor_fragment_container);
-        if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
-            switch (item.getItemId()) {
-                case R.id.nav_Auditor_Statistics:
-                    StatisticsFragment statisticsFragment = new StatisticsFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, statisticsFragment,
-                            statisticsFragment.getClass().getName())
-                            .addToBackStack(null)
-                            .commit();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        String currentTag;
+        String newTag;
+        if (fragmentManager.getBackStackEntryCount() == 0) {
+            currentTag = "";
+        } else {
+            currentTag = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1).getName();
+        }
+        switch (item.getItemId()) {
+            case R.id.nav_Auditor_Statistics:
+                StatisticsFragment statisticsFragment = new StatisticsFragment();
+                newTag = statisticsFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
                     break;
+                }
+                fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, statisticsFragment, newTag)
+                        .addToBackStack(newTag)
+                        .commit();
+                break;
 
-                case R.id.nav_Tenants:
-                    TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment,
-                            tenantsPreviewFragment.getClass().getName())
-                            .addToBackStack(null)
-                            .commit();
+            case R.id.nav_Tenants:
+                TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
+                newTag = tenantsPreviewFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
                     break;
+                }
+                fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment, newTag)
+                        .addToBackStack(newTag)
+                        .commit();
+                break;
 
-                case R.id.nav_Reports:
-                    ReportsPreviewFragment reportsPreviewFragment = new ReportsPreviewFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, reportsPreviewFragment,
-                            reportsPreviewFragment.getClass().getName())
-                            .addToBackStack(null)
-                            .commit();
+            case R.id.nav_Reports:
+                ReportsPreviewFragment reportsPreviewFragment = new ReportsPreviewFragment();
+                newTag = reportsPreviewFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
                     break;
+                }
+                fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, reportsPreviewFragment, newTag)
+                        .addToBackStack(newTag)
+                        .commit();
+                break;
 
-                case R.id.nav_Add_Tenant:
-                    AddTenantFragment addTenantFragment = new AddTenantFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, addTenantFragment,
-                            addTenantFragment.getClass().getName())
-                            .addToBackStack(null)
-                            .commit();
+            case R.id.nav_Add_Tenant:
+                AddTenantFragment addTenantFragment = new AddTenantFragment();
+                newTag = addTenantFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
                     break;
+                }
+                fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, addTenantFragment, newTag)
+                        .addToBackStack(newTag)
+                        .commit();
+                break;
 
-                case R.id.nav_Test:
-                    TestFragment testFragment = new TestFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, testFragment,
-                            testFragment.getClass().getName())
-                            .addToBackStack(null)
-                            .commit();
+            case R.id.nav_Test:
+                TestFragment testFragment = new TestFragment();
+                newTag = testFragment.getClass().getName();
+                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
+                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
+                if (currentTag.equals(newTag)) {
                     break;
-            }
+                }
+                fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, testFragment, newTag)
+                        .addToBackStack(newTag)
+                        .commit();
+                break;
         }
         auditor_drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -178,11 +213,8 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     private void clearData() {
         sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        String TOKEN_KEY = "TOKEN_KEY";
-        editor.putString(TOKEN_KEY, "");
-        //keys
-        String USER_TYPE_KEY = "USER_TYPE_KEY";
-        editor.putString(USER_TYPE_KEY, "");
+        editor.putString("TOKEN_KEY", "");
+        editor.putString("USER_TYPE_KEY", "");
         editor.apply();
     }
 

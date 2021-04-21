@@ -48,6 +48,10 @@ public class ProcessMainClass {
         if (context == null) {
             return;
         }
+        // if tenant has not logged in for the first time
+        if (tenantID == -2 || token == null) {
+            return;
+        }
         setServiceIntent(context);
         // depending on the version of Android we either launch the simple service (version<O)
         // or we start a foreground service

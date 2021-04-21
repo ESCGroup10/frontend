@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,13 +43,13 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     SharedPreferences.Editor editor;
     public static int tenantID = -2;
     public static String token = null;
-    private static Intent serviceIntent = null;
 
     DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.a_fragmentcontainer_tenant);
         loadFromSharedPref();
         startBackgroundNotificationProcess();
@@ -104,6 +105,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: called");
+        EspressoCountingIdlingResource.increment();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (!(fragment instanceof IOnBackPressed) || !((IOnBackPressed) fragment).onBackPressed()) {
             if (drawer.isDrawerOpen(GravityCompat.START)) {
