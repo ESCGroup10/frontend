@@ -27,7 +27,6 @@ import com.example.singhealthapp.HelperClasses.ProcessMainClass;
 import com.example.singhealthapp.HelperClasses.RestartServiceBroadcastReceiver;
 import com.example.singhealthapp.HelperClasses.SendInfoToPMC;
 import com.example.singhealthapp.Views.Login.LoginActivity;
-import com.example.singhealthapp.Views.TestFragment;
 import com.example.singhealthapp.Views.Tenant.LatestReportFragment;
 import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
 import com.example.singhealthapp.R;
@@ -180,20 +179,6 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 }
                 EspressoCountingIdlingResource.decrement();
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, newTag)
-                        .addToBackStack(newTag)
-                        .commit();
-                break;
-
-            case R.id.nav_Test:
-                TestFragment testFragment = new TestFragment();
-                newTag = testFragment.getClass().getName();
-                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
-                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
-                if (currentTag.equals(newTag)) {
-                    EspressoCountingIdlingResource.decrement();
-                    break;
-                }
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, testFragment, newTag)
                         .addToBackStack(newTag)
                         .commit();
                 break;

@@ -179,7 +179,7 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                 // this is just to let the auditor know, but otherwise the score is able to be calculated by assuming all non-set items are true
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                 builder.setTitle("Not all questions have been set!")
-                        .setMessage("Number of questions not set: ")
+//                        .setMessage("Number of questions not set: ")
                         .setCancelable(true)
                         .setPositiveButton("Set questions", (dialog, which) -> {
                             focusOnQuestion(unsetItemQuestion, R.color.orange_highlight);
@@ -546,22 +546,27 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                 case "Professional & Staff Hygiene":
                     staffhygiene_score-=currentChecklistNumCases;
                     original_staffhygiene_score-=currentChecklistNumNA;
+                    staffhygiene_score-=currentChecklistNumNA;
                     break;
                 case "Housekeeping & General Cleanliness":
                     housekeeping_score-=currentChecklistNumCases;
                     original_housekeeping_score-=currentChecklistNumNA;
+                    housekeeping_score-=currentChecklistNumNA;
                     break;
                 case "Healthier Choice":
                     foodhygiene_score-=currentChecklistNumCases;
                     original_healthierchoice_score-=currentChecklistNumNA;
+                    foodhygiene_score-=currentChecklistNumNA;
                     break;
                 case "Food Hygiene":
                     healthierchoice_score-=currentChecklistNumCases;
                     original_foodhygiene_score-=currentChecklistNumNA;
+                    healthierchoice_score-=currentChecklistNumNA;
                     break;
                 case "Workplace Safety & Health":
                     safety_score-=currentChecklistNumCases;
                     original_safety_score-=currentChecklistNumNA;
+                    safety_score-=currentChecklistNumNA;
                     break;
                 default:
                     throw new IllegalArgumentException();

@@ -65,6 +65,8 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 holder.cameraButton.setBackgroundResource(R.drawable.camera_photo_taken);
                 holder.colourStatusIndicator.setBackgroundColor(red);
                 checklist_items_array.get(position).setCase(true);
+                checklist_items_array.get(position).setPhotoTaken(true);
+                checklist_items_array.get(position).setStatusSet(true);
                 Log.d(TAG, "onBindViewHolder: setting qn: "+checklist_items_array.get(position).getStatement()+"\n"+
                         "to a case");
             }
@@ -117,6 +119,8 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
     @Override
     public void photoTaken(int position) {
         checklist_items_array.get(position).setPhotoTaken(true);
+        checklist_items_array.get(position).setStatusSet(true);
+        checklist_items_array.get(position).setCase(true);
         notifyItemChanged(position);
     }
 
@@ -188,6 +192,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
             textViewTrue.setOnClickListener(v -> {
                 cardView.setCardBackgroundColor(white);
                 if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == green) { // view has been clicked before
+                    checklist_items_array.get(getAdapterPosition()).setStatusSet(false);
                     colourStatusIndicator.setBackgroundColor(black);
                 } else { // view has not been clicked before
                     colourStatusIndicator.setBackgroundColor(green);
@@ -204,6 +209,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                     if (!checklist_items_array.get(getAdapterPosition()).isPhotoTaken()) {
                         colourStatusIndicator.setBackgroundColor(black);
                         checklist_items_array.get(getAdapterPosition()).setCase(false);
+                        checklist_items_array.get(getAdapterPosition()).setStatusSet(false);
                     }
                 } else { // view has not been clicked before
                     Log.d(TAG, "onClick: set false");
@@ -223,6 +229,7 @@ public class ChecklistAdapter extends RecyclerView.Adapter<ChecklistAdapter.View
                 if (((ColorDrawable)colourStatusIndicator.getBackground()).getColor() == grey) { // view has been clicked before
                     colourStatusIndicator.setBackgroundColor(black);
                     checklist_items_array.get(getAdapterPosition()).setNA(false);
+                    checklist_items_array.get(getAdapterPosition()).setStatusSet(false);
                 } else { // view has not been clicked before
                     colourStatusIndicator.setBackgroundColor(grey);
                     checklist_items_array.get(getAdapterPosition()).setCase(false);

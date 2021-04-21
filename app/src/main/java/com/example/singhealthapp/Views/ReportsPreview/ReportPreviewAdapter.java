@@ -63,10 +63,12 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
         holder.reportName.setText(list.get(position).getReportName());
         holder.reportDate.setText(("Created on: "));
         setHalfBoldTextViews(holder.reportDate, list.get(position).getReportDate());
-        if (!list.get(position).getResolution_date().equals("NOT RESOLVED")) {
-            holder.resolution.setText(("Resolved on: "+list.get(position).getResolution_date()));
+        if ((!list.get(position).getResolution_date().equals("NOT RESOLVED")) && (!list.get(position).getResolution_date().isEmpty())) {
+            holder.resolution.setText("Resolved on: ");
+            setHalfBoldTextViews(holder.resolution, list.get(position).getResolution_date());
+        } else {
+            holder.resolution.setText("");
         }
-        holder.resolution.setText(("No resolution record"));
         holder.id.setText("");
         System.out.println("tenant display id: "+report.getTenant_display_id());
         holder.view.setOnClickListener(v -> parent.navigateFromRecyclerView(report, token));

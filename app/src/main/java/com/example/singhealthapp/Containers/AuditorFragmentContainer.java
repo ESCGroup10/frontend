@@ -35,7 +35,6 @@ import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFrag
 import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
 import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
-import com.example.singhealthapp.Views.TestFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -198,20 +197,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                     break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, addTenantFragment, newTag)
-                        .addToBackStack(newTag)
-                        .commit();
-                break;
-
-            case R.id.nav_Test:
-                TestFragment testFragment = new TestFragment();
-                newTag = testFragment.getClass().getName();
-                Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
-                Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
-                if (currentTag.equals(newTag)) {
-                    EspressoCountingIdlingResource.decrement();
-                    break;
-                }
-                fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, testFragment, newTag)
                         .addToBackStack(newTag)
                         .commit();
                 break;
