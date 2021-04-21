@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.ReportedCases;
 import com.example.singhealthapp.Models.ResolvedCases;
@@ -36,7 +37,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ReportStatsFragment extends Fragment implements StatisticsFragment.TenantIdUpdateListener {
+public class ReportStatsFragment extends CustomFragment implements StatisticsFragment.TenantIdUpdateListener {
 
     LineChart mChart;
     Button mExportButton;
@@ -100,7 +101,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
             }
             @Override
             public void onFailure(Call<List<ReportedCases>> call, Throwable t) {
-                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
+                Toast.makeText(customRequireActivity(20), "" + t, Toast.LENGTH_SHORT).show();
             }
         });
         System.out.println("ReportStatsFragment UPDATED!" + tenantId);
@@ -126,7 +127,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
             }
             @Override
             public void onFailure(Call<List<ResolvedCases>> call, Throwable t) {
-                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
+                Toast.makeText(customRequireActivity(20), "" + t, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -147,7 +148,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
     }
 
     private void plotChart() {
-        getActivity().runOnUiThread(() -> {
+        customRequireActivity(20).runOnUiThread(() -> {
             if (!reportCount.isEmpty()) {
                 LineDataSet set1, set2;
                 set1 = new LineDataSet(reportCount, "No. of Reported Cases");
@@ -174,7 +175,7 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
                 mExportButton.setEnabled(true);
             } else {
-                Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(customRequireActivity(20), "No relevant data found.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -192,13 +193,13 @@ public class ReportStatsFragment extends Fragment implements StatisticsFragment.
 
         try {
             //saving the file into device
-            FileOutputStream out = getActivity().getApplicationContext().openFileOutput("datafile.csv", Context.MODE_PRIVATE);
+            FileOutputStream out = customRequireActivity(20).getApplicationContext().openFileOutput("datafile.csv", Context.MODE_PRIVATE);
             out.write((data.toString()).getBytes());
             out.close();
 
             //exporting
-            Context context = getActivity().getApplicationContext();
-            File filelocation = new File(getActivity().getApplicationContext().getFilesDir(), "datafile.csv");
+            Context context = customRequireActivity(20).getApplicationContext();
+            File filelocation = new File(customRequireActivity(20).getApplicationContext().getFilesDir(), "datafile.csv");
             Uri path = FileProvider.getUriForFile(context, "com.example.android.fileprovider", filelocation);
             Intent fileIntent = new Intent(Intent.ACTION_SEND);
             fileIntent.setType("text/csv");
