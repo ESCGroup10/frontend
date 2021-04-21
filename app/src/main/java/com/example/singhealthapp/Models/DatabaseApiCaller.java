@@ -53,6 +53,13 @@ public interface DatabaseApiCaller {
             @Query("email") String email
     );
 
+    // get a single user based on user id
+    @GET("/api/singleUser/")
+    Call<List<User>> getSingleUserById(
+            @Header("authorization") String token,
+            @Query("id") String id
+    );
+
 
     // post details of new user i.e. add a new tenant/auditor to the database
     @FormUrlEncoded
