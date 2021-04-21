@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -34,6 +35,7 @@ import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.TextAestheticsAndParsing;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
+import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
@@ -44,6 +46,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,6 +58,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.example.singhealthapp.HelperClasses.DateOperations.convertDatabaseDateToReadableDate;
+import static java.lang.Thread.yield;
 
 public class CaseExpanded extends CustomFragment implements IOnBackPressed {
     private static final String TAG = "CaseExpanded";
@@ -62,12 +66,14 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
     // UI stuff
     TextView companyTextView, institutionTextView, nonComplianceTypeTextView, resolvedStatusTextView, unresolvedImageDateTextView,
             unresolvedCommentsTextView, resolvedImageDateTextView, resolvedCommentsTextView, unresolvedImageViewPlaceholder,
-            resolvedImageViewPlaceholder, rejectedCommentsTextView, resolvingRejectedImageViewPlaceholder, questionTextView;
+            resolvedImageViewPlaceholder, rejectedCommentsTextView, resolvingRejectedImageViewPlaceholder, questionTextView,
+            questionHeader;
     ImageView unresolvedImageView, resolvedImageView, cameraButton, uploadButton, resolvingRejectedImageView;
     Button resolveButton, confirmButton, rejectButton, acceptButton, resolvingRejectedButton;
     LinearLayout resolvingCaseSection, auditorButtonsLinearLayout;
     EditText resolvedCommentsEditText, rejectedCommentsEditText;
     CardView resolvedCardView, resolvingRejectedImageCardView;
+    private final int green = Color.parseColor("#FF03AC13");
 
     private Bundle bundle;
 
@@ -79,6 +85,8 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
     private int reportID, caseID, reportNumber;
     private Integer caseNumber;
     private boolean RESOLVED;
+    private Report thisReport;
+    private final Object lock = new Object();
 
     // Camera stuff
     Uri mImageURI;
@@ -89,6 +97,8 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
     // flags
     private boolean PENDING;
     private boolean REJECTED = false;
+    private boolean REPORT_RESOLVED = false;
+    private AtomicBoolean REPORT_STATUS_UPDATED = new AtomicBoolean(false);
 
     @Nullable
     @Override
@@ -150,6 +160,7 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
         unresolvedImageViewPlaceholder = view.findViewById(R.id.unresolvedImageViewPlaceholder);
         resolvedImageViewPlaceholder = view.findViewById(R.id.resolvedImageViewPlaceholder);
         questionTextView = view.findViewById(R.id.questionTextView);
+        questionHeader = view.findViewById(R.id.questionHeader);
 
         // for auditor
         acceptButton = view.findViewById(R.id.acceptButton);
@@ -288,22 +299,75 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
             CustomViewSettings.makeScrollable(rejectedCommentsEditText);
 
             acceptButton.setOnClickListener(v -> {
-                // TODO: update case to be resolved
                 createUpdatedCase(true);
-                Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
-
-                patchCall.enqueue(new Callback<Void>() {
+                // if there are no more unresolved after this acceptance, set report status to true!
+                Call<List<Case>> call = apiCaller.getCasesById("Token " + token, reportID, 0);
+                call.enqueue(new Callback<List<Case>>() {
                     @Override
-                    public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                        Log.d(TAG, "patchCall onResponse: code: " + response.code());
-                        AuditorSubmit("Case Resolution Accepted", "Thank you!", "", "Return to case previews");
+                    public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
+                        Log.d(TAG, "updateIsReportClosed: response code: " + response.code());
+                        Log.d(TAG, " updateIsReportClosed onResponse: number of cases in report: " + response.body().size());
+                        if (response.body().size() == 1) {
+                            // the only unresolved case is this one
+                            Log.d(TAG, "onResponse: the only unresolved case is this one, patching report...");
+                            Call<List<Report>> getReportCall = apiCaller.getReport("Token " + token);
+                            getReportCall.enqueue(new Callback<List<Report>>() {
+                                @Override
+                                public void onResponse(Call<List<Report>> call, Response<List<Report>> response) {
+                                    Log.d(TAG, "createdUpdatedReport onResponse: response code: "+response.code());
+                                    for (Report report : response.body()) {
+                                        if (report.getId() == reportID) {
+                                            thisReport = report;
+                                            break;
+                                        }
+                                    }
+                                    String datetime = DateOperations.getCurrentDatabaseDate();
+                                    thisReport.setResolution_date(datetime);
+                                    thisReport.setStatus(true);
+
+                                    Call<Void> patchReport = apiCaller.patchReport("Token " + token, reportID, thisReport);
+                                    patchReport.enqueue(new Callback<Void>() {
+                                        @Override
+                                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                                            Log.d(TAG, "patchReport onResponse: code: " + response.code());
+                                        }
+
+                                        @Override
+                                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                                            Log.d(TAG, "patchReport onFailure: " + t.toString());
+                                            Toast.makeText(getActivity(), "Failed to update report status", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(Call<List<Report>> call, Throwable t) {
+                                    t.printStackTrace();
+                                }
+                            });
+                        }
+                        // regardless of whether we update report, update case and submit
+                        Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
+
+                        patchCall.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                                Log.d(TAG, "patchCall onResponse: code: " + response.code());
+                                AuditorSubmit("Case Resolution Accepted", "Thank you!", "", "Return to case previews");
+                            }
+
+                            @Override
+                            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                                t.printStackTrace();
+                                CentralisedToast.makeText(getActivity(), "Failed to accept resolution, try again.",
+                                        CentralisedToast.LENGTH_SHORT);
+                            }
+                        });
                     }
 
                     @Override
-                    public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                    public void onFailure(Call<List<Case>> call, Throwable t) {
                         t.printStackTrace();
-                        CentralisedToast.makeText(getActivity(), "Failed to accept resolution, try again.",
-                                CentralisedToast.LENGTH_SHORT);
                     }
                 });
             });
@@ -351,6 +415,61 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
         thisCase.setResolved_photo(resolvedImageName);
         thisCase.setResolved_comments(resolvedCommentsEditText.getText().toString());
     }
+
+//    private void updateIsReportClosed() {
+//        Log.d(TAG, "updateIsReportClosed: called");
+//        new Thread(() -> {
+//            Log.d(TAG, "updateIsReportClosed: in thread");
+//            // if there are no more unresolved after this acceptance, set report status to true!
+//            Call<List<Case>> call = apiCaller.getCasesById("Token " + token, reportID, 0);
+//            call.enqueue(new Callback<List<Case>>() {
+//                @Override
+//                public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
+//                    Log.d(TAG, "updateIsReportClosed: response code: " + response.code());
+//                    Log.d(TAG, "onResponse: number of cases in report" + response.body().size());
+//                    if (response.body().size() == 1) {
+//                        // the only unresolved case is this one
+//                        synchronized (lock) {
+//                            REPORT_STATUS_UPDATED.set(true);
+//                            REPORT_RESOLVED = true;
+//                            Log.d(TAG, "onResponse: notifying REPORT_STATUS_UPDATED");
+//                            lock.notifyAll();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<List<Case>> call, Throwable t) {
+//                    t.printStackTrace();
+//                }
+//            });
+//        }).start();
+//    }
+
+//    private void createdUpdatedReport () {
+//        Log.d(TAG, "createdUpdatedReport: called");
+//        Call<List<Report>> call = apiCaller.getReport("Token " + token);
+//        call.enqueue(new Callback<List<Report>>() {
+//                         @Override
+//                         public void onResponse(Call<List<Report>> call, Response<List<Report>> response) {
+//                             Log.d(TAG, "createdUpdatedReport onResponse: response code: "+response.code());
+//                             for (Report report : response.body()) {
+//                                 if (report.getId() == reportID) {
+//                                     thisReport = report;
+//                                     break;
+//                                 }
+//                             }
+//                             String datetime = DateOperations.getCurrentDatabaseDate();
+//                             thisReport.setResolution_date(datetime);
+//                             thisReport.setStatus(true);
+//                         }
+//
+//                         @Override
+//                         public void onFailure(Call<List<Report>> call, Throwable t) {
+//                             t.printStackTrace();
+//                         }
+//                     });
+//    }
 
     private void TenantSubmit(String title, String msg, String additionalMsg, String buttonText) {
         Bundle bundle = new Bundle();
@@ -451,6 +570,11 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
         String resolvedStatus = RESOLVED ?"Resolved":"Unresolved";
         resolvedStatus = PENDING?"Pending resolution":resolvedStatus;
         resolvedStatusTextView.setText(resolvedStatus);
+
+        if (resolvedStatus=="Resolved") {
+            questionHeader.setText("Resolved:");
+            questionHeader.setTextColor(green);
+        }
     }
 
     private void setAllViewsFromDatabase() {

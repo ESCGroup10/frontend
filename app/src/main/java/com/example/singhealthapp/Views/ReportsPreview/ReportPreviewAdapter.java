@@ -59,8 +59,7 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
     @Override
     public void onBindViewHolder(@NonNull ReportPreviewHolder holder, int position) {
         Report report = reports.get(position);
-        if (report.tenant)report.setTenant_display_id(position + 1);
-        else report.setTenant_display_id(null);
+        report.setTenant_display_id(position + 1);
         holder.reportName.setText(list.get(position).getReportName());
         holder.reportDate.setText(("Created on: "));
         setHalfBoldTextViews(holder.reportDate, list.get(position).getReportDate());
@@ -69,6 +68,7 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
         }
         holder.resolution.setText(("No resolution record"));
         holder.id.setText("");
+        System.out.println("tenant display id: "+report.getTenant_display_id());
         holder.view.setOnClickListener(v -> parent.navigateFromRecyclerView(report, token));
     }
 

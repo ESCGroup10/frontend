@@ -101,7 +101,7 @@ public class ReportStatsFragment extends CustomFragment implements StatisticsFra
             }
             @Override
             public void onFailure(Call<List<ReportedCases>> call, Throwable t) {
-                Toast.makeText(customRequireActivity(20), "" + t, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
             }
         });
         System.out.println("ReportStatsFragment UPDATED!" + tenantId);
@@ -127,7 +127,7 @@ public class ReportStatsFragment extends CustomFragment implements StatisticsFra
             }
             @Override
             public void onFailure(Call<List<ResolvedCases>> call, Throwable t) {
-                Toast.makeText(customRequireActivity(20), "" + t, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -148,7 +148,7 @@ public class ReportStatsFragment extends CustomFragment implements StatisticsFra
     }
 
     private void plotChart() {
-        customRequireActivity(20).runOnUiThread(() -> {
+        getActivity().runOnUiThread(() -> {
             if (!reportCount.isEmpty()) {
                 LineDataSet set1, set2;
                 set1 = new LineDataSet(reportCount, "No. of Reported Cases");
@@ -175,7 +175,7 @@ public class ReportStatsFragment extends CustomFragment implements StatisticsFra
 
                 mExportButton.setEnabled(true);
             } else {
-                Toast.makeText(customRequireActivity(20), "No relevant data found.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -193,13 +193,13 @@ public class ReportStatsFragment extends CustomFragment implements StatisticsFra
 
         try {
             //saving the file into device
-            FileOutputStream out = customRequireActivity(20).getApplicationContext().openFileOutput("datafile.csv", Context.MODE_PRIVATE);
+            FileOutputStream out = getActivity().getApplicationContext().openFileOutput("datafile.csv", Context.MODE_PRIVATE);
             out.write((data.toString()).getBytes());
             out.close();
 
             //exporting
-            Context context = customRequireActivity(20).getApplicationContext();
-            File filelocation = new File(customRequireActivity(20).getApplicationContext().getFilesDir(), "datafile.csv");
+            Context context = getActivity().getApplicationContext();
+            File filelocation = new File(getActivity().getApplicationContext().getFilesDir(), "datafile.csv");
             Uri path = FileProvider.getUriForFile(context, "com.example.android.fileprovider", filelocation);
             Intent fileIntent = new Intent(Intent.ACTION_SEND);
             fileIntent.setType("text/csv");

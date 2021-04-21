@@ -63,6 +63,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: I'm here");
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         EspressoCountingIdlingResource.increment();
 
@@ -82,14 +83,17 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         auditor_drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        Log.d(TAG, "onCreate: is savedInstanceState null: "+(savedInstanceState == null));
         if (savedInstanceState == null) {
+//            EspressoCountingIdlingResource.increment();
             TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
             String tag = tenantsPreviewFragment.getClass().getName();
             getSupportFragmentManager().beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment, tag)
                     .addToBackStack(tag)
                     .commit();
+        } else {
+            EspressoCountingIdlingResource.decrement();
         }
-        EspressoCountingIdlingResource.decrement();
 
     }
 
@@ -147,6 +151,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, statisticsFragment, newTag)
@@ -155,11 +160,13 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 break;
 
             case R.id.nav_Tenants:
+                EspressoCountingIdlingResource.decrement();
                 TenantsPreviewFragment tenantsPreviewFragment = new TenantsPreviewFragment();
                 newTag = tenantsPreviewFragment.getClass().getName();
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+//                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, tenantsPreviewFragment, newTag)
@@ -173,6 +180,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, reportsPreviewFragment, newTag)
@@ -186,6 +194,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, addTenantFragment, newTag)
@@ -199,6 +208,7 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.auditor_fragment_container, testFragment, newTag)

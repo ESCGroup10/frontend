@@ -44,7 +44,7 @@ public class RestartServiceBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        Log.d(TAG, "about to start timer " + context.toString());
+//        Log.d(TAG, "about to start timer " + context.toString());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             scheduleJob(context);
         } else {
@@ -71,7 +71,7 @@ public class RestartServiceBroadcastReceiver extends BroadcastReceiver {
 
     public static void reStartTracker(Context context) {
         // restart the never ending service
-        Log.i(TAG, "Restarting tracker");
+//        Log.i(TAG, "Restarting tracker");
         Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
         context.sendBroadcast(broadcastIntent);
     }

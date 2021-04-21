@@ -244,6 +244,9 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
         thisReport.setHousekeeping_score(round(housekeeping_score));
         thisReport.setSafety_score(round(safety_score));
         thisReport.setStaffhygiene_score(round(staffhygiene_score));
+        if (numCases == 0) {
+            thisReport.setStatus(true);
+        }
         // check final report
     }
 

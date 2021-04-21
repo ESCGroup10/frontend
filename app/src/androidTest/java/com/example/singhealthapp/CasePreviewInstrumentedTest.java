@@ -38,7 +38,7 @@ public class CasePreviewInstrumentedTest {
         Thread.sleep(2000);
         onView(withText("Report 4")).check(matches(isDisplayed())).perform(click());
         Thread.sleep(1000);
-        onView(withId(R.id.casePreviewScrollView)).perform(swipeUp());
+        onView(withId(R.id.CasesPreview)).perform(swipeUp());
         onView(withId(R.id.auditorReportViewCases))
                 .perform(click());
     }

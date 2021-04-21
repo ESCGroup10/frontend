@@ -48,7 +48,9 @@ public class ReportPreviewTenantAdapter extends RecyclerView.Adapter<ReportPrevi
         setHalfBoldTextViews(holder.reportDate, list.get(position).getReportDate());
         holder.resolution.setText("");
         holder.id.setText("");
-        holder.view.setOnClickListener(v -> parent.navigateFromRecyclerView(report, token));
+        holder.view.setOnClickListener(v -> {
+            parent.navigateFromRecyclerView(report, token);
+        });
     }
 
     @Override

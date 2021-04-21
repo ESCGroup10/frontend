@@ -7,9 +7,19 @@ public class Report implements Parcelable {
     private int id, auditor_id, tenant_id;
     private Integer tenant_display_id = null;
     private float staffhygiene_score, housekeeping_score, safety_score, healthierchoice_score, foodhygiene_score;
-    private String company, institution, location, outlet_type, report_notes, report_date, report_image, resolution_notes, resolution_date, resolution_image;
+    private String company, institution, location, outlet_type, report_notes, report_date, report_image, resolution_date;
     private boolean status;
-    public boolean tenant = false;
+
+    public Report() {
+    }
+
+    public void setResolution_date(String resolution_date) {
+        this.resolution_date = resolution_date;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
     protected Report(Parcel in) {
         id = in.readInt();
@@ -32,9 +42,7 @@ public class Report implements Parcelable {
         report_notes = in.readString();
         report_date = in.readString();
         report_image = in.readString();
-        resolution_notes = in.readString();
         resolution_date = in.readString();
-        resolution_image = in.readString();
         status = in.readByte() != 0;
     }
 
@@ -72,9 +80,7 @@ public class Report implements Parcelable {
                 ", report_notes='" + report_notes + '\'' +
                 ", report_date='" + report_date + '\'' +
                 ", report_image='" + report_image + '\'' +
-                ", resolution_notes='" + resolution_notes + '\'' +
                 ", resolution_date='" + resolution_date + '\'' +
-                ", resolution_image='" + resolution_image + '\'' +
                 ", status=" + status +
                 '}';
     }
@@ -151,20 +157,8 @@ public class Report implements Parcelable {
         return report_date;
     }
 
-    public String getReport_image() {
-        return report_image;
-    }
-
-    public String getResolution_notes() {
-        return resolution_notes;
-    }
-
     public String getResolution_date() {
         return resolution_date;
-    }
-
-    public String getResolution_image() {
-        return resolution_image;
     }
 
     public boolean isStatus() {
@@ -208,9 +202,7 @@ public class Report implements Parcelable {
         dest.writeString(report_notes);
         dest.writeString(report_date);
         dest.writeString(report_image);
-        dest.writeString(resolution_notes);
         dest.writeString(resolution_date);
-        dest.writeString(resolution_image);
         dest.writeByte((byte) (status ? 1 : 0));
     }
 }

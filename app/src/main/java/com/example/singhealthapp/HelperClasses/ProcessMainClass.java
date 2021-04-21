@@ -29,7 +29,7 @@ public class ProcessMainClass {
         try {
             context.stopService(serviceIntent);
         } catch (Exception e) {
-            System.out.println("serviceIntent ont initialized yet");
+//            System.out.println("serviceIntent ont initialized yet");
         }
     }
 
@@ -41,7 +41,7 @@ public class ProcessMainClass {
             TenantFragmentContainer tenantFragmentContainer = new TenantFragmentContainer();
             token = ((SendInfoToPMC)tenantFragmentContainer).sendToken();
             tenantID = ((SendInfoToPMC)tenantFragmentContainer).sendID();
-            Log.d(TAG, "launchService: \nreceived token: "+token+"\ntenantID: "+tenantID);
+//            Log.d(TAG, "launchService: \nreceived token: "+token+"\ntenantID: "+tenantID);
 //            Log.d(TAG, "launchService: static token: "+TenantFragmentContainer.token);
 //            Log.d(TAG, "launchService: static token: "+TenantFragmentContainer.tenantID);
         }
@@ -59,12 +59,12 @@ public class ProcessMainClass {
             System.out.println(serviceIntent);
             ComponentName componentName = context.startForegroundService(serviceIntent);
             System.out.println(componentName);
-            Log.d(TAG, "launchService: sdk>Oreo");
+//            Log.d(TAG, "launchService: sdk>Oreo");
         } else {
-            Log.d(TAG, "launchService: sdk<Oreo");
+//            Log.d(TAG, "launchService: sdk<Oreo");
             context.startService(serviceIntent);
         }
-        Log.d(TAG, "ProcessMainClass: start service go!!!!");
+//        Log.d(TAG, "ProcessMainClass: start service go!!!!");
     }
 
 }

@@ -60,7 +60,8 @@ public class Service extends android.app.Service {
     public void onCreate() {
         super.onCreate();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            System.out.println("creating the service");
+//            System.out.println("creating the service");
+            Log.d(TAG, "onCreate: service created");
             restartForeground();
         }
         mCurrentService = this;
@@ -69,11 +70,11 @@ public class Service extends android.app.Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Log.d(TAG, "restarting Service !!");
+//        Log.d(TAG, "restarting Service !!");
 
         // it has been killed by Android and now it is restarted. We must make sure to have reinitialised everything
         if (intent == null) {
-            Log.d(TAG, "onStartCommand: it has been killed by Android and now it is restarted. We must make sure to have reinitialised everything");
+//            Log.d(TAG, "onStartCommand: it has been killed by Android and now it is restarted. We must make sure to have reinitialised everything");
             ProcessMainClass bck = new ProcessMainClass();
             bck.launchService(this);
         }
@@ -85,7 +86,7 @@ public class Service extends android.app.Service {
         }
 
         // get extras from intent
-        Log.d(TAG, "onStartCommand: setting token and tenantID");
+//        Log.d(TAG, "onStartCommand: setting token and tenantID");
         Bundle bundle = intent.getExtras();
         tenantID = bundle.getInt("TENANT_ID_KEY");
         token = bundle.getString("TOKEN_KEY");
@@ -112,11 +113,11 @@ public class Service extends android.app.Service {
      */
     public void restartForeground() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Log.i(TAG, "restarting foreground");
+//            Log.i(TAG, "restarting foreground");
             try {
                 Notification notification = new Notification();
                 startForeground(NOTIFICATION_ID, notification.setNotification(this, "Hello there!", "I will notify you of any new reports!", R.drawable.ic_baseline_anchor_24));
-                Log.i(TAG, "restarting foreground successful");
+//                Log.i(TAG, "restarting foreground successful");
                 startTask();
             } catch (Exception e) {
                 Log.e(TAG, "Error in notification " + e.getMessage());
@@ -127,12 +128,14 @@ public class Service extends android.app.Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: check if we should shut down the process");
-        System.out.println("shut down: "+checkShutDown());
+//        Log.d(TAG, "onDestroy: check if we should shut down the process");
+//        System.out.println("shut down: "+checkShutDown());
         if (checkShutDown()) {
+            Log.d(TAG, "onDestroy: service shutting down");
             return;
         }
-        Log.i(TAG, "onDestroy called");
+        Log.d(TAG, "onDestroy: service restarting");
+//        Log.i(TAG, "onDestroy called");
         // restart the never ending service
         Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
         sendBroadcast(broadcastIntent);
@@ -147,7 +150,7 @@ public class Service extends android.app.Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        Log.i(TAG, "onTaskRemoved called");
+//        Log.i(TAG, "onTaskRemoved called");
         // restart the never ending service
         Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
         sendBroadcast(broadcastIntent);
@@ -157,12 +160,12 @@ public class Service extends android.app.Service {
     }
 
     public void startTask() {
-        Log.d(TAG, "startTask: starting task");
+//        Log.d(TAG, "startTask: starting task");
 
         // initialize the TimerTask's job
         initializeTimerTask();
 
-        Log.d(TAG, "Scheduling...");
+//        Log.d(TAG, "Scheduling...");
         //schedule the timer, to wake up every 5 minutes
         timer.schedule(timerTask, 0, 10000);
     }
@@ -180,7 +183,7 @@ public class Service extends android.app.Service {
         // or other notification behaviors after this
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
-        Log.d(TAG, "createNotificationChannel: notification channel created");
+//        Log.d(TAG, "createNotificationChannel: notification channel created");
     }
 
     private void buildNotification() {
@@ -197,12 +200,12 @@ public class Service extends android.app.Service {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_SOUND)
                 .setAutoCancel(true);
-        Log.d(TAG, "buildNotification: notification built");
+//        Log.d(TAG, "buildNotification: notification built");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void startChecking() {
-        System.out.println("shut down: "+checkShutDown());
+//        System.out.println("shut down: "+checkShutDown());
         if (checkShutDown()) {
             stopSelf();
             return;
@@ -216,27 +219,27 @@ public class Service extends android.app.Service {
 
         // GET request to get information about any new reports
         Call<List<ReportedCases>> getReportedCases = apiCaller.getReportedCase("Token " + token, tenantID);
-        Log.d(TAG, "startChecking: get request sent with \ntenantID: "+tenantID+"\nand token: "+token);
+//        Log.d(TAG, "startChecking: get request sent with \ntenantID: "+tenantID+"\nand token: "+token);
 
         getReportedCases.enqueue(new Callback<List<ReportedCases>>() {
             @Override
             public void onResponse(@NotNull Call<List<ReportedCases>> call, @NotNull Response<List<ReportedCases>> response) {
-                Log.d(TAG, "we got back response code: " + response.code());
+//                Log.d(TAG, "we got back response code: " + response.code());
                 if (response.isSuccessful()) {
                     List<ReportedCases> reportedCasesList = response.body();
                     int numReports = 0;
                     for (ReportedCases rc : reportedCasesList) {
                         numReports += rc.getCount();
                     }
-                    Log.d(TAG, "number of ReportedCases in list: " + numReports);
-                    Log.d(TAG, "savedSize before: "+savedSize);
-                    Log.d(TAG, "=========================================================");
+//                    Log.d(TAG, "number of ReportedCases in list: " + numReports);
+//                    Log.d(TAG, "savedSize before: "+savedSize);
+//                    Log.d(TAG, "=========================================================");
                     if (savedSize != -1 && savedSize < numReports) {
-                        Log.d(TAG, "savedSize has been set more than once");
+//                        Log.d(TAG, "savedSize has been set more than once");
                         newReport = true;
                     }
                     savedSize = numReports;
-                    Log.d(TAG, "savedSize after: "+savedSize);
+//                    Log.d(TAG, "savedSize after: "+savedSize);
                 } else {
                     // something wrong, act as if there are no new reports
                     newReport = false;
@@ -256,7 +259,7 @@ public class Service extends android.app.Service {
         createNotificationChannel();
         buildNotification();
         if (newReport) {
-            Log.d(TAG, "found a new report, will make notification!");
+//            Log.d(TAG, "found a new report, will make notification!");
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(Service.this);
             notificationManager.notify(123, builder.build());
             newReport = false;
@@ -264,7 +267,7 @@ public class Service extends android.app.Service {
     }
 
     public void initializeTimerTask() {
-        Log.i(TAG, "initialising TimerTask");
+//        Log.i(TAG, "initialising TimerTask");
         timer = new Timer();
         timerTask = new TimerTask() {
             @RequiresApi(api = Build.VERSION_CODES.O)

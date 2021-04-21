@@ -15,11 +15,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.singhealthapp.HelperClasses.BackStackInfo;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
+import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
 import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
 import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
 
@@ -55,7 +57,8 @@ public class StatusConfirmationFragment extends Fragment implements IOnBackPress
             message = bundle.getString(MSG_KEY);
             button_text = bundle.getString(BUTTON_TXT_KEY);
         } catch (Exception e) {
-            Log.d(TAG, "onCreateView: "+ Arrays.toString(e.getStackTrace()));
+            Log.d(TAG, "StatusConfirmationFragment could not get bundle: "+ Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
         }
         getActivity().setTitle(title);
 
@@ -72,10 +75,13 @@ public class StatusConfirmationFragment extends Fragment implements IOnBackPress
         button = view.findViewById(R.id.button_return);
         messageText.setText(message);
         button.setText(button_text);
+        Log.d(TAG, "onCreateView: set views");
 
+        BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
         button.setOnClickListener(v -> {
             EspressoCountingIdlingResource.increment();
-            getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
+            getParentFragmentManager().popBackStack(0, 0);
         });
         EspressoCountingIdlingResource.decrement();
         return view;
@@ -88,7 +94,10 @@ public class StatusConfirmationFragment extends Fragment implements IOnBackPress
 
     @Override
     public boolean onBackPressed() {
-        getParentFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        while (EspressoCountingIdlingResource.getCount() > 0) {
+            EspressoCountingIdlingResource.decrement();
+        }
+        getParentFragmentManager().popBackStack(0, 0);
         return true;
     }
 

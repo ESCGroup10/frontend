@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
-    android:id="@+id/casePreviewScrollView"
+    android:id="@+id/summaryReportScrollView"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout

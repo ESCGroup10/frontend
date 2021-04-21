@@ -112,7 +112,7 @@ public class TotalScoreStatsFragment extends CustomFragment implements Statistic
 
             @Override
             public void onFailure(Call<List<Report>> call, Throwable t) {
-                Toast.makeText(customRequireActivity(20), "" + t, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "" + t, Toast.LENGTH_SHORT).show();
             }
         });
         System.out.println("TotalScoreStatsFragment UPDATED!" + tenantId);
@@ -120,7 +120,7 @@ public class TotalScoreStatsFragment extends CustomFragment implements Statistic
 
     private void plotChart() {
 
-        customRequireActivity(20).runOnUiThread(() -> {
+        getActivity().runOnUiThread(() -> {
             if (!scores.isEmpty()) {
                 LineDataSet set, set1, set2, set3, set4, set5, set6;
                 set1 = new LineDataSet(scores, "Total");
@@ -169,7 +169,7 @@ public class TotalScoreStatsFragment extends CustomFragment implements Statistic
 
                 mExportButton.setEnabled(true);
             } else {
-                Toast.makeText(customRequireActivity(20), "No relevant data found.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "No relevant data found.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -231,13 +231,13 @@ public class TotalScoreStatsFragment extends CustomFragment implements Statistic
         try{
 
             // saving the file into device
-            FileOutputStream out = customRequireActivity(20).getApplicationContext().openFileOutput("datafile.csv", Context.MODE_PRIVATE);
+            FileOutputStream out = getActivity().getApplicationContext().openFileOutput("datafile.csv", Context.MODE_PRIVATE);
             out.write((data.toString()).getBytes());
             out.close();
 
             // exporting
-            Context context = customRequireActivity(20).getApplicationContext();
-            File filelocation = new File(customRequireActivity(20).getApplicationContext().getFilesDir(), "datafile.csv");
+            Context context = getActivity().getApplicationContext();
+            File filelocation = new File(getActivity().getApplicationContext().getFilesDir(), "datafile.csv");
             Uri path = FileProvider.getUriForFile(context, "com.example.android.fileprovider", filelocation);
             Intent fileIntent = new Intent(Intent.ACTION_SEND);
             fileIntent.setType("text/csv");

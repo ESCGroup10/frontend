@@ -66,7 +66,7 @@ public class Notification {
                     .build();
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            System.out.println("Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP");
+//            System.out.println("Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP");
             notification = new NotificationCompat.Builder(context, "channel")
                     // to be defined in the MainActivity of the app
 //                    .setSmallIcon(icon)
@@ -76,7 +76,7 @@ public class Notification {
                     .setPriority(android.app.Notification.PRIORITY_MIN)
                     .setContentIntent(notificationPendingIntent).build();
         } else {
-            System.out.println("Build.VERSION.SDK_INT is low");
+//            System.out.println("Build.VERSION.SDK_INT is low");
             notification = new NotificationCompat.Builder(context, "channel")
                     // to be defined in the MainActivity of the app
 //                    .setSmallIcon(icon)

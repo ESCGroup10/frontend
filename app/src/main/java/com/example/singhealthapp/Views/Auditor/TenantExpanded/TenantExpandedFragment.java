@@ -113,7 +113,7 @@ public class TenantExpandedFragment extends CustomFragment {
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.code() == 204) {
+                if (response.isSuccessful()) {
                     Call<List<Report>> reportCall = apiCaller.getScoresById("Token " + token, id);
                     reportCall.enqueue(new Callback<List<Report>>(){
                         @Override

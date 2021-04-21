@@ -22,5 +22,15 @@
         android:id="@+id/tenantRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/reloadButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reload"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:backgroundTint="@color/button_normal"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 
 </LinearLayout>

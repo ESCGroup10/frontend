@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
-    android:id="@+id/casePreviewScrollView"
+    android:id="@+id/latestReportScrollView"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
@@ -17,8 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/latestReportDefault"
-        android:visibility="gone">
+        android:id="@+id/latestReportDefault">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -37,20 +36,22 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="20dp"
-                    android:textSize="20dp"
-                    android:textStyle="normal"
-                    android:id="@+id/dateLatestReport"
-                    android:textColor="@color/black"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:textSize="30sp"
+                    android:textColor="@color/green"
+                    android:textStyle="bold"
+                    android:id="@+id/resolvedLatestReport"
                     android:layout_gravity="center" />
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="25dp"
-                    android:layout_margin="5dp"
-                    android:textSize="18dp"
-                    android:id="@+id/resolvedLatestReport"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textSize="18sp"
+                    android:textStyle="normal"
+                    android:id="@+id/dateLatestReport"
+                    android:textColor="@color/black"
                     android:layout_gravity="center" />
 
                 <com.github.mikephil.charting.charts.HorizontalBarChart
@@ -240,24 +241,20 @@
 
         </LinearLayout>
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+
+        <TextView
             android:id="@+id/latestReportNotAvailable"
-            android:visibility="gone">
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_margin="20dp"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:text="No Reports Found"
+            android:textColor="@color/grey_semi_transparent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="gone"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_margin="20dp"
-                android:textSize="20dp"
-                android:textStyle="bold"
-                android:text="No Reports"
-                android:textColor="@color/black"
-                android:gravity="center"
-                android:layout_gravity="center" />
-
-        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 

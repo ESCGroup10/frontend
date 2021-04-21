@@ -57,7 +57,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
-        drawer = findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.tenant_drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -66,6 +66,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         toggle.syncState();
 
         if (savedInstanceState == null) {
+//            EspressoCountingIdlingResource.increment();
             LatestReportFragment latestReportFragment = new LatestReportFragment();
             String tag = latestReportFragment.getClass().getName();
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, tag)
@@ -77,11 +78,11 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
     public void handleIntentFromNotification() {
         if (getIntent().getExtras() != null) {
             boolean fromNotification = getIntent().getBooleanExtra("FROM_NOTIFICATION", false);
-            System.out.println("got fromNotification: "+fromNotification);
+            Log.d(TAG, "handleIntentFromNotification: extras were found, fromNotification: "+fromNotification);
 
             if (fromNotification) {
                 EspressoCountingIdlingResource.increment();
-                System.out.println("going to my reports");
+                Log.d(TAG, "handleIntentFromNotification: going to my reports");
                 MyReportsFragment myReportsFragment = new MyReportsFragment();
                 String tag = myReportsFragment.getClass().getName();
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, myReportsFragment, tag)
@@ -89,7 +90,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                         .commit();
             }
         } else {
-            System.out.println("no extras were found");
+            Log.d(TAG, "handleIntentFromNotification: no extras were found");
         }
     }
 
@@ -146,6 +147,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.fragment_container, myReportsFragment, newTag)
@@ -159,6 +161,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, statisticsFragment, newTag)
@@ -172,8 +175,10 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
+                EspressoCountingIdlingResource.decrement();
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, latestReportFragment, newTag)
                         .addToBackStack(newTag)
                         .commit();
@@ -185,6 +190,7 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
                 Log.d(TAG, "onNavigationItemSelected: current tag: "+currentTag);
                 Log.d(TAG, "onNavigationItemSelected: new tag: "+newTag);
                 if (currentTag.equals(newTag)) {
+                    EspressoCountingIdlingResource.decrement();
                     break;
                 }
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, testFragment, newTag)

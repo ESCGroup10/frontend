@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.singhealthapp.HelperClasses.BackStackInfo;
+import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.TenantReportPreviewNavigateListener;
@@ -26,6 +28,7 @@ import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
+import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
 import com.example.singhealthapp.Views.ReportsPreview.ReportPreviewTenantAdapter;
 
 import java.util.ArrayList;
@@ -41,8 +44,12 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
     ReportPreviewTenantAdapter adapterUnresolved, adapterCompleted;
     private ArrayList<ReportPreview> reportPreviews, displayPreviews;
     private ArrayList<Report> reports, displayReports;
-    private int userId;
+    private int userID;
     boolean unresolved, completed;
+    String token, userType;
+    private static DatabaseApiCaller apiCaller;
+
+    private static final String TAG = "MyReportsFragment";
 
     @Nullable
     @Override
@@ -50,6 +57,8 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
         BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
         getActivity().setTitle("My Reports");
         View view = inflater.inflate(R.layout.f_reports_all, container, false);
+        loadFromSharedPreferences();
+        initApiCaller();
         view.findViewById(R.id.reportPreviewSearchButton).setOnClickListener(v -> {
             if ( reportPreviews.isEmpty() ) return;
             TextView textView = view.findViewById(R.id.reportPreviewSearch);
@@ -97,8 +106,18 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
         return view;
     }
 
+    private synchronized void initApiCaller() {
+        apiCaller = new Retrofit.Builder()
+                .baseUrl("https://esc10-303807.et.r.appspot.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(DatabaseApiCaller.class);
+        notifyAll();
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onViewCreated: called");
         reportPreviews = new ArrayList<>();
         reports = new ArrayList<>();
         displayPreviews = new ArrayList<>();
@@ -107,12 +126,19 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
         Button button2 = view.findViewById(R.id.reportPreviewCompletedButton);
         button1.setBackgroundColor(Color.rgb(115, 194, 239));
         button2.setBackgroundColor(Color.rgb(115, 194, 239));
-        queuePreviews(loadToken());
+        queuePreviews();
     }
 
-    private void queuePreviews(String token){
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/").addConverterFactory(GsonConverterFactory.create()).build();
-        DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
+    private synchronized void queuePreviews(){
+        Log.d(TAG, "queuePreviews: called");
+        while (token == null || apiCaller == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.d(TAG, "queuePreviews: getting ReportPreview with token: "+token);
         Call<List<ReportPreview>> call = apiCaller.getReportPreview("Token " + token);
         call.enqueue(new Callback<List<ReportPreview>>() {
             @Override
@@ -123,24 +149,32 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
                 }
                 if (response.body().isEmpty() || response.body() == null) return;
                 for ( ReportPreview r : response.body()){
-                    if (r.getTenant_id() == userId) {
+                    if (r.getTenant_id() == userID) {
                         reportPreviews.add(r);
                         displayPreviews.add(r);
-                        System.out.println(userId);
                     }
                 }
-                queueReport(token, reportPreviews);
+                queueReport(reportPreviews);
             }
             @Override
             public void onFailure(Call<List<ReportPreview>> call, Throwable t) {
-                Toast.makeText(getActivity(), "Failure: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Log.d(TAG, "onFailure: queuePreviews");
+                t.printStackTrace();
+                CentralisedToast.makeText(getActivity(), "Unable to make request to server, server might be down", CentralisedToast.LENGTH_LONG);
             }
         });
     }
 
-    private void queueReport(String token, List<ReportPreview> reportPreviews){
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
-        DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
+    private synchronized void queueReport(List<ReportPreview> reportPreviews){
+        Log.d(TAG, "queueReport: called");
+        while (token == null || apiCaller == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.d(TAG, "queueReport: getting Report with token: "+token);
         Call<List<Report>> call = apiCaller.getReport("Token " + token);
         call.enqueue(new Callback<List<Report>>() {
             @Override
@@ -150,7 +184,7 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
                     return ;
                 }
                 for ( Report r : response.body()){
-                    if (r.getTenant_id() == userId) {
+                    if (r.getTenant_id() == userID) {
                         reports.add(r);
                         displayReports.add(r);
                     }
@@ -158,17 +192,21 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
                 unresolved = true;
                 completed = true;
                 displayRecycleView(reportPreviews, reports);
-                TextView textView = (TextView) getView().findViewById(R.id.reportPreviewSearch);
-                if(!textView.getText().toString().isEmpty()) getView().findViewById(R.id.reportPreviewSearchButton).performClick();
+//                TextView textView = (TextView) getView().findViewById(R.id.reportPreviewSearch);
+//                if(!textView.getText().toString().isEmpty()) getView().findViewById(R.id.reportPreviewSearchButton).performClick();
+                Log.d(TAG, "queueReport onResponse: success");
             }
             @Override
             public void onFailure(Call<List<Report>> call, Throwable t) {
-                Toast.makeText(getActivity(), "Failure: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Log.d(TAG, "onFailure: queueReport");
+                t.printStackTrace();
+                CentralisedToast.makeText(getActivity(), "Unable to make request to server, server might be down", CentralisedToast.LENGTH_LONG);
             }
         });
     }
 
     protected void displayRecycleView(List<ReportPreview> reportPreviews, List<Report> reports){
+        Log.d(TAG, "displayRecycleView: called");
         ArrayList<ReportPreview> unresolvedPreview = new ArrayList<>();
         ArrayList<Report> unresolvedReports = new ArrayList<>();
         ArrayList<ReportPreview> completedPreview = new ArrayList<>();
@@ -179,7 +217,6 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
                 Invalid.add(o.getId());
                 continue;
             }
-            o.tenant = true;
             if ( ! o.isStatus() ) {
                 unresolvedReports.add(o);
             }
@@ -200,18 +237,25 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
             completedPreview.clear();
             completedReports.clear();
         }
-        adapterUnresolved = new ReportPreviewTenantAdapter(unresolvedPreview, unresolvedReports, (TenantReportPreviewNavigateListener)this, loadToken());
+        Log.d(TAG, "displayRecycleView: unresolved: "+unresolved);
+        Log.d(TAG, "displayRecycleView: completed: "+completed);
+        Log.d(TAG, "displayRecycleView: unresolvedPreview size: "+unresolvedPreview.size());
+        Log.d(TAG, "displayRecycleView: unresolvedReports size: "+unresolvedReports.size());
+        Log.d(TAG, "displayRecycleView: completedPreview size: "+completedPreview.size());
+        Log.d(TAG, "displayRecycleView: completedReports size: "+completedReports.size());
+
+        adapterUnresolved = new ReportPreviewTenantAdapter(unresolvedPreview, unresolvedReports, this, token);
         try {
-            RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved);
+            RecyclerView view = getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved);
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
             view.setItemAnimator(new DefaultItemAnimator());
             view.setAdapter(adapterUnresolved);
         } catch (Exception e) {
             System.out.println("Unresolved recycleView not set");
         }
-        adapterCompleted = new ReportPreviewTenantAdapter(completedPreview, completedReports, (TenantReportPreviewNavigateListener)this, loadToken());
+        adapterCompleted = new ReportPreviewTenantAdapter(completedPreview, completedReports, this, token);
         try {
-            RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerView);
+            RecyclerView view = getView().findViewById(R.id.reportPreviewRecyclerView);
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
             view.setItemAnimator(new DefaultItemAnimator());
             view.setAdapter(adapterCompleted);
@@ -221,19 +265,9 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
         }
     }
 
-    private String loadToken() {
-        String token = null;
-        try {
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
-            token = sharedPreferences.getString("TOKEN_KEY", null);
-            userId = sharedPreferences.getInt("USER_ID_KEY", 0);
-        }
-        catch (Exception ignored){}
-        return token;
-    }
-
     @Override
     public void navigateFromRecyclerView(Report report, String token) {
+        Log.d(TAG, "navigateFromRecyclerView: called");
         ReportSummaryFragment reportSummaryFragment = new ReportSummaryFragment(report, token);
         String tag = reportSummaryFragment.getClass().getName();
         getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, reportSummaryFragment, tag)
@@ -242,11 +276,27 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
     }
 
     boolean isDataValid(Report r){
-        if (r.getFoodhygiene_score() > 1 || r.getFoodhygiene_score() < 0) return false;
-        if (r.getHealthierchoice_score() > 1 || r.getHealthierchoice_score() < 0) return false;
-        if (r.getHousekeeping_score() > 1 || r.getHousekeeping_score() < 0) return false;
-        if (r.getStaffhygiene_score() > 1 || r.getStaffhygiene_score() < 0) return false;
-        if (r.getSafety_score() > 1 || r.getSafety_score() < 0) return false;
+        if (r.getHousekeeping_score() > 100 || r.getHousekeeping_score() < 0) return false;
+        if (r.getStaffhygiene_score() > 100 || r.getStaffhygiene_score() < 0) return false;
+        if (r.getSafety_score() > 100 || r.getSafety_score() < 0) return false;
+        if (userType.equals("F&B")) {
+            if (r.getFoodhygiene_score() > 100 || r.getFoodhygiene_score() < 0) return false;
+            if (r.getHealthierchoice_score() > 100 || r.getHealthierchoice_score() < 0) return false;
+        }
         return true;
+    }
+
+    private synchronized void loadFromSharedPreferences() {
+        try {
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+            String USER_ID_KEY = "USER_ID_KEY";
+            userID = sharedPreferences.getInt(USER_ID_KEY, -1);
+            userType = sharedPreferences.getString("USER_TYPE_KEY", null);
+            token = sharedPreferences.getString("TOKEN_KEY", null);
+        }
+        catch (Exception ignored){
+        }
+        Log.d(TAG, "loadToken: token loaded");
+        notifyAll();
     }
 }

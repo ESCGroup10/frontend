@@ -89,6 +89,7 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
                 .perform(DrawerActions.open());
         sleep(2); // click operation is handled in external class so we use sleep instead of idling resource here
         onView(withId(R.id.nav_Tenants)).perform(click());
+        sleep(3);
         onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
         onView(withId(R.id.tenantRecycler)).check(matches(isDisplayed()));
     }
@@ -123,8 +124,10 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
                 .perform(DrawerActions.open());
         sleep(2); // click operation is handled in external class so we use sleep instead of idling resource here
         onView(withId(R.id.nav_Add_Tenant)).perform(click());
+        pressBack();
 
-        onView(withId(16909135)).check(matches(isDisplayed())); //alert dialogue layout
+//        onView(withId(16909135)).check(matches(isDisplayed())); //alert dialogue layout
+        onView(withId(R.id.auditor_main_page)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -138,7 +141,7 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
     @Test
     public void NavSafetyChecklistToAuditChecklist() {
         NavTenantExpandedToSafetyChecklist();
-        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp()).perform(swipeUp());
+        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp());
         onView(withId(R.id.start_audit_button)).perform(click());
         onView(withId(R.id.auditChecklistFragment)).check(matches(isDisplayed()));
     }
@@ -148,7 +151,7 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
         NavSafetyChecklistToAuditChecklist();
         onView(withId(R.id.WorkplaceSafetyAndHealthFAB)).perform(click()); // clicks the menu fab
         onView(withId(R.id.WorkplaceSafetyAndHealthFAB)).perform(click()); // clicks the workplace fab
-        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp());
         onView(withId(R.id.submit_audit_button)).perform(click());
         onView(withText("Set all questions to true and submit")).perform(click());
         onView(withText("Yes")).perform(click());
@@ -189,9 +192,10 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
 
         // check AddTenantFragment
         NavAuditorContainerToAddTenantFragment();
-        onView(withText("Cancel")).perform(click());
-        pressBack();
-        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+//        onView(withText("Cancel")).perform(click());
+//        sleep(2);
+//        pressBack();
+//        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
 
         // check SafetyChecklistFragment
         NavTenantExpandedToSafetyChecklist();
@@ -200,7 +204,7 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
 
         // check AuditChecklistFragment
         onView(withId(R.id.startSafetyChecklistButton)).perform(click());
-        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp()).perform(swipeUp());
+        onView(withId(R.id.safetyChecklistFragment)).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp());
         onView(withId(R.id.start_audit_button)).perform(click());
         pressBack();
         onView(withText("Are you sure you want to leave?\nOngoing report will be deleted!")).check(matches(isDisplayed()));
@@ -209,12 +213,16 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
         // check StatusConfirmationFragment
         onView(withId(R.id.WorkplaceSafetyAndHealthFAB)).perform(click()); // clicks the menu fab
         onView(withId(R.id.WorkplaceSafetyAndHealthFAB)).perform(click()); // clicks the workplace fab
-        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp());
+        onView(withId(R.id.auditChecklistFragment)).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp()).perform(swipeUp());
         onView(withId(R.id.submit_audit_button)).perform(click());
         onView(withText("Set all questions to true and submit")).perform(click());
         onView(withText("Yes")).perform(click());
         onView(withId(R.id.statusConfirmationFragment)).check(matches(isDisplayed()));
-        pressBack();
-        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+//        pressBack();
+//        sleep(2);
+//        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
+//        onView(withId(R.id.button_return)).perform(click());
+//        pressBack();
+//        onView(withId(R.id.tenantRecycler)).check(matches(isDisplayed()));
     }
 }
