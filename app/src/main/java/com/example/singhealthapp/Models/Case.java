@@ -10,6 +10,34 @@ public class Case {
         this.rejected_comments = rejected_comments;
     }
 
+    public void setReport_id(int report_id) {
+        this.report_id = report_id;
+    }
+
+    public void setTenant_id(int tenant_id) {
+        this.tenant_id = tenant_id;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public void setUnresolved_photo(String unresolved_photo) {
+        this.unresolved_photo = unresolved_photo;
+    }
+
+    public void setUnresolved_comments(String unresolved_comments) {
+        this.unresolved_comments = unresolved_comments;
+    }
+
+    public void setNon_compliance_type(String non_compliance_type) {
+        this.non_compliance_type = non_compliance_type;
+    }
+
+    public void setUnresolved_date(String unresolved_date) {
+        this.unresolved_date = unresolved_date;
+    }
+
     public String getRejected_comments() {
         return rejected_comments;
     }

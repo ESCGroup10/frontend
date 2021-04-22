@@ -26,15 +26,16 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
-public class DatabaseApiPostCaseTest {
+public class PostCaseApiUnitTest {
     public String token, question, non_compliance_type, unresolved_photo, unresolved_comments, unresolved_date, rejected_comments;
-    public int report_id, expected_response_code, is_resolved;
+    public int report_id, tenant_id, expected_response_code, is_resolved;
 
     // classic constructor
-    public DatabaseApiPostCaseTest(int expected_response_code, int report_id, String question, int is_resolved,
-                                   String non_compliance_type, String unresolved_photo, String unresolved_comments,
-                                   String rejected_comments, String unresolved_date) {
+    public PostCaseApiUnitTest(int expected_response_code, int report_id, int tenant_id, String question, int is_resolved,
+                               String non_compliance_type, String unresolved_photo, String unresolved_comments,
+                               String rejected_comments, String unresolved_date) {
         this.report_id = report_id;
+        this.tenant_id = tenant_id;
         this.question = question;
         this.is_resolved = is_resolved;
         this.non_compliance_type = non_compliance_type;
@@ -52,20 +53,7 @@ public class DatabaseApiPostCaseTest {
         return Arrays.asList (new Object [][] {
                 // correct base version = [expected response code, report ID, question, isResolved, non-compliance type, unresolved photo name,
                 // unresolved comments, unresolved date, rejected comments]
-                {200, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.204000Z", ""},
-                // invalid date formats
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.20400Z", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.204000", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.204080Z", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2020-04-12T18:42:36.204000Z", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-13-12T18:42:36.204000Z", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-13T18:42:36.204000Z", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T25:42:36.204000Z", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:61:36.204000Z", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "HOW", "2021-04-12T18:42:61.204000Z", ""},
-                // invalid non-compliance types
-                {405, 5, "Label caloric count of healthier options.", 0, "Food Hygienee", "5_1", "HOW", "2021-04-12T18:42:36.204000Z", ""},
-                {405, 5, "Label caloric count of healthier options.", 0, "Food  Hygiene", "5_1", "HOW", "2021-04-12T18:42:36.204000Z", ""}
+                {200, 5, 3, "Label caloric count of healthier options.", 0, "Food Hygiene", "5_1", "comments", "2021-04-12T18:42:36.204000Z", ""},
         });
     }
 
@@ -74,7 +62,7 @@ public class DatabaseApiPostCaseTest {
 
         MockWebServer server = new MockWebServer();
 
-        String mockTokenJson = "{\"id\":2,\"report_id\":5,\"tenant_id\":28,\"question\":\"Label caloric count of healthier options.\"," +
+        String mockTokenJson = "{\"id\":2,\"report_id\":5,\"tenant_id\":3,\"question\":\"Label caloric count of healthier options.\"," +
                 "\"is_resolved\":false,\"non_compliance_type\":\"Food Hygiene\",\"unresolved_photo\":\"5_1\",\"unresolved_comments\":\"HOW\"," +
                 "\"unresolved_date\":\"2021-04-12T18:42:36.204000Z\",\"resolved_photo\":\"\",\"resolved_comments\":\"\",\"resolved_date\":null," +
                 "\"rejected_comments\":\"\"}";
@@ -91,7 +79,7 @@ public class DatabaseApiPostCaseTest {
                 .build()
                 .create(DatabaseApiCaller.class);
 
-        Call<Case> testCall = mockApiCaller.postCase("Token "+token, report_id,  28, "question", 0, "non_compliance type",
+        Call<Case> testCall = mockApiCaller.postCase("Token "+token, report_id,  tenant_id, question, 0, non_compliance_type,
                 unresolved_photo, unresolved_comments, unresolved_date, rejected_comments);
 
         int actual_response_code = testCall.execute().code();

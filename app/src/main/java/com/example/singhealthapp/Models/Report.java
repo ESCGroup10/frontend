@@ -178,6 +178,46 @@ public class Report implements Parcelable {
         return 0;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setAuditor_id(int auditor_id) {
+        this.auditor_id = auditor_id;
+    }
+
+    public void setTenant_id(int tenant_id) {
+        this.tenant_id = tenant_id;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setOutlet_type(String outlet_type) {
+        this.outlet_type = outlet_type;
+    }
+
+    public void setReport_notes(String report_notes) {
+        this.report_notes = report_notes;
+    }
+
+    public void setReport_date(String report_date) {
+        this.report_date = report_date;
+    }
+
+    public void setReport_image(String report_image) {
+        this.report_image = report_image;
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 

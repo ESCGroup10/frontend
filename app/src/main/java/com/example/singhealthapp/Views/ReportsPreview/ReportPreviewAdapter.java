@@ -4,6 +4,7 @@ import android.os.Build;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.example.singhealthapp.Models.ReportPreview;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
 
+import java.sql.SQLOutput;
 import java.util.List;
 
 import static com.example.singhealthapp.HelperClasses.DateOperations.convertDatabaseDateToReadableDate;
@@ -65,10 +67,16 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
         holder.reportName.setText(list.get(position).getReportName());
         holder.reportDate.setText(("Created on: "));
         setHalfBoldTextViews(holder.reportDate, list.get(position).getReportDate());
-        if ((!list.get(position).getResolution_date().equals("NOT RESOLVED")) && (!list.get(position).getResolution_date().isEmpty())) {
-            String date = list.get(position).getResolution_date().substring(17, 27)+" "+list.get(position).getResolution_date().substring(28, 36);
-            holder.resolution.setText("Resolved on: ");
-            setHalfBoldTextViews(holder.resolution, convertDatabaseDateToReadableDate(date));
+        if ((!list.get(position).getResolution_date().equals("NOT RESOLVED")) || (!list.get(position).getResolution_date().equals("Resolution Date: "))) {
+            System.out.println("LEN: "+list.get(position).getResolution_date().length());
+            System.out.println("CONTENT: "+list.get(position).getResolution_date());
+            try {
+                String date = list.get(position).getResolution_date().substring(17, 27) + " " + list.get(position).getResolution_date().substring(28, 36);
+                holder.resolution.setText("Resolved on: ");
+                setHalfBoldTextViews(holder.resolution, convertDatabaseDateToReadableDate(date));
+            } catch (Exception e) {
+                holder.resolution.setText("");
+            }
         } else {
             holder.resolution.setText("");
         }

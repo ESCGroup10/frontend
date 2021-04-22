@@ -58,6 +58,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.example.singhealthapp.HelperClasses.DateOperations.getCurrentDatabaseDate;
+
 public class AuditChecklistFragment extends CustomFragment implements IOnBackPressed {
     public static final String TAG = "AuditChecklistFragment";
 
@@ -93,6 +95,8 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
 
     private float staffhygiene_weightage, housekeeping_weightage, safety_weightage, healthierchoice_weightage, foodhygiene_weightage = 0;
 
+    private float immutable_original_staffhygiene_score, immutable_original_housekeeping_score, immutable_original_safety_score,
+            immutable_original_healthierchoice_score, immutable_original_foodhygiene_score = 0;
     // photo stuff
     private HandlePhotoListener mActivityCallback;
     private int photoNameCounter = 0;
@@ -246,6 +250,8 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
         thisReport.setStaffhygiene_score(round(staffhygiene_score));
         if (numCases == 0) {
             thisReport.setStatus(true);
+            String date = getCurrentDatabaseDate();
+            thisReport.setResolution_date(date);
         }
         // check final report
     }
@@ -445,7 +451,7 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                     return false;
                 }
 
-                String datetime = DateOperations.getCurrentDatabaseDate();
+                String datetime = getCurrentDatabaseDate();
 
                 Call<Case> caseCall = apiCaller.postCase("Token " + token, reportID, tenantID, question, 0, non_compliance_type,
                         photoName, comments, datetime, "");
@@ -495,9 +501,13 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
 
     private void deleteRecentlySubmittedCases() {
         Log.d(TAG, "deleteRecentlySubmittedCases: called");
+        Log.d(TAG, "deleteRecentlySubmittedCases: size of submittedCaseIDs: "+submittedCaseIDs.size());
         for (int caseID : submittedCaseIDs) {
             Log.d(TAG, "deleteRecentlySubmittedCases: id: "+caseID);
             deleteCase(caseID);
+        }
+        if (submittedCaseIDs.size() == 0) {
+            Log.d(TAG, "deleteRecentlySubmittedCases: There are no cases to delete");
         }
     }
 
@@ -520,11 +530,14 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
     }
 
     private void reInitScores() {
-        staffhygiene_score=original_staffhygiene_score;
-        housekeeping_score=original_housekeeping_score;
-        foodhygiene_score=original_foodhygiene_score;
-        healthierchoice_score=original_healthierchoice_score;
-        safety_score=original_safety_score;
+        staffhygiene_score=original_staffhygiene_score=immutable_original_staffhygiene_score;
+        housekeeping_score=original_housekeeping_score=immutable_original_housekeeping_score;
+        foodhygiene_score=original_foodhygiene_score=immutable_original_foodhygiene_score;
+        healthierchoice_score=original_healthierchoice_score=immutable_original_healthierchoice_score;
+        safety_score=original_safety_score=immutable_original_safety_score;
+        Log.d(TAG, "reInitScores: staffhygiene_score:" +staffhygiene_score);
+        Log.d(TAG, "reInitScores: original_staffhygiene_score:" +original_staffhygiene_score);
+        Log.d(TAG, "reInitScores: immutable_original_staffhygiene_score:" +immutable_original_staffhygiene_score);
     }
 
     private void calculateScores() throws IllegalArgumentException {
@@ -544,9 +557,13 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
 
             switch (name) {
                 case "Professional & Staff Hygiene":
+                    Log.d(TAG, "calculateScores: Professional & Staff Hygiene: score: "+staffhygiene_score);
                     staffhygiene_score-=currentChecklistNumCases;
+                    Log.d(TAG, "calculateScores: Professional & Staff Hygiene: score after -numcases: "+staffhygiene_score);
                     original_staffhygiene_score-=currentChecklistNumNA;
+                    Log.d(TAG, "calculateScores: Professional & Staff Hygiene: original score after -na: "+original_staffhygiene_score);
                     staffhygiene_score-=currentChecklistNumNA;
+                    Log.d(TAG, "calculateScores: Professional & Staff Hygiene: score after -na: "+staffhygiene_score);
                     break;
                 case "Housekeeping & General Cleanliness":
                     housekeeping_score-=currentChecklistNumCases;
@@ -575,6 +592,7 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
 
         // calculate scores
         staffhygiene_score = staffhygiene_score /original_staffhygiene_score * 100f;
+        Log.d(TAG, "calculateScores: Professional & Staff Hygiene: score after calculation: "+staffhygiene_score);
         housekeeping_score = housekeeping_score /original_housekeeping_score * 100f;
         safety_score = safety_score /original_safety_score * 100f;
         if (tenantType.equals("F&B")) {
@@ -747,20 +765,20 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
 
     private void initScoresAndPercentages(String tenantType) {
         if (tenantType.equals("F&B")) {
-            staffhygiene_score = original_staffhygiene_score = 13;
-            housekeeping_score = original_housekeeping_score = 17;
-            safety_score = original_safety_score = 18;
-            healthierchoice_score = original_healthierchoice_score = 11;
-            foodhygiene_score = original_foodhygiene_score = 37;
+            staffhygiene_score = original_staffhygiene_score = immutable_original_staffhygiene_score = 13;
+            housekeeping_score = original_housekeeping_score = immutable_original_housekeeping_score = 17;
+            safety_score = original_safety_score = immutable_original_safety_score = 18;
+            healthierchoice_score = original_healthierchoice_score = immutable_original_healthierchoice_score = 11;
+            foodhygiene_score = original_foodhygiene_score = immutable_original_foodhygiene_score = 37;
             staffhygiene_weightage = 0.10f;
             housekeeping_weightage = 0.20f;
             safety_weightage = 0.20f;
             healthierchoice_weightage = 0.15f;
             foodhygiene_weightage = 0.35f;
         } else if (tenantType.equals("Non F&B")) {
-            staffhygiene_score = original_staffhygiene_score = 6;
-            housekeeping_score = original_housekeeping_score = 12;
-            safety_score = original_safety_score = 16;
+            staffhygiene_score = original_staffhygiene_score = immutable_original_staffhygiene_score = 6;
+            housekeeping_score = original_housekeeping_score = immutable_original_housekeeping_score = 12;
+            safety_score = original_safety_score = immutable_original_safety_score = 16;
             staffhygiene_weightage = 0.20f;
             housekeeping_weightage = 0.40f;
             safety_weightage = 0.40f;

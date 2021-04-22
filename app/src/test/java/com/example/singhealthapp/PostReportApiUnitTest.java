@@ -23,18 +23,18 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
-public class DatabaseApiPostNewNFBReportTest {
+public class PostReportApiUnitTest {
     public String token, company, location, institution, outlet_type, report_notes, report_date, resolution_date;
     public int auditor_id, tenant_id, expected_response_code;
     public float staff_hygiene_score, housekeeping_score, safety_score, healthier_choice_score, food_hygiene_score;
     public boolean status;
 
     // classic constructor
-    public DatabaseApiPostNewNFBReportTest(int expected_response_code, int auditor_id, int tenant_id, String company,
-                                           String institution, String location, String outlet_type, boolean status,
-                                           String report_notes, String report_date, String resolution_date, float staff_hygiene_score,
-                                           float housekeeping_score, float safety_score, float healthierchoice_score,
-                                           float foodhygiene_score) {
+    public PostReportApiUnitTest(int expected_response_code, int auditor_id, int tenant_id, String company,
+                                 String institution, String location, String outlet_type, boolean status,
+                                 String report_notes, String report_date, String resolution_date, float staff_hygiene_score,
+                                 float housekeeping_score, float safety_score, float healthierchoice_score,
+                                 float foodhygiene_score) {
         this.auditor_id = auditor_id;
         this.tenant_id = tenant_id;
         this.company = company;
@@ -65,39 +65,11 @@ public class DatabaseApiPostNewNFBReportTest {
                 // base correct case
                 {200, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T08:45:18.386910Z", "",
                         0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                // more than 2dp - fail
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T08:45:18.386910Z", "",
-                        0.2f, 0.37f, 0.423f, -1.00f, -1.00f},
-                // more than 10 digits - fail
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T08:45:18.386910Z", "",
-                        0.2f, 0.37f, 0.41234321234f, -1.00f, -1.00f},
-                // negative score - pass (frontend code should prevent this)
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T08:45:18.386910Z", "",
-                        0.2f, 0.37f, -0.4f, -1.00f, -1.00f},
-                // invalid date format -fail
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T08:45:18.386910", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T08:45:18.38691Z", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T08:45:61.386910Z", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T08:61:18.386910Z", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-14T25:45:18.386910Z", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-04-40T08:45:18.386910Z", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021-13-14T08:45:18.386910Z", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2020-04-14T08:45:18.386910Z", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
-                {401, 20, 22, "Fred's Bookstore", "SGH", "Blk 6 Lvl 1", "Non F&B", false, "notes", "2021_04-14T08:45:18.386910Z", "",
-                        0.2f, 0.37f, 0.4f, -1.00f, -1.00f},
         });
     }
 
     @Test
-    public void postNewReportTest() throws IOException, InterruptedException {
+    public void postReportTest() throws IOException, InterruptedException {
         MockWebServer server = new MockWebServer();
         String mockTokenJson = "{\n" +
                 "        \"id\": 1430,\n" +
@@ -111,9 +83,9 @@ public class DatabaseApiPostNewNFBReportTest {
                 "        \"report_notes\": \"\",\n" +
                 "        \"report_date\": \"2021-04-14T08:45:18.386910Z\",\n" +
                 "        \"resolution_date\": \"\",\n" +
-                "        \"staffhygiene_score\": \"0.20\",\n" +
-                "        \"housekeeping_score\": \"0.37\",\n" +
-                "        \"safety_score\": \"0.40\",\n" +
+                "        \"staffhygiene_score\": \"20\",\n" +
+                "        \"housekeeping_score\": \"37\",\n" +
+                "        \"safety_score\": \"40\",\n" +
                 "        \"healthierchoice_score\": \"-1.00\",\n" +
                 "        \"foodhygiene_score\": \"-1.00\"\n" +
                 "    }";
