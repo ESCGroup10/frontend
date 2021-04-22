@@ -458,7 +458,7 @@ public class AuditChecklistFragment extends CustomFragment implements IOnBackPre
                             submittedCaseIDs.add(caseID); // keep track of the caseIDs that have been created
                         }
                         //upload non-null bitmap to database
-                        HandleImageOperations.uploadImageToDatabase(photoBitmap, photoName);
+                        HandleImageOperations.uploadImageToDatabase(photoBitmap, photoName, 5);
                         if (stopCreatingCases) {
                             deleteCase(caseID);
                         }

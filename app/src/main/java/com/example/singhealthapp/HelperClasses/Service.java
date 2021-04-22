@@ -87,9 +87,13 @@ public class Service extends android.app.Service {
 
         // get extras from intent
 //        Log.d(TAG, "onStartCommand: setting token and tenantID");
-        Bundle bundle = intent.getExtras();
-        tenantID = bundle.getInt("TENANT_ID_KEY");
-        token = bundle.getString("TOKEN_KEY");
+        try {
+            Bundle bundle = intent.getExtras();
+            tenantID = bundle.getInt("TENANT_ID_KEY");
+            token = bundle.getString("TOKEN_KEY");
+        } catch (Exception e) {
+            stopSelf();
+        }
 
         // return start sticky so if it is killed by android, it will be restarted with Intent null
         return START_STICKY;

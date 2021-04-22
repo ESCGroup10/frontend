@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.singhealthapp.HelperClasses.BackStackInfo;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
+import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.TenantReportPreviewNavigateListener;
@@ -212,6 +213,12 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
         ArrayList<ReportPreview> completedPreview = new ArrayList<>();
         ArrayList<Report> completedReports = new ArrayList<>();
         ArrayList<Integer> Invalid = new ArrayList<>();
+//        Log.d(TAG, "displayRecycleView: size of reports: "+reports.size());
+//        Log.d(TAG, "displayRecycleView: size of reportPreviews: "+reportPreviews.size());
+//        reports = DateOperations.organiseReportByDate(reports);
+//        reportPreviews = DateOperations.organiseReportPreviewByDate(reportPreviews);
+//        Log.d(TAG, "displayRecycleView: size of reports: "+reports.size());
+//        Log.d(TAG, "displayRecycleView: size of reportPreviews: "+reportPreviews.size());
         for ( Report o : reports ){
             if (! isDataValid(o)) {
                 Invalid.add(o.getId());

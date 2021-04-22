@@ -14,13 +14,5 @@
         android:icon="@drawable/ic_statistics"
         android:id="@+id/nav_Tenant_Statistics"
         android:title="View Statistics" />
-    <item android:title="Manage">
-        <menu>
-            <item
-                android:icon="@drawable/ic_report"
-                android:id="@+id/nav_Test"
-                android:title="Test Example"/>
-        </menu>
-    </item>
 
 </menu>

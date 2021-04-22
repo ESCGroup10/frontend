@@ -41,6 +41,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.example.singhealthapp.HelperClasses.DateOperations.convertDatabaseDateToReadableDate;
+import static com.example.singhealthapp.HelperClasses.DateOperations.getMoreRecentDate;
 
 public class LatestReportFragment extends CustomFragment {
     private static final String TAG = "LatestReportFragment";
@@ -100,6 +102,28 @@ public class LatestReportFragment extends CustomFragment {
                 }
                 else {
                     report = reports.get(reports.size()-1);
+                    String mostRecentDate = null;
+                    int reportIdx = 0;
+                    for (int i=0;(i+1)<reports.size();i++) {
+                        if (i==0) {
+                            String date1 = convertDatabaseDateToReadableDate(reports.get(i).getReport_date());
+                            String date2 = convertDatabaseDateToReadableDate(reports.get(i+1).getReport_date());
+                            mostRecentDate = getMoreRecentDate(date1, date2);
+                            if ((mostRecentDate.equals(date1))) {
+                                reportIdx = i;
+                            } else {
+                                reportIdx = (i + 1);
+                            }
+                        } else {
+                            String date1 = convertDatabaseDateToReadableDate(reports.get(i+1).getReport_date());
+                            mostRecentDate = getMoreRecentDate(date1, mostRecentDate);
+                            if ((mostRecentDate.equals(date1))) {
+                                reportIdx = i+1;
+                            }
+                        }
+                    }
+                    Log.d(TAG, "onResponse: most recent date: "+mostRecentDate);
+                    report = reports.get(reportIdx);
                     Log.d(TAG, "onResponse: userType: "+userType);
                     if (userType.equals("F&B")) {
                         data = new float[][]{new float[]{report.getStaffhygiene_score(), 100f - report.getStaffhygiene_score()},

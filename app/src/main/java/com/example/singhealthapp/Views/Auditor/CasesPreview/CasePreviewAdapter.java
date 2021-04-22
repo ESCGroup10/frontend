@@ -50,8 +50,13 @@ public class CasePreviewAdapter extends RecyclerView.Adapter<CasePreviewHolder>{
         }
         else {
             if (thisCase.getRejected_comments().isEmpty()) {
-                holder.is_resolved.setText("Unresolved");
-                holder.is_resolved.setTextColor(Color.parseColor("#ff6961"));
+                if (!thisCase.getResolved_photo().isEmpty()) {
+                    holder.is_resolved.setText("Pending Resolution");
+                    holder.is_resolved.setTextColor(Color.parseColor("#ff6961"));
+                } else {
+                    holder.is_resolved.setText("Unresolved");
+                    holder.is_resolved.setTextColor(Color.parseColor("#ff6961"));
+                }
             }
             else {
                 holder.is_resolved.setText("Rejected");

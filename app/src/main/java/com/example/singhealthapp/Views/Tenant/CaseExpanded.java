@@ -22,10 +22,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.Containers.TenantFragmentContainer;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.CustomViewSettings;
@@ -39,6 +41,7 @@ import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
+import com.example.singhealthapp.Views.Login.LoginActivity;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -273,7 +276,9 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
                             CentralisedToast.LENGTH_SHORT);
                     return;
                 }
-                createUpdatedCase(true);
+                if (!createUpdatedCase(true)) {
+                    return;
+                }
                 Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
 
             patchCall.enqueue(new Callback<Void>() {
@@ -293,13 +298,15 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
                     }
                 });
                 // upload non-null bitmap to database
-                HandleImageOperations.uploadImageToDatabase(resolutionImageBitmap, resolvedImageName);
+                HandleImageOperations.uploadImageToDatabase(resolutionImageBitmap, resolvedImageName, 5);
             });
         } else {
             CustomViewSettings.makeScrollable(rejectedCommentsEditText);
 
             acceptButton.setOnClickListener(v -> {
-                createUpdatedCase(true);
+                if (!createUpdatedCase(true)) {
+                    return;
+                }
                 // if there are no more unresolved after this acceptance, set report status to true!
                 Call<List<Case>> call = apiCaller.getCasesById("Token " + token, reportID, 0);
                 call.enqueue(new Callback<List<Case>>() {
@@ -378,7 +385,9 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
                     acceptButton.setVisibility(GONE);
                     rejectButton.setText("Confirm reject");
                 } else {
-                    createUpdatedCase(false);
+                    if (!createUpdatedCase(false)) {
+                        return;
+                    }
                     Call<Void> patchCall = apiCaller.patchCase("Token " + token, caseID, thisCase);
 
                     patchCall.enqueue(new Callback<Void>() {
@@ -400,76 +409,36 @@ public class CaseExpanded extends CustomFragment implements IOnBackPressed {
         }
     }
 
-    private void createUpdatedCase (boolean accept) {
+    private boolean createUpdatedCase (boolean accept) {
         if (userType.equals("Auditor")) {
             if (accept) {
                 thisCase.setIs_resolved(true);
             } else {
-                thisCase.setRejected_comments(rejectedCommentsEditText.getText().toString());
+                if (!rejectedCommentsEditText.getText().toString().isEmpty()) {
+                    thisCase.setRejected_comments(rejectedCommentsEditText.getText().toString());
+                } else {
+                    handleNoRejectedComments();
+                    return false;
+                }
             }
-            return;
+            return true;
         }
         String datetime = DateOperations.getCurrentDatabaseDate();
         thisCase.setRejected_comments(""); // set this to empty since each new submission is not rejected
         thisCase.setResolved_date(datetime);
         thisCase.setResolved_photo(resolvedImageName);
         thisCase.setResolved_comments(resolvedCommentsEditText.getText().toString());
+        return true;
     }
 
-//    private void updateIsReportClosed() {
-//        Log.d(TAG, "updateIsReportClosed: called");
-//        new Thread(() -> {
-//            Log.d(TAG, "updateIsReportClosed: in thread");
-//            // if there are no more unresolved after this acceptance, set report status to true!
-//            Call<List<Case>> call = apiCaller.getCasesById("Token " + token, reportID, 0);
-//            call.enqueue(new Callback<List<Case>>() {
-//                @Override
-//                public void onResponse(Call<List<Case>> call, Response<List<Case>> response) {
-//                    Log.d(TAG, "updateIsReportClosed: response code: " + response.code());
-//                    Log.d(TAG, "onResponse: number of cases in report" + response.body().size());
-//                    if (response.body().size() == 1) {
-//                        // the only unresolved case is this one
-//                        synchronized (lock) {
-//                            REPORT_STATUS_UPDATED.set(true);
-//                            REPORT_RESOLVED = true;
-//                            Log.d(TAG, "onResponse: notifying REPORT_STATUS_UPDATED");
-//                            lock.notifyAll();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Call<List<Case>> call, Throwable t) {
-//                    t.printStackTrace();
-//                }
-//            });
-//        }).start();
-//    }
-
-//    private void createdUpdatedReport () {
-//        Log.d(TAG, "createdUpdatedReport: called");
-//        Call<List<Report>> call = apiCaller.getReport("Token " + token);
-//        call.enqueue(new Callback<List<Report>>() {
-//                         @Override
-//                         public void onResponse(Call<List<Report>> call, Response<List<Report>> response) {
-//                             Log.d(TAG, "createdUpdatedReport onResponse: response code: "+response.code());
-//                             for (Report report : response.body()) {
-//                                 if (report.getId() == reportID) {
-//                                     thisReport = report;
-//                                     break;
-//                                 }
-//                             }
-//                             String datetime = DateOperations.getCurrentDatabaseDate();
-//                             thisReport.setResolution_date(datetime);
-//                             thisReport.setStatus(true);
-//                         }
-//
-//                         @Override
-//                         public void onFailure(Call<List<Report>> call, Throwable t) {
-//                             t.printStackTrace();
-//                         }
-//                     });
-//    }
+    private void handleNoRejectedComments() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setMessage("Please set some comments so the tenant knows what to change!");
+        builder.setPositiveButton("OK", (dialog, id) -> {
+            dialog.dismiss();
+        });
+        builder.show();
+    }
 
     private void TenantSubmit(String title, String msg, String additionalMsg, String buttonText) {
         Bundle bundle = new Bundle();

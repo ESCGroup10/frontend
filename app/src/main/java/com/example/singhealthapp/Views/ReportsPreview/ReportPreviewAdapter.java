@@ -21,6 +21,8 @@ import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragme
 
 import java.util.List;
 
+import static com.example.singhealthapp.HelperClasses.DateOperations.convertDatabaseDateToReadableDate;
+
 public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHolder>{
     List<ReportPreview> list;
     AuditorReportPreviewNavigateListener parent;
@@ -64,8 +66,9 @@ public class ReportPreviewAdapter extends RecyclerView.Adapter<ReportPreviewHold
         holder.reportDate.setText(("Created on: "));
         setHalfBoldTextViews(holder.reportDate, list.get(position).getReportDate());
         if ((!list.get(position).getResolution_date().equals("NOT RESOLVED")) && (!list.get(position).getResolution_date().isEmpty())) {
+            String date = list.get(position).getResolution_date().substring(17, 27)+" "+list.get(position).getResolution_date().substring(28, 36);
             holder.resolution.setText("Resolved on: ");
-            setHalfBoldTextViews(holder.resolution, list.get(position).getResolution_date());
+            setHalfBoldTextViews(holder.resolution, convertDatabaseDateToReadableDate(date));
         } else {
             holder.resolution.setText("");
         }

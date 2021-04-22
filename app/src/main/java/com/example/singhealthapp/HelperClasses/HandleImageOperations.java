@@ -162,7 +162,7 @@ public class HandleImageOperations {
         return inSampleSize;
     }
 
-    public static void uploadImageToDatabase(Bitmap bitmap, String photoName) throws NullPointerException {
+    public static void uploadImageToDatabase(Bitmap bitmap, String photoName, int count) throws NullPointerException {
 
         new Thread(() -> {
             try {
@@ -182,6 +182,14 @@ public class HandleImageOperations {
             } catch (NullPointerException e) {
                 System.out.println("uploadImage: image does not exist");
                 throw new NullPointerException();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (count > 0) {
+                    System.out.println("Trying to upload image to database again");
+                    uploadImageToDatabase(bitmap, photoName, count - 1);
+                } else {
+                    System.out.println("Unable to upload image to database");
+                }
             }
 
         }).start();
