@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.singhealthapp.HelperClasses.BackStackInfo;
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Case;
@@ -64,7 +63,6 @@ public class ReportSummaryFragment extends CustomFragment {
                              Bundle savedInstanceState) {
         loadUserType();
         initApiCaller();
-        BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
         if (report.getTenant_display_id() == null){
             getActivity().setTitle("Report " + report.getId());
         }

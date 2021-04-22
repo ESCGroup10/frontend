@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 import static android.app.Activity.RESULT_OK;
+import static java.lang.Thread.yield;
 
 public class HandleImageOperations {
 
@@ -162,6 +163,9 @@ public class HandleImageOperations {
         return inSampleSize;
     }
 
+    /**
+     * Uploads image to database on a separate thread, may try to repeat the operation count times if it failed
+     * */
     public static void uploadImageToDatabase(Bitmap bitmap, String photoName, int count) throws NullPointerException {
 
         new Thread(() -> {
@@ -186,6 +190,7 @@ public class HandleImageOperations {
                 e.printStackTrace();
                 if (count > 0) {
                     System.out.println("Trying to upload image to database again");
+                    yield();
                     uploadImageToDatabase(bitmap, photoName, count - 1);
                 } else {
                     System.out.println("Unable to upload image to database");

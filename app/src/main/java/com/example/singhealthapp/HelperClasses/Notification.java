@@ -16,13 +16,6 @@ import com.example.singhealthapp.R;
 public class Notification {
     private PendingIntent notificationPendingIntent;
 
-//    public Notification setFakeNotification(Context context, String CHANNEL_ID) {
-//        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID);
-//        notificationBuilder.setPriority(NotificationCompat.PRIORITY_MIN);
-//        return notification;
-//    }
-
     /**
      * This is the method  called to create the Notification
      */
@@ -47,7 +40,7 @@ public class Notification {
             //mContext.getString(R.string.channel_name);
             int importance = NotificationManager.IMPORTANCE_LOW;
 
-            String CHANNEL_ID = "uk.ac.shef.oak.channel";
+            String CHANNEL_ID = "com.example.singhealthapp.channel";
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             //String description = mContext.getString(R.string.notifications_description);
             String description = "I would like to receive travel alerts and notifications for:";

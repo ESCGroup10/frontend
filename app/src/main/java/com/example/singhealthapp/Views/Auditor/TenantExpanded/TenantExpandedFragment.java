@@ -12,11 +12,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
-
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
-import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
@@ -24,9 +21,7 @@ import com.example.singhealthapp.Models.Tenant;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.Checklists.SafetyChecklistFragment;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;

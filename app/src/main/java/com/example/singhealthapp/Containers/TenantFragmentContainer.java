@@ -22,7 +22,6 @@ import android.view.MenuItem;
 
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
-import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.HelperClasses.ProcessMainClass;
 import com.example.singhealthapp.HelperClasses.RestartServiceBroadcastReceiver;
 import com.example.singhealthapp.HelperClasses.SendInfoToPMC;
@@ -33,7 +32,7 @@ import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
 import com.google.android.material.navigation.NavigationView;
 
-public class TenantFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Ping,
+public class TenantFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         SendInfoToPMC {
 
     private static final String TAG = "TenantFragmentContainer";
@@ -254,7 +253,6 @@ public class TenantFragmentContainer extends AppCompatActivity implements Naviga
         handleIntentFromNotification();
     }
 
-    @Override
     @VisibleForTesting
     public void activateEspressoIdlingResource() {
         EspressoCountingIdlingResource.activate();

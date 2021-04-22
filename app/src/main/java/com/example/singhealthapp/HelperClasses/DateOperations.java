@@ -31,6 +31,9 @@ public class DateOperations {
         return date.substring(0, 10);
     }
 
+    /**
+     * returns the more recent date based on the date format: yyyy-mm-dd hh:MM:ss
+     * */
     public static String getMoreRecentDate(String date1, String date2) {
         // yyyy-mm-dd hh:MM:ss
 //        Log.d(TAG, "getMoreRecentDate: year: "+date1.substring(0, 4)+" vs "+date2.substring(0, 4));
@@ -96,72 +99,72 @@ public class DateOperations {
         }
     }
 
-    public static List<Report> organiseReportByDate(List<Report> reportList) {
-        // first is more recent
-//        Report[] organisedReportList = new Report[reportList.size()];
-        /**
-         * Does not work, need to make deepcopy of list and remove the most recent report/make its date large after every loop
-         * */
-        Log.d(TAG, "organiseReportByDate: size: "+reportList.size());
-        List<Report> organisedReportList = new ArrayList<Report>();
-        for (int j=0;j<reportList.size();j++) {
-            String mostRecentDate = null;
-            int reportIdx = 0;
-            for (int i = 0; (i + 1) < reportList.size(); i++) {
-                if (i == 0) {
-                    String date1 = convertDatabaseDateToReadableDate(reportList.get(i).getReport_date());
-                    String date2 = convertDatabaseDateToReadableDate(reportList.get(i + 1).getReport_date());
-                    mostRecentDate = getMoreRecentDate(date1, date2);
-                    if ((mostRecentDate.equals(date1))) {
-                        reportIdx = i;
-                    } else {
-                        reportIdx = (i + 1);
-                    }
-                } else {
-                    String date1 = convertDatabaseDateToReadableDate(reportList.get(i + 1).getReport_date());
-                    mostRecentDate = getMoreRecentDate(date1, mostRecentDate);
-                    if ((mostRecentDate.equals(date1))) {
-                        reportIdx = i + 1;
-                    }
-                }
-            }
-            organisedReportList.add(reportList.get(reportIdx));
-
-        }
-        Log.d(TAG, "organiseReportByDate: final size: "+organisedReportList.size());
-        return organisedReportList;
-    }
-
-    public static List<ReportPreview> organiseReportPreviewByDate(List<ReportPreview> reportList) {
-        // first is more recent
-//        Report[] organisedReportList = new Report[reportList.size()];
-        Log.d(TAG, "organiseReportByDate: size: "+reportList.size());
-        List<ReportPreview> organisedReportPreviewList = new ArrayList<ReportPreview>();
-        for (int j=0;j<reportList.size();j++) {
-            String mostRecentDate = null;
-            int reportIdx = 0;
-            for (int i = 0; (i + 1) < reportList.size(); i++) {
-                if (i == 0) {
-                    String date1 = convertDatabaseDateToReadableDate(reportList.get(i).getReport_date());
-                    String date2 = convertDatabaseDateToReadableDate(reportList.get(i + 1).getReport_date());
-                    mostRecentDate = getMoreRecentDate(date1, date2);
-                    if ((mostRecentDate.equals(date1))) {
-                        reportIdx = i;
-                    } else {
-                        reportIdx = (i + 1);
-                    }
-                } else {
-                    String date1 = convertDatabaseDateToReadableDate(reportList.get(i + 1).getReport_date());
-                    mostRecentDate = getMoreRecentDate(date1, mostRecentDate);
-                    if ((mostRecentDate.equals(date1))) {
-                        reportIdx = i + 1;
-                    }
-                }
-            }
-            organisedReportPreviewList.add(reportList.get(reportIdx));
-        }
-        Log.d(TAG, "organiseReportByDate: final size: "+organisedReportPreviewList.size());
-        return organisedReportPreviewList;
-    }
+//    public static List<Report> organiseReportByDate(List<Report> reportList) {
+//        // first is more recent
+////        Report[] organisedReportList = new Report[reportList.size()];
+//        /**
+//         * Does not work, need to make deepcopy of list and remove the most recent report/make its date large after every loop
+//         * */
+//        Log.d(TAG, "organiseReportByDate: size: "+reportList.size());
+//        List<Report> organisedReportList = new ArrayList<Report>();
+//        for (int j=0;j<reportList.size();j++) {
+//            String mostRecentDate = null;
+//            int reportIdx = 0;
+//            for (int i = 0; (i + 1) < reportList.size(); i++) {
+//                if (i == 0) {
+//                    String date1 = convertDatabaseDateToReadableDate(reportList.get(i).getReport_date());
+//                    String date2 = convertDatabaseDateToReadableDate(reportList.get(i + 1).getReport_date());
+//                    mostRecentDate = getMoreRecentDate(date1, date2);
+//                    if ((mostRecentDate.equals(date1))) {
+//                        reportIdx = i;
+//                    } else {
+//                        reportIdx = (i + 1);
+//                    }
+//                } else {
+//                    String date1 = convertDatabaseDateToReadableDate(reportList.get(i + 1).getReport_date());
+//                    mostRecentDate = getMoreRecentDate(date1, mostRecentDate);
+//                    if ((mostRecentDate.equals(date1))) {
+//                        reportIdx = i + 1;
+//                    }
+//                }
+//            }
+//            organisedReportList.add(reportList.get(reportIdx));
+//
+//        }
+//        Log.d(TAG, "organiseReportByDate: final size: "+organisedReportList.size());
+//        return organisedReportList;
+//    }
+//
+//    public static List<ReportPreview> organiseReportPreviewByDate(List<ReportPreview> reportList) {
+//        // first is more recent
+////        Report[] organisedReportList = new Report[reportList.size()];
+//        Log.d(TAG, "organiseReportByDate: size: "+reportList.size());
+//        List<ReportPreview> organisedReportPreviewList = new ArrayList<ReportPreview>();
+//        for (int j=0;j<reportList.size();j++) {
+//            String mostRecentDate = null;
+//            int reportIdx = 0;
+//            for (int i = 0; (i + 1) < reportList.size(); i++) {
+//                if (i == 0) {
+//                    String date1 = convertDatabaseDateToReadableDate(reportList.get(i).getReport_date());
+//                    String date2 = convertDatabaseDateToReadableDate(reportList.get(i + 1).getReport_date());
+//                    mostRecentDate = getMoreRecentDate(date1, date2);
+//                    if ((mostRecentDate.equals(date1))) {
+//                        reportIdx = i;
+//                    } else {
+//                        reportIdx = (i + 1);
+//                    }
+//                } else {
+//                    String date1 = convertDatabaseDateToReadableDate(reportList.get(i + 1).getReport_date());
+//                    mostRecentDate = getMoreRecentDate(date1, mostRecentDate);
+//                    if ((mostRecentDate.equals(date1))) {
+//                        reportIdx = i + 1;
+//                    }
+//                }
+//            }
+//            organisedReportPreviewList.add(reportList.get(reportIdx));
+//        }
+//        Log.d(TAG, "organiseReportByDate: final size: "+organisedReportPreviewList.size());
+//        return organisedReportPreviewList;
+//    }
 
 }

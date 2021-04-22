@@ -18,9 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.singhealthapp.HelperClasses.BackStackInfo;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
-import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.TenantReportPreviewNavigateListener;
@@ -29,7 +27,6 @@ import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
-import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
 import com.example.singhealthapp.Views.ReportsPreview.ReportPreviewTenantAdapter;
 
 import java.util.ArrayList;
@@ -55,7 +52,6 @@ public class MyReportsFragment extends CustomFragment implements TenantReportPre
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
         getActivity().setTitle("My Reports");
         View view = inflater.inflate(R.layout.f_reports_all, container, false);
         loadFromSharedPreferences();

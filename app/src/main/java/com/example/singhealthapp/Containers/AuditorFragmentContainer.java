@@ -25,7 +25,6 @@ import androidx.fragment.app.FragmentManager;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
-import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
 import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment;
@@ -43,7 +42,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class AuditorFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        HandlePhotoInterface, AuditChecklistFragment.HandlePhotoListener, Ping {
+        HandlePhotoInterface, AuditChecklistFragment.HandlePhotoListener {
 
     private static final String TAG = "AuditorFragmentContain";
     ChecklistAdapter mChecklistAdapter;
@@ -277,7 +276,6 @@ public class AuditorFragmentContainer extends AppCompatActivity implements Navig
         mCurrentPhotoBitmap = null;
     }
 
-    @Override
     @VisibleForTesting
     public void activateEspressoIdlingResource() {
         EspressoCountingIdlingResource.activate();

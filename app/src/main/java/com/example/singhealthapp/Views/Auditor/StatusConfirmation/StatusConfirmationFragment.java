@@ -13,17 +13,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import com.example.singhealthapp.HelperClasses.BackStackInfo;
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
-import com.example.singhealthapp.HelperClasses.Ping;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
-import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
-import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
 
 import java.util.Arrays;
 
@@ -77,10 +70,8 @@ public class StatusConfirmationFragment extends Fragment implements IOnBackPress
         button.setText(button_text);
         Log.d(TAG, "onCreateView: set views");
 
-        BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
         button.setOnClickListener(v -> {
             EspressoCountingIdlingResource.increment();
-            BackStackInfo.printBackStackInfo(getParentFragmentManager(), this);
             getParentFragmentManager().popBackStack(0, 0);
         });
         EspressoCountingIdlingResource.decrement();
