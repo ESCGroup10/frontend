@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.ReportsPreview;
+package com.example.singhealthapp.Views.Common.ReportsPreview;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -25,7 +25,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.ReportPreview;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.ReportSummary.ReportSummaryFragment;
+import com.example.singhealthapp.Views.Common.ReportSummary.ReportSummaryFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ReportsPreviewFragment extends CustomFragment implements AuditorReportPreviewNavigateListener {
     private static final String TAG = "ReportsPreviewFragment";
-    ReportPreviewAdapter adapterUnresolved, adapterCompleted;
+    ReportPreviewAuditorAdapter adapterUnresolved, adapterCompleted;
     private ArrayList<ReportPreview> reportPreviews, displayPreviews;
     private ArrayList<Report> reports, displayReports;
     boolean unresolved, completed;
@@ -226,7 +226,7 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
 //        Log.d(TAG, "displayRecycleView: unresolvedReports size: "+unresolvedReports.size());
 //        Log.d(TAG, "displayRecycleView: completedPreview size: "+completedPreview.size());
 //        Log.d(TAG, "displayRecycleView: completedReports size: "+completedReports.size());
-        adapterUnresolved = new ReportPreviewAdapter(unresolvedPreview, unresolvedReports, this, token);
+        adapterUnresolved = new ReportPreviewAuditorAdapter(unresolvedPreview, unresolvedReports, this, token);
         try {
             RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved);
             view.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -235,7 +235,7 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
         } catch (Exception e) {
             System.out.println("Unresolved recycleView not set");
         }
-        adapterCompleted = new ReportPreviewAdapter(completedPreview, completedReports, this, token);
+        adapterCompleted = new ReportPreviewAuditorAdapter(completedPreview, completedReports, this, token);
         try {
             RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerView);
             view.setLayoutManager(new LinearLayoutManager(getActivity()));

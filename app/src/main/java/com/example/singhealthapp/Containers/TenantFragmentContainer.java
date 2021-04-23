@@ -25,11 +25,11 @@ import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.HelperClasses.ProcessMainClass;
 import com.example.singhealthapp.HelperClasses.RestartServiceBroadcastReceiver;
 import com.example.singhealthapp.HelperClasses.SendInfoToPMC;
-import com.example.singhealthapp.Views.Login.LoginActivity;
+import com.example.singhealthapp.Views.Common.Login.LoginActivity;
 import com.example.singhealthapp.Views.Tenant.LatestReportFragment;
 import com.example.singhealthapp.Views.Tenant.MyReportsFragment;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
+import com.example.singhealthapp.Views.Common.Statistics.StatisticsFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class TenantFragmentContainer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,

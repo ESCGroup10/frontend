@@ -24,11 +24,11 @@ import static org.junit.Assert.assertEquals;
 public class PatchReportApiUnitTest {
     public static String token;
     public Report report;
-    public int auditor_id, expected_response_code;
+    public int report_id, expected_response_code;
 
     // classic constructor
-    public PatchReportApiUnitTest(int expected_response_code, int auditor_id, Report report) {
-        this.auditor_id = auditor_id;
+    public PatchReportApiUnitTest(int expected_response_code, int report_id, Report report) {
+        this.report_id = report_id;
         this.report = report;
         this.expected_response_code = expected_response_code;
         token = "fake token";
@@ -38,7 +38,7 @@ public class PatchReportApiUnitTest {
     public static Collection<Object[]> parameters() {
         // map result to constructor parameters (each inner list corresponds to the inputs to the constructor)
         return Arrays.asList (new Object [][] {
-                {200, 20, new Report()}
+                {200, 1430, new Report()}
         });
     }
 
@@ -73,7 +73,7 @@ public class PatchReportApiUnitTest {
                 .build()
                 .create(DatabaseApiCaller.class);
 
-        Call<Void> patchReport = mockApiCaller.patchReport("Token "+token, auditor_id, report);
+        Call<Void> patchReport = mockApiCaller.patchReport("Token "+token, report_id, report);
 
         int actual_response_code = patchReport.execute().code();
         System.out.println("Actual response code: "+actual_response_code);
@@ -82,7 +82,7 @@ public class PatchReportApiUnitTest {
         System.out.println("Actual header response: "+request.getHeader("authorization"));
         assertEquals("Token fake token", request.getHeader("authorization"));
         System.out.println("Request line: "+request.getRequestLine());
-        assertEquals("PATCH /api/report/20/ HTTP/1.1", request.getRequestLine());
+        assertEquals("PATCH /api/report/1430/ HTTP/1.1", request.getRequestLine());
     }
 
 }

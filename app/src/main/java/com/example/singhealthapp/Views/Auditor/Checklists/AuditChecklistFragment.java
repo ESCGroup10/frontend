@@ -2,7 +2,6 @@ package com.example.singhealthapp.Views.Auditor.Checklists;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -23,14 +22,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.CustomViewSettings;
-import com.example.singhealthapp.HelperClasses.DateOperations;
 import com.example.singhealthapp.HelperClasses.EspressoCountingIdlingResource;
 import com.example.singhealthapp.HelperClasses.HandleImageOperations;
 import com.example.singhealthapp.HelperClasses.HandlePhotoInterface;
@@ -41,8 +38,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
-import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
-import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
+import com.example.singhealthapp.Views.Common.StatusConfirmation.StatusConfirmationFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +46,6 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.FutureTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;

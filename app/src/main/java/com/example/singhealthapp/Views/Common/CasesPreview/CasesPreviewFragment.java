@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.CasesPreview;
+package com.example.singhealthapp.Views.Common.CasesPreview;
 
 import android.content.Context;
 import android.content.SharedPreferences;

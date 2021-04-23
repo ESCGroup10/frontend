@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.StatusConfirmation;
+package com.example.singhealthapp.Views.Common.StatusConfirmation;
 
 import android.content.Context;
 import android.content.SharedPreferences;

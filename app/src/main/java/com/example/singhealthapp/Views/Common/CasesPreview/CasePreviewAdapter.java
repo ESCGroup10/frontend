@@ -1,23 +1,17 @@
-package com.example.singhealthapp.Views.Auditor.CasesPreview;
+package com.example.singhealthapp.Views.Common.CasesPreview;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.singhealthapp.HelperClasses.CasePreviewNavigateListener;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.Models.Case;
-import com.example.singhealthapp.Views.Tenant.CaseExpanded;
 
 import java.util.List;
 

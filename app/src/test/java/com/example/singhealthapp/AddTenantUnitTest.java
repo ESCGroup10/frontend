@@ -1,11 +1,7 @@
 package com.example.singhealthapp;
 
-import android.widget.Toast;
-
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Token;
-import com.example.singhealthapp.Models.User;
-import com.example.singhealthapp.Views.Login.LoginActivity;
 
 import org.junit.Before;
 import org.junit.Test;

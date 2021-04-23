@@ -2,13 +2,11 @@ package com.example.singhealthapp;
 import android.text.InputType;
 import android.view.Gravity;
 
-import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
 import com.example.singhealthapp.Containers.AuditorFragmentContainer;
-import com.example.singhealthapp.Views.Auditor.AddTenant.AddTenantFragment;
-import com.example.singhealthapp.Views.Login.LoginActivity;
+
 import androidx.test.espresso.contrib.DrawerActions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -18,14 +16,11 @@ import org.junit.runner.RunWith;
 import java.util.Random;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.DrawerMatchers.isClosed;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withInputType;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;

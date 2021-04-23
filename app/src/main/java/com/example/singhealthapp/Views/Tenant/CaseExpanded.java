@@ -25,9 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 
-import com.example.singhealthapp.Containers.TenantFragmentContainer;
 import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.HelperClasses.CustomViewSettings;
@@ -40,8 +38,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
-import com.example.singhealthapp.Views.Auditor.StatusConfirmation.StatusConfirmationFragment;
-import com.example.singhealthapp.Views.Login.LoginActivity;
+import com.example.singhealthapp.Views.Common.StatusConfirmation.StatusConfirmationFragment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,7 +58,6 @@ import static android.app.Activity.RESULT_OK;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.example.singhealthapp.HelperClasses.DateOperations.convertDatabaseDateToReadableDate;
-import static java.lang.Thread.yield;
 
 public class CaseExpanded extends CustomFragment implements IOnBackPressed {
     private static final String TAG = "CaseExpanded";

@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Auditor.ReportSummary;
+package com.example.singhealthapp.Views.Common.ReportSummary;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,7 +18,7 @@ import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Case;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Auditor.CasesPreview.CasesPreviewFragment;
+import com.example.singhealthapp.Views.Common.CasesPreview.CasesPreviewFragment;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.data.BarData;

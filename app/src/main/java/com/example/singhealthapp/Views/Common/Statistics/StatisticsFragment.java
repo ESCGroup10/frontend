@@ -1,8 +1,7 @@
-package com.example.singhealthapp.Views.Statistics;
+package com.example.singhealthapp.Views.Common.Statistics;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
@@ -26,7 +25,6 @@ import com.google.android.material.tabs.TabLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -1,6 +1,7 @@
 package com.example.singhealthapp.Containers;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -31,9 +32,9 @@ import com.example.singhealthapp.Views.Auditor.Checklists.AuditChecklistFragment
 import com.example.singhealthapp.Views.Auditor.Checklists.ChecklistAdapter;
 import com.example.singhealthapp.HelperClasses.IOnBackPressed;
 import com.example.singhealthapp.Views.Auditor.TenantsPreview.TenantsPreviewFragment;
-import com.example.singhealthapp.Views.ReportsPreview.ReportsPreviewFragment;
-import com.example.singhealthapp.Views.Login.LoginActivity;
-import com.example.singhealthapp.Views.Statistics.StatisticsFragment;
+import com.example.singhealthapp.Views.Common.ReportsPreview.ReportsPreviewFragment;
+import com.example.singhealthapp.Views.Common.Login.LoginActivity;
+import com.example.singhealthapp.Views.Common.Statistics.StatisticsFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;

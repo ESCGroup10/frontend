@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Token;
-import com.example.singhealthapp.Views.Login.LoginActivity;
 
 import retrofit2.Call;
 import retrofit2.Callback;

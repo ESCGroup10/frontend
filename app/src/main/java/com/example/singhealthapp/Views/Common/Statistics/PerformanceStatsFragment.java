@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Statistics;
+package com.example.singhealthapp.Views.Common.Statistics;
 
 import android.content.Context;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.ReportsPreview;
+package com.example.singhealthapp.Views.Common.ReportsPreview;
 
 import android.view.LayoutInflater;
 import android.view.View;

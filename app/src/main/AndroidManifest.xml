@@ -28,11 +28,11 @@
 
         <activity android:name=".Containers.AuditorFragmentContainer"
             android:screenOrientation="portrait"
-            android:parentActivityName=".Views.Login.LoginActivity" />
+            android:parentActivityName=".Views.Common.Login.LoginActivity" />
         <activity android:name=".Containers.TenantFragmentContainer"
             android:screenOrientation="portrait"
-            android:parentActivityName=".Views.Login.LoginActivity" />
-        <activity android:name=".Views.Login.LoginActivity"
+            android:parentActivityName=".Views.Common.Login.LoginActivity" />
+        <activity android:name=".Views.Common.Login.LoginActivity"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

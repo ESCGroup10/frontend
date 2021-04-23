@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Statistics;
+package com.example.singhealthapp.Views.Common.Statistics;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
@@ -27,8 +26,6 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter;
-import com.github.mikephil.charting.formatter.DefaultValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 

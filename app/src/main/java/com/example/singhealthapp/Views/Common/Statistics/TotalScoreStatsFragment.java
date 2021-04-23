@@ -1,4 +1,4 @@
-package com.example.singhealthapp.Views.Statistics;
+package com.example.singhealthapp.Views.Common.Statistics;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,15 +15,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 
 import com.example.singhealthapp.HelperClasses.CustomFragment;
-import com.example.singhealthapp.HelperClasses.CentralisedToast;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.Models.Report;
 import com.example.singhealthapp.Models.User;
 import com.example.singhealthapp.R;
-import com.example.singhealthapp.Views.Login.LoginActivity;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -38,7 +35,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import retrofit2.Call;
 import retrofit2.Callback;

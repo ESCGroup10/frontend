@@ -4,7 +4,7 @@ package com.example.singhealthapp;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
-import com.example.singhealthapp.Views.Login.LoginActivity;
+import com.example.singhealthapp.Views.Common.Login.LoginActivity;
 
 import org.junit.Rule;
 import org.junit.Test;
