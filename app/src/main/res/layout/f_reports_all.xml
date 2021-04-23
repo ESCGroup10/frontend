@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
             android:maxLines="1"
-            android:hint="Search Report" />
+            android:inputType="text"
+            android:hint="Search By Date" />
         <Button
             android:id="@+id/reportPreviewSearchButton"
             android:layout_margin="20dp"

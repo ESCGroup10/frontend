@@ -1,14 +1,20 @@
 package com.example.singhealthapp;
 
 
+import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
 import com.example.singhealthapp.Views.Common.Login.LoginActivity;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.example.singhealthapp.HelperClasses.StandardHelperMethods.sleep;
 import static org.hamcrest.CoreMatchers.not;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -21,12 +27,17 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
-// Instrumented test for UI
-// ensure that users only navigate to homepage if they successfully log in
 
-// Robustness test:
-// if users key in the wrong email/password for 5 times, the login button will be disabled for 10s
-// saboteurs will take much longer for brute force login attacks to succeed (much harder)
+/**
+ * Precondition: Start the test after logging out
+ *
+ * Instrumented test for UI
+ * ensure that users only navigate to homepage if they successfully log in
+ *
+ * Robustness test:
+ *              if users key in the wrong email/password for 5 times, the login button will be disabled for 10s
+ *              saboteurs will take much longer for brute force login attacks to succeed (much harder)
+ * */
 
 @RunWith(AndroidJUnit4ClassRunner.class)
 public class LoginInstrumentedTest {

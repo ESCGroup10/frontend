@@ -3,6 +3,7 @@ package com.example.singhealthapp;
 import android.view.Gravity;
 
 import androidx.test.espresso.contrib.DrawerActions;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
@@ -21,6 +22,8 @@ import static androidx.test.espresso.contrib.DrawerMatchers.isClosed;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.example.singhealthapp.HelperClasses.StandardHelperMethods.clickChildViewWithId;
+import static com.example.singhealthapp.HelperClasses.StandardHelperMethods.sleep;
 
 @RunWith(AndroidJUnit4ClassRunner.class)
 public class CasePreviewInstrumentedTest {
@@ -35,16 +38,15 @@ public class CasePreviewInstrumentedTest {
                 .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
                 .perform(DrawerActions.open());
         onView(withId(R.id.nav_Reports)).perform(click());
-        Thread.sleep(2000);
-        onView(withText("Report 4")).check(matches(isDisplayed())).perform(click());
-        Thread.sleep(1000);
-        onView(withId(R.id.CasesPreview)).perform(swipeUp());
-        onView(withId(R.id.auditorReportViewCases))
-                .perform(click());
     }
 
     @Test
     public void TestViewCase() {
-        onView(withText("Case 11")).check(matches(isDisplayed()));
+        onView(withId(R.id.reports)).check(matches(isDisplayed()));
+
+        sleep(5);
+        onView(withId(R.id.reportPreviewRecyclerViewUnresolved)).perform(
+                RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.card_report)));
+        onView(withId(R.id.summaryReportScrollView)).check(matches(isDisplayed()));
     }
 }

@@ -41,7 +41,6 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
     ReportPreviewAuditorAdapter adapterUnresolved, adapterCompleted;
     private ArrayList<ReportPreview> reportPreviews, displayPreviews;
     private ArrayList<Report> reports, displayReports;
-    boolean unresolved, completed;
     String token, userType;
 
     @Nullable
@@ -84,19 +83,19 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
             displayRecycleView(displayPreviews, displayReports);
         });
         view.findViewById(R.id.reportPreviewUnresolvedButton).setOnClickListener(v -> {
-            if ( reportPreviews.isEmpty() ) {
-                return;
+            if (getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved).getVisibility() == View.VISIBLE) {
+                getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved).setVisibility(View.GONE);
             } else {
-                Log.d(TAG, "onCreateView: reportPreviews len: "+reportPreviews.size());
+                getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved).setVisibility(View.VISIBLE);
             }
-            unresolved = !unresolved;
-            displayRecycleView(displayPreviews, displayReports);
         });
 
         view.findViewById(R.id.reportPreviewCompletedButton).setOnClickListener(v -> {
-            if ( reportPreviews.isEmpty() ) return;
-            completed = !completed;
-            displayRecycleView(displayPreviews, displayReports);
+            if (getView().findViewById(R.id.reportPreviewRecyclerView).getVisibility() == View.VISIBLE) {
+                getView().findViewById(R.id.reportPreviewRecyclerView).setVisibility(View.GONE);
+            } else {
+                getView().findViewById(R.id.reportPreviewRecyclerView).setVisibility(View.VISIBLE);
+            }
         });
         return view;
     }
@@ -123,10 +122,8 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
     }
 
     private void queuePreviews(String token){
-//        Log.d(TAG, "queuePreviews: called");
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com/").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-//        Log.d(TAG, "queuePreviews: getting report preview with token: "+token);
         Call<List<ReportPreview>> call = apiCaller.getReportPreview("Token " + token);
         call.enqueue(new Callback<List<ReportPreview>>() {
             @Override
@@ -136,11 +133,8 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
                     return ;
                 }
                 Log.d(TAG, "queuePreviews onResponse: "+response.code());
-//                Log.d(TAG, "queuePreviews response body: "+response.body().toString());
                 reportPreviews.addAll(response.body());
                 displayPreviews.addAll(response.body());
-//                Log.d(TAG, "queueReport len of reportPreviews: "+reportPreviews.size());
-//                Log.d(TAG, "queueReport len of displayPreviews: "+displayPreviews.size());
                 queueReport(token, response.body());
             }
             @Override
@@ -151,10 +145,8 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
     }
 
     private void queueReport(String token, List<ReportPreview> reportPreviews){
-//        Log.d(TAG, "queueReport: called");
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://esc10-303807.et.r.appspot.com").addConverterFactory(GsonConverterFactory.create()).build();
         DatabaseApiCaller apiCaller = retrofit.create(DatabaseApiCaller.class);
-//        Log.d(TAG, "queuePreviews: getting report with token: "+token);
         Call<List<Report>> call = apiCaller.getReport("Token " + token);
         call.enqueue(new Callback<List<Report>>() {
             @Override
@@ -163,18 +155,9 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
                     Toast.makeText(getContext(), "Unsuccessful: response code " + response.code(), Toast.LENGTH_LONG).show();
                     return ;
                 }
-//                Log.d(TAG, "queueReport onResponse: tenant id gotten from queueReport: "+response.body().get(0).getTenant_id());
-//                System.out.println(response.body().get(0).getTenant_id());
-//                Log.d(TAG, "queueReport response body: "+response.body().toString());
                 reports.addAll(response.body());
                 displayReports.addAll(response.body());
-//                Log.d(TAG, "queueReport len of reports: "+reports.size());
-//                Log.d(TAG, "queueReport len of displayReports: "+displayReports.size());
-                unresolved = true;
-                completed = true;
                 displayRecycleView(displayPreviews, response.body());
-//                TextView textView = getView().findViewById(R.id.reportPreviewSearch);
-//                if(!textView.getText().toString().isEmpty()) getView().findViewById(R.id.reportPreviewSearchButton).performClick();
             }
             @Override
             public void onFailure(Call<List<Report>> call, Throwable t) {
@@ -192,7 +175,6 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
         ArrayList<Integer> Invalid = new ArrayList<>();
         for ( Report o : reports ){
             if (! isDataValid(o)) {
-//                Log.d(TAG, "displayRecycleView: adding to invalid");
                 Invalid.add(o.getId());
                 continue;
             }
@@ -204,28 +186,12 @@ public class ReportsPreviewFragment extends CustomFragment implements AuditorRep
         for ( ReportPreview o : reportPreviews ){
             if (Invalid.contains(o.getId())) continue;
             if ( ! o.isStatus() ) {
-//                Log.d(TAG, "displayRecycleView: adding to unresolvedPreview");
                 unresolvedPreview.add(o);
             }
             else {
-//                Log.d(TAG, "completedPreview: adding to unresolvedPreview");
                 completedPreview.add(o);
             }
         }
-        if ( ! unresolved ) {
-            unresolvedPreview.clear();
-            unresolvedReports.clear();
-        }
-        if ( ! completed ) {
-            completedPreview.clear();
-            completedReports.clear();
-        }
-//        Log.d(TAG, "displayRecycleView: unresolved: "+unresolved);
-//        Log.d(TAG, "displayRecycleView: completed: "+completed);
-//        Log.d(TAG, "displayRecycleView: unresolvedPreview size: "+unresolvedPreview.size());
-//        Log.d(TAG, "displayRecycleView: unresolvedReports size: "+unresolvedReports.size());
-//        Log.d(TAG, "displayRecycleView: completedPreview size: "+completedPreview.size());
-//        Log.d(TAG, "displayRecycleView: completedReports size: "+completedReports.size());
         adapterUnresolved = new ReportPreviewAuditorAdapter(unresolvedPreview, unresolvedReports, this, token);
         try {
             RecyclerView view = (RecyclerView) getView().findViewById(R.id.reportPreviewRecyclerViewUnresolved);

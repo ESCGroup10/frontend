@@ -126,7 +126,6 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
         onView(withId(R.id.nav_Add_Tenant)).perform(click());
         pressBack();
 
-//        onView(withId(16909135)).check(matches(isDisplayed())); //alert dialogue layout
         onView(withId(R.id.auditor_main_page)).check(matches(isDisplayed()));
     }
 
@@ -185,17 +184,13 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
         pressBack();
         onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
 
-        // check ReportSummaryFragment
+        // check ReportPreviewFragment
         NavAuditorContainerToReportsFragment();
         pressBack();
         onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
 
         // check AddTenantFragment
         NavAuditorContainerToAddTenantFragment();
-//        onView(withText("Cancel")).perform(click());
-//        sleep(2);
-//        pressBack();
-//        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
 
         // check SafetyChecklistFragment
         NavTenantExpandedToSafetyChecklist();
@@ -218,11 +213,5 @@ public class AuditorProjectLevelTest extends StandardHelperMethods {
         onView(withText("Set all questions to true and submit")).perform(click());
         onView(withText("Yes")).perform(click());
         onView(withId(R.id.statusConfirmationFragment)).check(matches(isDisplayed()));
-//        pressBack();
-//        sleep(2);
-//        onView(withId(R.id.tenantSearchFragment)).check(matches(isDisplayed()));
-//        onView(withId(R.id.button_return)).perform(click());
-//        pressBack();
-//        onView(withId(R.id.tenantRecycler)).check(matches(isDisplayed()));
     }
 }

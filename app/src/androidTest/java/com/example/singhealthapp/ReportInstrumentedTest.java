@@ -3,8 +3,10 @@ package com.example.singhealthapp;
 import android.text.InputType;
 import android.view.Gravity;
 
+import androidx.test.espresso.PerformException;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.contrib.DrawerActions;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
@@ -26,7 +28,14 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withInputType;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.example.singhealthapp.HelperClasses.StandardHelperMethods.clickChildViewWithId;
+import static com.example.singhealthapp.HelperClasses.StandardHelperMethods.sleep;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.StringContains.containsString;
+
+/**
+ * Precondition: Log in as auditor
+ * */
 
 @RunWith(AndroidJUnit4ClassRunner.class)
 public class ReportInstrumentedTest {
@@ -41,36 +50,40 @@ public class ReportInstrumentedTest {
                 .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
                 .perform(DrawerActions.open());
         onView(withId(R.id.nav_Reports)).perform(click());
-        Thread.sleep(2000);
+        sleep(2);
     }
 
     @Test
     public void TestViewReport() {
-        onView(withText("Report 4")).check(matches(isDisplayed()));
+        onView(withId(R.id.reportPreviewUnresolvedButton)).check(matches(isDisplayed()));
     }
 
     @Test
     public void TestHideReport() {
+        sleep(2);
         onView(withId(R.id.reportPreviewUnresolvedButton)).perform(click());
-        onView(withText("Report 4")).check(doesNotExist());
-        onView(withText("Report 6")).check(matches(isDisplayed()));
+        try {
+            onView(withId(R.id.reportPreviewRecyclerViewUnresolved)).perform(
+                    RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.card_report)));
+        } catch (PerformException e) {
+            // pass
+        }
 
     }
 
     @Test
     public void TestSearchReport() {
-        onView(withInputType(InputType.TYPE_CLASS_TEXT)).perform(typeText("2021-03-22 08:37:44"));
+        onView(withId(R.id.reportPreviewRecyclerViewUnresolved)).check(matches(isDisplayed()));
+        onView(withInputType(InputType.TYPE_CLASS_TEXT)).perform(typeText("2020-03-22"));
         onView(withId(R.id.reportPreviewSearchButton)).perform(click());
-        onView(withText("Report 4")).check(matches(isDisplayed()));
-        onView(withText("Report 6")).check(doesNotExist());
+        onView(withId(R.id.reportPreviewRecyclerViewUnresolved)).check(matches(not(isDisplayed())));
 
     }
 
     @Test
     public void TestClickTest() throws InterruptedException {
-        onView(withText("Report 4")).perform(click());
-        onView(withId(R.id.auditorReportViewCases)).check(matches(isDisplayed()));
-        Thread.sleep(1000);
-        onView(withId(R.id.auditorReportResolved)).check(matches(withText(containsString("2"))));
+        onView(withId(R.id.reportPreviewRecyclerViewUnresolved)).perform(
+                RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.card_report)));
+        onView(withId(R.id.summaryReportScrollView)).check(matches(isDisplayed()));
     }
 }

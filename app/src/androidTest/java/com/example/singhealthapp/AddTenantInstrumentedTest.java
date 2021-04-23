@@ -40,12 +40,13 @@ public class AddTenantInstrumentedTest {
                 .perform(DrawerActions.open());
         onView(withId(R.id.nav_Add_Tenant)).perform(click());
         Thread.sleep(100);
+        onView(withText("Cancel")).perform(click());
     }
 
     @Test
     public void TestEmptyFieldInput(){
         onView(withId(R.id.addTenantConfirm)).perform(click());
-        onView(withText("ERROR")).check(matches(isDisplayed()));
+        onView(withText("OK")).check(matches(isDisplayed()));
     }
 
     @Test
@@ -59,7 +60,7 @@ public class AddTenantInstrumentedTest {
         fillText("TestInstitution", R.id.text6);
 
         onView(withId(R.id.addTenantConfirm)).perform(click());
-        onView(withText("SUCCESS")).check(matches(isDisplayed()));
+        onView(withText("Success")).check(matches(isDisplayed()));
     }
 
     static void fillText(String string, Integer id){
@@ -74,8 +75,8 @@ public class AddTenantInstrumentedTest {
         fillText("TestCompany", R.id.text3);
         onView(withId(R.id.text4)).perform(click());
         onView(withInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)).perform(typeText("w"+"@test.u"));
-        onView(withText("OK")).perform(click());
-        onView(withText("ERROR")).check(matches(isDisplayed()));
+        onView(withText("Ok")).perform(click());
+        onView(withText("Invalid email format")).check(matches(isDisplayed()));
     }
 
     static String generateString(int length){
