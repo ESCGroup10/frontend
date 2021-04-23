@@ -125,7 +125,8 @@ public class TotalScoreStatsFragment extends CustomFragment implements Statistic
     }
 
     private void plotChart() {
-        getActivity().runOnUiThread(() -> {
+//        getActivity().runOnUiThread(() -> {
+        new Thread(()->{
 
             if (!scores.isEmpty()) {
                 LineDataSet set, set1, set2, set3, set4, set5, set6;

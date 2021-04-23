@@ -10,11 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.singhealthapp.HelperClasses.CustomFragment;
 import com.example.singhealthapp.Models.DatabaseApiCaller;
 import com.example.singhealthapp.R;
 
 
-public class PerformanceStatsFragment extends Fragment implements StatisticsFragment.TenantIdUpdateListener {
+public class PerformanceStatsFragment extends CustomFragment implements StatisticsFragment.TenantIdUpdateListener {
 
     public static PerformanceStatsFragment getInstance() {
         return new PerformanceStatsFragment();

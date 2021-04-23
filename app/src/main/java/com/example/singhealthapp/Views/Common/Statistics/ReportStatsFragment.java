@@ -149,8 +149,8 @@ public class ReportStatsFragment extends CustomFragment implements StatisticsFra
     }
 
     private void plotChart() {
-        getActivity().runOnUiThread(() -> {
-
+//        getActivity().runOnUiThread(() -> {
+        new Thread(()->{
             if (!reportCount.isEmpty()) {
             LineDataSet set1, set2;
             set1 = new LineDataSet(reportCount, "No. of Reported Cases ");

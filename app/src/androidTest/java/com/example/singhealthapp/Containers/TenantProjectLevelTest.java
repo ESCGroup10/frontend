@@ -52,7 +52,7 @@ public class TenantProjectLevelTest extends StandardHelperMethods {
     @Before
     public void setUp() {
         // register idling resources here
-        rule.getScenario().onActivity(TenantFragmentContainer::activateEspressoIdlingResource);
+//        rule.getScenario().onActivity(TenantFragmentContainer::activateEspressoIdlingResource);
         IdlingRegistry.getInstance().register(EspressoCountingIdlingResource.getIdlingResource());
     }
 
@@ -113,25 +113,23 @@ public class TenantProjectLevelTest extends StandardHelperMethods {
         onView(withId(R.id.CasesPreview)).check(matches(isDisplayed()));
     }
 
-//    @Test
-//    public void CasesPreviewFragmentToCaseExpanded() {
-//        ReportSummaryFragmentToCasesPreviewFragment();
-//        sleep(5);
-//        onView(withId(R.id.casePreviewRecyclerViewUnresolved)).perform(
-//                RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.casePreviewCard)));
-//        onView(withId(R.id.fragment_expanded_case)).check(matches(isDisplayed()));
-//    }
-//
-//    @Test
-//    public void CaseExpandedToStatusConfirmationFragment() {
-//        // We cannot test setting a picture so we will test trying to submit without a picture
-//        CasesPreviewFragmentToCaseExpanded();
-//        onView(withId(R.id.resolveButton)).perform(click());
-//        onView(withId(R.id.fragment_expanded_case)).perform(swipeUp());
-//        onView(withId(R.id.confirmButton)).perform(click());
-//        onView(withId(R.id.fragment_expanded_case)).check(matches(isDisplayed()));
-//    }
+    @Test
+    public void CasesPreviewFragmentToCaseExpanded() {
+        ReportSummaryFragmentToCasesPreviewFragment();
+        sleep(5);
+        onView(withId(R.id.casePreviewRecyclerViewUnresolved)).perform(
+                RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.casePreviewCard)));
+        onView(withId(R.id.fragment_expanded_case)).check(matches(isDisplayed()));
+    }
 
-
+    @Test
+    public void CaseExpandedToStatusConfirmationFragment() {
+        // We cannot test setting a picture so we will test trying to submit without a picture
+        CasesPreviewFragmentToCaseExpanded();
+        onView(withId(R.id.resolveButton)).perform(click());
+        onView(withId(R.id.fragment_expanded_case)).perform(swipeUp());
+        onView(withId(R.id.confirmButton)).perform(click());
+        onView(withId(R.id.fragment_expanded_case)).check(matches(isDisplayed()));
+    }
 
 }
